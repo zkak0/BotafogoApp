@@ -1,0 +1,1574 @@
+<!DOCTYPE html>
+<html lang="es" class=""> <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deportivo Botafogo - App Gestión</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css" integrity="sha512-hvNR0F/e2J7zPPfLC9auFe3/SE0yG4aJCOd/qxew74NN7eyiSKjr7xJJMu1Jy2wf7FXITpWS1E/RY8yzuXN7VA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+		<script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <style>
+        /* --- Estilos CSS (sin cambios) --- */
+        :root {
+            --bg-primary: #f9fafb;      /* gray-50 */
+            --bg-secondary: #ffffff;    /* white */
+            --bg-sidebar: #e5e7eb;      /* gray-200 */
+            --bg-sidebar-hover: #d1d5db; /* gray-300 */
+            --text-primary: #1f2937;    /* gray-800 */
+            --text-secondary: #6b7280;  /* gray-500 */
+            --text-sidebar: #374151;    /* gray-700 */
+            --text-sidebar-title: #111827; /* gray-900 */
+            --text-sidebar-hover: #111827; /* gray-900 */
+            --border-color: #e5e7eb;    /* gray-200 */
+            --border-input: #d1d5db;    /* gray-300 */
+            --border-input-focus: #2563eb; /* blue-600 */
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --link-color: #2563eb;      /* blue-600 */
+            --link-hover-color: #1d4ed8; /* blue-700 */
+            --button-action-bg: #2563eb; /* blue-600 */
+            --button-action-hover-bg: #1d4ed8; /* blue-700 */
+            --sidebar-border-color: #d1d5db; /* gray-300 */
+            --button-green-bg: #16a34a; /* green-600 */
+            --button-green-hover-bg: #15803d; /* green-700 */
+            --button-cancel-text: #4b5563; /* gray-600 */
+            --button-cancel-hover-bg: #f3f4f6; /* gray-100 */
+        }
+        html.dark {
+            --bg-primary: #111827;      /* gray-900 */
+            --bg-secondary: #1f2937;    /* gray-800 */
+            --bg-sidebar: #1f2937;      /* gray-800 */
+            --bg-sidebar-hover: #374151; /* gray-700 */
+            --text-primary: #f9fafb;    /* gray-50 */
+            --text-secondary: #9ca3af;  /* gray-400 */
+            --text-sidebar: #d1d5db;    /* gray-300 */
+            --text-sidebar-title: #f9fafb; /* gray-50 */
+            --text-sidebar-hover: #ffffff; /* white */
+            --border-color: #374151;    /* gray-700 */
+            --border-input: #4b5563;    /* gray-600 */
+            --border-input-focus: #60a5fa; /* blue-400 */
+            --shadow-color: rgba(0, 0, 0, 0.4);
+            --link-color: #60a5fa;      /* blue-400 */
+            --link-hover-color: #93c5fd; /* blue-300 */
+            --button-action-bg: #60a5fa; /* blue-400 */
+            --button-action-hover-bg: #3b82f6; /* blue-500 */
+            --sidebar-border-color: #4b5563; /* gray-600 */
+            --button-green-bg: #22c55e; /* green-500 */
+            --button-green-hover-bg: #16a34a; /* green-600 */
+            --button-cancel-text: #d1d5db; /* gray-300 */
+            --button-cancel-hover-bg: #374151; /* gray-700 */
+        }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-primary); color: var(--text-primary); transition: background-color 0.3s ease, color 0.3s ease; }
+        #login-screen { display: flex; justify-content: center; align-items: center; min-height: 100vh; background-color: var(--bg-primary); }
+        .login-box { background-color: var(--bg-secondary); box-shadow: 0 10px 15px -3px var(--shadow-color), 0 4px 6px -2px var(--shadow-color); padding: 2.5rem; border-radius: 0.5rem; width: 100%; max-width: 28rem; text-align: center;}
+        .login-logo { max-width: 200px; height: auto; margin-bottom: 1.5rem; margin-left: auto; margin-right: auto; }
+        .login-input { border-color: var(--border-input); background-color: var(--bg-secondary); color: var(--text-primary); appearance-none; display: block; width: 100%; padding: 0.75rem; border-radius: 0.375rem; box-shadow: inset 0 1px 2px rgba(0,0,0,0.075); margin-bottom: 1rem; transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;}
+        .login-input::placeholder { color: var(--text-secondary); }
+        .login-input:focus { outline: none; border-color: var(--border-input-focus); box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.3); }
+        .login-button { display: inline-flex; justify-content: center; width: 100%; padding: 0.75rem 1rem; border: 1px solid transparent; background-color: var(--button-action-bg); color: white; font-weight: 600; font-size: 0.875rem; border-radius: 0.375rem; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); cursor: pointer; transition: background-color 0.15s ease-in-out; }
+        .login-button:hover { background-color: var(--button-action-hover-bg); }
+        .login-error { color: #dc2626; min-height: 1.25rem; /* Para evitar saltos de layout */ }
+        #app-screen { display: none; }
+        .sidebar { background-color: var(--bg-sidebar); color: var(--text-sidebar); transition: width 0.3s ease; flex-shrink: 0; }
+        .sidebar-title { color: var(--text-sidebar-title); font-weight: 700; }
+        .sidebar-nav ul { list-style: none; padding: 0; margin: 0; }
+        .sidebar-nav ul li a { padding: 10px 16px; display: flex; align-items: center; transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out; color: var(--text-sidebar); border-radius: 0.375rem; }
+        .sidebar-nav ul li a i { margin-right: 10px; font-size: 1.25rem; width: 20px; text-align: center; }
+        .sidebar-nav ul li a:hover { background-color: var(--bg-sidebar-hover); color: var(--text-sidebar-hover); }
+        .sidebar .border-t { border-color: var(--sidebar-border-color); }
+        .collapse-button { color: var(--text-sidebar); }
+        .collapse-button:hover { color: var(--text-sidebar-hover); }
+        #logout-button { color: var(--text-sidebar); padding-top: 0.75rem; padding-bottom: 0.75rem; }
+        #logout-button:hover { background-color: var(--bg-sidebar-hover); color: var(--text-sidebar-hover); }
+        aside.sidebar-collapsed { width: 80px !important; padding-left: 10px; padding-right: 10px; }
+        .sidebar-collapsed .menu-item-text span { display: none; }
+        .sidebar-collapsed .sidebar-nav ul li a { justify-content: center; padding: 10px 0; }
+        .sidebar-collapsed .sidebar-nav ul li a i { margin-right: 0; }
+        .sidebar-collapsed .sidebar-title { display: none; }
+        .sidebar-collapsed #logout-button span { display: none; }
+        .sidebar-collapsed #logout-button i { margin-right: 0; }
+        .flex-container { display: flex; }
+        .flex-main { flex-grow: 1; position: relative; background-color: var(--bg-primary); }
+        #main-title { color: var(--text-primary); }
+        #content-area p { color: var(--text-secondary); }
+        #content-area .bg-white { background-color: var(--bg-secondary); }
+        #content-area h2 { color: var(--text-primary); }
+        #content-area label, #content-area span { color: var(--text-primary); }
+        #content-area .text-gray-500 { color: var(--text-secondary); }
+        #content-area .bg-gray-50 { background-color: var(--bg-primary); border-color: var(--border-color); }
+        #content-area table { border-color: var(--border-input); }
+        #content-area thead { background-color: var(--bg-secondary); }
+        #content-area th { color: var(--text-secondary); border-color: var(--border-color); font-weight: 600; }
+        #content-area tbody { background-color: var(--bg-secondary); } /* Removed divide-color from here */
+        #content-area tbody tr { border-bottom: 1px solid var(--border-color); } /* Added border for rows */
+        #content-area tbody tr:last-child { border-bottom: none; }
+        #content-area td { color: var(--text-primary); border-color: var(--border-color); }
+        #content-area tr:hover { background-color: var(--bg-primary); }
+        ::placeholder { color: var(--text-secondary); opacity: 1; }
+        :-ms-input-placeholder { color: var(--text-secondary); }
+        ::-ms-input-placeholder { color: var(--text-secondary); }
+        .action-button { cursor: pointer; transition: color 0.15s ease-in-out; }
+        .hidden-file-input { width: 0.1px; height: 0.1px; opacity: 0; overflow: hidden; position: absolute; z-index: -1; }
+        .file-input-label { cursor: pointer; display: inline-flex; align-items: center; padding: 0.5rem 1rem; background-color: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border-input); border-radius: 0.375rem; font-weight: 500; transition: background-color 0.2s ease-in-out; }
+        .file-input-label:hover { background-color: var(--bg-primary); }
+        .file-input-label i { margin-right: 0.5rem; }
+        .form-input-base { display: block; width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--border-input); border-radius: 0.375rem; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); color: var(--text-primary); background-color: var(--bg-secondary); font-size: 0.875rem; }
+        .form-input-base::placeholder { color: var(--text-secondary); }
+        .form-input-base:focus { outline: none; border-color: var(--border-input-focus); box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.3); }
+        .form-select-base { background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e"); background-position: right 0.5rem center; background-repeat: no-repeat; background-size: 1.5em 1.5em; padding-right: 2.5rem; appearance: none; } /* Added appearance: none */
+        html.dark .form-select-base { background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e"); }
+        .edit-user-button { background-color: #fbbf24; color: #78350f; }
+        .edit-user-button:hover { background-color: #f59e0b; }
+        html.dark .edit-user-button { background-color: #fcd34d; color: #78350f; }
+        html.dark .edit-user-button:hover { background-color: #fbbf24; }
+        #add-user-error { color: #dc2626; min-height: 1.25rem; /* Para evitar saltos de layout */ }
+        /* Botones de acción en tablas */
+        .action-button[data-action="generate-pdf"] { color: var(--link-color); }
+        .action-button[data-action="generate-pdf"]:hover { color: var(--link-hover-color); }
+        .action-button[data-action="edit"] { color: #ca8a04; } /* yellow-600 */
+        .action-button[data-action="edit"]:hover { color: #a16207; } /* yellow-700 */
+        html.dark .action-button[data-action="edit"] { color: #fcd34d; } /* yellow-300 */
+        html.dark .action-button[data-action="edit"]:hover { color: #fbbf24; } /* yellow-400 */
+        .action-button[data-action="delete"] { color: #dc2626; } /* red-600 */
+        .action-button[data-action="delete"]:hover { color: #b91c1c; } /* red-700 */
+        html.dark .action-button[data-action="delete"] { color: #f87171; } /* red-400 */
+        html.dark .action-button[data-action="delete"]:hover { color: #fb7185; } /* red-300 */
+        /* Botones principales de formularios */
+        #form-tramite button[type=submit], #form-autorizacion button[type=submit], #form-add-user #user-submit-button[class*="bg-green"], #generate-button { background-color: var(--button-action-bg); color: white; }
+        #form-tramite button[type=submit]:hover, #form-autorizacion button[type=submit]:hover, #form-add-user #user-submit-button[class*="bg-green"]:hover, #generate-button:hover { background-color: var(--button-action-hover-bg); }
+        /* Botón Agregar específicamente */
+        #form-add-user #user-submit-button { background-color: var(--button-green-bg); color: white; }
+        #form-add-user #user-submit-button:hover { background-color: var(--button-green-hover-bg); }
+        #form-add-user #user-cancel-button { border-color: var(--border-input); background-color: var(--bg-secondary); color: var(--text-secondary); }
+        #form-add-user #user-cancel-button:hover { background-color: var(--bg-primary); }
+        /* --- Estilos Foto Carnet --- */
+        .cropper-container-wrapper { max-width: 500px; height: 400px; margin-top: 0.5rem; border: 1px dashed var(--border-color); background-color: var(--bg-primary); }
+        #cropper-image { display: block; max-width: 100%; max-height: 100%; /* Para asegurar que la imagen no desborde el contenedor del cropper */ }
+        .result-canvas-container { margin-top: 1rem; padding: 1rem; border: 1px solid var(--border-input); background-color: var(--bg-primary); border-radius: 0.375rem; text-align: center; min-height: 150px; }
+        #result-canvas { border: 1px solid var(--border-color); max-width: 100%; height: auto; display: none; margin: 0 auto; }
+        .button-group button, .button-group .file-input-label { margin-right: 0.5rem; margin-bottom: 0.5rem; }
+        .button-group button:last-child, .button-group .file-input-label:last-child { margin-right: 0; }
+        .form-section { margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color); }
+        /* Input de 1 letra */
+        .single-char-input {
+             width: 2.25rem; /* w-9, un poco más ancho */
+             height: 2.25rem; /* h-9, un poco más alto */
+             text-align: center;
+             padding: 0.25rem; /* p-1 */
+             margin-left: 0.25rem; /* ml-1 */
+             margin-right: 0.5rem; /* mr-2 */
+             border-width: 1px;
+             border-radius: 0.375rem; /* rounded-md, más redondeado */
+             border-color: var(--border-input);
+             background-color: var(--bg-secondary);
+             color: var(--text-primary);
+             text-transform: uppercase; /* Para que sea mayúscula */
+             font-size: 0.875rem; /* text-sm */
+        }
+         .single-char-input:focus {
+             outline: none;
+             border-color: var(--border-input-focus);
+             box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.3);
+         }
+        /* Botón Dark Mode */
+         #dark-mode-toggle {
+             position: fixed; /* Cambiado a fixed para que no se mueva con el scroll */
+             top: 1rem;
+             right: 1rem;
+             background-color: var(--bg-secondary);
+             color: var(--text-secondary);
+             border: 1px solid var(--border-color);
+             border-radius: 9999px; /* rounded-full */
+             padding: 0.5rem;
+             cursor: pointer;
+             transition: background-color 0.2s ease, color 0.2s ease;
+             z-index: 50; /* Para que esté sobre otros elementos */
+             width: 2.5rem; height: 2.5rem; /* w-10 h-10 */
+             display: flex; align-items: center; justify-content: center;
+         }
+          #dark-mode-toggle:hover {
+             background-color: var(--bg-primary);
+             color: var(--text-primary);
+          }
+         #dark-mode-toggle i { font-size: 1.1rem; }
+    </style>
+    </head>
+<body class="bg-primary">
+    <div id="login-screen">
+        <div class="login-box">
+            <img src="https://i.imgur.com/IAVAqup.jpeg" alt="Logo Botafogo" class="login-logo" onerror="this.src='https://placehold.co/200x100/cccccc/333333?text=LOGO'; this.onerror=null;">
+            <h2 class="text-2xl font-bold text-primary mb-6">Bienvenido a Botafogo App</h2>
+            <form id="login-form">
+                <div>
+                    <label for="username" class="sr-only">Usuario</label>
+                    <input type="text" id="username" name="username" class="login-input" placeholder="Usuario" required>
+                </div>
+                <div>
+                    <label for="password" class="sr-only">Clave</label>
+                    <input type="password" id="password" name="password" class="login-input" placeholder="Clave" required>
+                </div>
+                <div id="login-error-message" class="login-error mt-2 text-sm"></div>
+                <button type="submit" class="login-button mt-4">Ingresar</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="app-screen" class="min-h-screen flex-container">
+        <aside class="w-64 bg-sidebar text-sidebar p-6 space-y-6 rounded-r-lg flex flex-col justify-between sidebar" id="sidebar">
+            <div>
+                <div class="text-2xl font-bold mb-6 sidebar-title text-sidebar-title">Botafogo App</div>
+                <nav class="sidebar-nav">
+                    <ul class="space-y-2">
+                        <li><a href="#" class="block rounded transition duration-200 px-4 py-2.5 text-sm font-medium hover:bg-sidebar-hover hover:text-sidebar-hover menu-item-text" id="menu-tramite"><i class="fas fa-file-contract text-lg"></i> <span>Trámite Individual</span></a></li>
+                        <li><a href="#" class="block rounded transition duration-200 px-4 py-2.5 text-sm font-medium hover:bg-sidebar-hover hover:text-sidebar-hover menu-item-text" id="menu-autorizacion"><i class="fas fa-file-signature text-lg"></i> <span>Autorización</span></a></li>
+                        <li><a href="#" class="block rounded transition duration-200 px-4 py-2.5 text-sm font-medium hover:bg-sidebar-hover hover:text-sidebar-hover menu-item-text" id="menu-lista"><i class="fas fa-list-alt text-lg"></i> <span>Listado Jugadores</span></a></li>
+                        <li><a href="#" class="block rounded transition duration-200 px-4 py-2.5 text-sm font-medium hover:bg-sidebar-hover hover:text-sidebar-hover menu-item-text" id="menu-fotocarnet"><i class="fas fa-id-badge text-lg"></i> <span>Foto Carnet</span></a></li>
+                        <li><a href="#" class="block rounded transition duration-200 px-4 py-2.5 text-sm font-medium hover:bg-sidebar-hover hover:text-sidebar-hover menu-item-text" id="menu-usuarios"><i class="fas fa-users-cog text-lg"></i> <span>Gestión Usuarios</span></a></li>
+                    </ul>
+                </nav>
+            </div>
+            <div class="border-t border-t-sidebar-border pt-4 mt-4 flex flex-col items-center">
+                <button class="text-sidebar hover:text-sidebar-hover focus:outline-none collapse-button mb-4" id="collapse-toggle" title="Colapsar/Expandir Menú">
+                     <i class="fas fa-bars text-xl"></i>
+                </button>
+                <button class="w-full flex items-center justify-center py-2.5 px-4 text-sm font-medium rounded-md text-sidebar hover:bg-sidebar-hover hover:text-sidebar-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-sidebar focus:ring-white" id="logout-button">
+                    <i class="fas fa-sign-out-alt mr-2"></i>
+                    <span>Cerrar Sesión</span>
+                </button>
+            </div>
+        </aside>
+
+        <main class="flex-1 p-8 flex-main bg-primary overflow-y-auto"> <button id="dark-mode-toggle" title="Cambiar modo claro/oscuro" class="focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                <i class="fas fa-moon"></i> </button>
+
+            <h1 class="text-3xl font-bold mb-6 text-primary" id="main-title">Bienvenido</h1>
+            <div id="content-area" class="text-secondary">
+                <p>Selecciona una opción del menú lateral para comenzar.</p>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // --- Datos Globales ---
+        let players = []; // Almacena datos de trámites individuales
+        let autorizaciones = []; // Almacena datos de autorizaciones
+        // Array 'users' para simulación local de usuarios (INSEGURO PARA PRODUCCIÓN)
+        let users = [
+			{ username: '15974472-8', password: 'CLAUDIA', nombreCompleto: 'CLAUDIA ALEJANDRA ROJAS ARMIJO' },
+            { username: '16776631-5', password: 'WIZARDS', nombreCompleto: 'CLAUDIO EDUARDO MÁRQUEZ JAR' },
+            { username: '16233122-1', password: 'CINDY', nombreCompleto: 'CINDY ALEXANDRA ALVARADO APABLAZA' },
+            { username: '18583622-3', password: 'RAFITA', nombreCompleto: 'RAFAEL MANUEL RUBILAR MONTOYA' },
+            { username: '17753927-9', password: 'NIKO7', nombreCompleto: 'NICOLAS IGNACIO PAREDES VILLARREAL' },
+            { username: '14747870-4', password: 'YAGO10', nombreCompleto: 'YAGO CLAUDIO PEREIRA MARCAL' },
+            { username: '16888568-7', password: 'CHELO5', nombreCompleto: 'MARCELO ALEXIS SOARZO CATALDO' }
+        ];
+        let cropperInstance = null; // Instancia de Cropper.js
+        let isCropperScriptLoaded = false; // Flag para controlar la carga dinámica de Cropper.js
+
+        // --- Funciones Auxiliares ---
+        /**
+         * Formatea un input de RUT (Cédula Chilena) mientras el usuario escribe.
+         * @param {HTMLInputElement} rutInput - El campo input del RUT.
+         */
+        function formatRut(rutInput) {
+            if (!rutInput) return;
+            let rut = rutInput.value.replace(/[^0-9kK]/g, '').toLowerCase(); // Limpia y convierte a minúsculas
+            let formattedRut = '';
+            if (rut.length > 1) {
+                let dv = rut.slice(-1); // Dígito verificador
+                let body = rut.slice(0, -1); // Cuerpo del RUT
+                let bodyFormatted = "";
+                while (body.length > 3) {
+                    bodyFormatted = "." + body.slice(-3) + bodyFormatted;
+                    body = body.slice(0, -3);
+                }
+                bodyFormatted = body + bodyFormatted;
+                formattedRut = bodyFormatted + '-' + dv;
+            } else {
+                formattedRut = rut;
+            }
+            rutInput.value = formattedRut.toUpperCase(); // Muestra en mayúsculas
+        }
+
+        /**
+         * Formatea un input de fecha (dd-mm-aaaa) mientras el usuario escribe.
+         * @param {HTMLInputElement} dateInput - El campo input de la fecha.
+         */
+        function formatFechaNacimiento(dateInput) {
+            if (!dateInput) return;
+            let date = dateInput.value.replace(/[^0-9]/g, ''); // Solo números
+            let formattedDate = '';
+            if (date.length >= 2) {
+                formattedDate += date.substring(0, 2); // dd
+                if (date.length >= 4) {
+                    formattedDate += '-' + date.substring(2, 4); // mm
+                    if (date.length >= 8) {
+                        formattedDate += '-' + date.substring(4, 8); // aaaa
+                    } else if (date.length > 4) {
+                        formattedDate += '-' + date.substring(4);
+                    }
+                } else if (date.length > 2) {
+                    formattedDate += '-' + date.substring(2);
+                }
+            } else {
+                formattedDate = date;
+            }
+            dateInput.value = formattedDate.substring(0, 10); // Limita a 10 caracteres (dd-mm-aaaa)
+        }
+
+        // --- Funciones de Visibilidad de Pantallas ---
+        function showLoginScreen() {
+            document.getElementById('login-screen').style.display = 'flex';
+            document.getElementById('app-screen').style.display = 'none';
+        }
+        function showAppScreen() {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('app-screen').style.display = 'flex';
+            const mainTitle = document.getElementById('main-title');
+            const contentArea = document.getElementById('content-area');
+            if(mainTitle) mainTitle.innerText = 'Bienvenido';
+            if(contentArea) contentArea.innerHTML = '<p class="text-lg">Selecciona una opción del menú lateral para comenzar.</p>';
+        }
+
+        // --- Funciones de Renderizado de Contenido Dinámico ---
+
+        /**
+         * Renderiza la lista de jugadores (trámites) y autorizaciones.
+         */
+        function renderPlayerList() {
+            const mainTitle = document.getElementById('main-title');
+            const contentArea = document.getElementById('content-area');
+            if (!mainTitle || !contentArea) return;
+
+            mainTitle.innerText = 'Listado de Jugadores y Autorizaciones';
+            let listHtml = '<div class="bg-secondary p-4 sm:p-6 rounded-lg shadow-md">';
+
+            // Sección Trámites Individuales
+            listHtml += `
+                <div class="mb-8 p-4 border border-border-color rounded-lg bg-primary">
+                    <h2 class="text-xl sm:text-2xl font-semibold mb-4 text-primary">Trámites Individuales</h2>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-border-color border border-border-input">
+                            <thead class="bg-secondary">
+                                <tr>
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-secondary uppercase tracking-wider border-r border-border-color">Cédula</th>
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-secondary uppercase tracking-wider border-r border-border-color">A. Paterno</th>
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-secondary uppercase tracking-wider border-r border-border-color">A. Materno</th>
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-secondary uppercase tracking-wider border-r border-border-color">Nombres</th>
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-secondary uppercase tracking-wider border-r border-border-color">Fec. Nac.</th>
+                                    <th scope="col" class="px-4 py-3 text-center text-xs font-semibold text-secondary uppercase tracking-wider border-r border-border-color">PDF</th>
+                                    <th scope="col" class="px-4 py-3 text-center text-xs font-semibold text-secondary uppercase tracking-wider">Eliminar</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-secondary">`;
+            if (players.length === 0) {
+                listHtml += '<tr><td colspan="7" class="px-6 py-4 text-center text-secondary">No hay trámites registrados.</td></tr>';
+            } else {
+                players.forEach((p, i) => {
+                    listHtml += `<tr class="hover:bg-primary">
+                                    <td class="px-4 py-4 whitespace-nowrap text-sm text-primary border-r border-border-color">${p.ci || ''}</td>
+                                    <td class="px-4 py-4 whitespace-nowrap text-sm text-primary border-r border-border-color">${p.apellidoPaterno || ''}</td>
+                                    <td class="px-4 py-4 whitespace-nowrap text-sm text-primary border-r border-border-color">${p.apellidoMaterno || ''}</td>
+                                    <td class="px-4 py-4 whitespace-nowrap text-sm text-primary border-r border-border-color">${p.nombres || ''}</td>
+                                    <td class="px-4 py-4 whitespace-nowrap text-sm text-primary border-r border-border-color">${p.fechaNac || ''}</td>
+                                    <td class="px-4 py-4 text-center border-r border-border-color"><button class="action-button" data-action="generate-pdf" data-type="tramite" data-index="${i}" title="Generar PDF Trámite"><i class="fas fa-file-pdf fa-lg"></i></button></td>
+                                    <td class="px-4 py-4 text-center"><button class="action-button" data-action="delete" data-type="tramite" data-index="${i}" title="Eliminar Trámite"><i class="fas fa-trash fa-lg"></i></button></td>
+                                 </tr>`;
+                });
+            }
+            listHtml += '</tbody></table></div></div>';
+
+            // Sección Autorizaciones
+            listHtml += `
+                <div class="p-4 border border-border-color rounded-lg bg-primary">
+                    <h2 class="text-xl sm:text-2xl font-semibold mb-4 text-primary">Autorizaciones</h2>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-border-color border border-border-input">
+                            <thead class="bg-secondary">
+                                <tr>
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-secondary uppercase tracking-wider border-r border-border-color">Apoderado</th>
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-secondary uppercase tracking-wider border-r border-border-color">CI Apod.</th>
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-secondary uppercase tracking-wider border-r border-border-color">Jugador</th>
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-secondary uppercase tracking-wider border-r border-border-color">Parentesco</th>
+                                    <th scope="col" class="px-4 py-3 text-center text-xs font-semibold text-secondary uppercase tracking-wider border-r border-border-color">PDF</th>
+                                    <th scope="col" class="px-4 py-3 text-center text-xs font-semibold text-secondary uppercase tracking-wider">Eliminar</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-secondary">`;
+            if (autorizaciones.length === 0) {
+                listHtml += '<tr><td colspan="6" class="px-6 py-4 text-center text-secondary">No hay autorizaciones registradas.</td></tr>';
+            } else {
+                autorizaciones.forEach((a, i) => {
+                    listHtml += `<tr class="hover:bg-primary">
+                                    <td class="px-4 py-4 whitespace-nowrap text-sm text-primary border-r border-border-color">${a.apoderadoNombre || ''}</td>
+                                    <td class="px-4 py-4 whitespace-nowrap text-sm text-primary border-r border-border-color">${a.apoderadoCi || ''}</td>
+                                    <td class="px-4 py-4 whitespace-nowrap text-sm text-primary border-r border-border-color">${a.jugadorNombre || ''}</td>
+                                    <td class="px-4 py-4 whitespace-nowrap text-sm text-primary border-r border-border-color">${a.parentesco || ''}</td>
+                                    <td class="px-4 py-4 text-center border-r border-border-color"><button class="action-button" data-action="generate-pdf" data-type="autorizacion" data-index="${i}" title="Generar PDF Autorización"><i class="fas fa-file-pdf fa-lg"></i></button></td>
+                                    <td class="px-4 py-4 text-center"><button class="action-button" data-action="delete" data-type="autorizacion" data-index="${i}" title="Eliminar Autorización"><i class="fas fa-trash fa-lg"></i></button></td>
+                                 </tr>`;
+                });
+            }
+            listHtml += '</tbody></table></div></div>';
+            listHtml += '</div>'; // Cierre de bg-secondary
+            contentArea.innerHTML = listHtml;
+        }
+
+        /**
+         * Renderiza el formulario para Trámite Individual.
+         */
+        function renderTramiteForm() {
+            const mainTitle = document.getElementById('main-title');
+            const contentArea = document.getElementById('content-area');
+            if (!mainTitle || !contentArea) return;
+
+            mainTitle.innerText = 'Trámite Individual';
+            const inputBaseClasses = "form-input-base";
+            const singleCharInputClasses = "single-char-input"; // Clases para input de 1 letra
+
+            contentArea.innerHTML = `
+                <div class="bg-secondary p-4 sm:p-6 rounded-lg shadow-md max-w-4xl mx-auto">
+                    <h2 class="text-xl sm:text-2xl font-semibold mb-6 text-primary">Datos del Jugador</h2>
+                    <form id="form-tramite">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                            <div>
+                                <label for="ci" class="block text-sm font-medium text-secondary mb-1">Cédula Identidad (RUT):</label>
+                                <input type="text" id="ci" class="${inputBaseClasses}" placeholder="Ej: 12.345.678-9" required>
+                            </div>
+                            <div>
+                                <label for="fecha-nac" class="block text-sm font-medium text-secondary mb-1">Fecha Nacimiento:</label>
+                                <input type="text" id="fecha-nac" class="${inputBaseClasses}" placeholder="DD-MM-AAAA" required maxlength="10">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div>
+                                <label for="apellido-paterno" class="block text-sm font-medium text-secondary mb-1">Apellido Paterno:</label>
+                                <input type="text" id="apellido-paterno" class="${inputBaseClasses}" required>
+                            </div>
+                            <div>
+                                <label for="apellido-materno" class="block text-sm font-medium text-secondary mb-1">Apellido Materno:</label>
+                                <input type="text" id="apellido-materno" class="${inputBaseClasses}" required>
+                            </div>
+                        </div>
+                        <div class="mb-6">
+                            <label for="nombres" class="block text-sm font-medium text-secondary mb-1">Nombres:</label>
+                            <input type="text" id="nombres" class="${inputBaseClasses}" required>
+                        </div>
+
+                        <div class="mb-6">
+                            <span class="block text-sm font-medium text-secondary mb-2">Solicita (Marcar con 'X'):</span>
+                            <div class="mt-2 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-x-4 gap-y-3 items-center">
+                                <div class="flex items-center"> <input type="text" id="solicita_inscripcion_char" maxlength="1" class="${singleCharInputClasses}"> <span class="ml-2 text-sm text-primary">Inscripción</span> </div>
+                                <div class="flex items-center"> <input type="text" id="solicita_pase_interno_char" maxlength="1" class="${singleCharInputClasses}"> <span class="ml-2 text-sm text-primary">Pase Interno</span> </div>
+                                <div class="flex items-center"> <input type="text" id="solicita_pase_regional_char" maxlength="1" class="${singleCharInputClasses}"> <span class="ml-2 text-sm text-primary">Pase Regional</span> </div>
+                                <div class="flex items-center"> <input type="text" id="solicita_pase_externo_char" maxlength="1" class="${singleCharInputClasses}"> <span class="ml-2 text-sm text-primary">Pase Externo</span> </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-6">
+                            <span class="block text-sm font-medium text-secondary mb-2">Categoría (Marcar con 'X'):</span>
+                            <div class="mt-2 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-x-4 gap-y-3 items-center">
+                                <div class="flex items-center"> <input type="text" id="categoria_extranjero_char" maxlength="1" class="${singleCharInputClasses}"> <span class="ml-2 text-sm text-primary">Extranjero</span> </div>
+                                <div class="flex items-center"> <input type="text" id="categoria_libertad_char" maxlength="1" class="${singleCharInputClasses}"> <span class="ml-2 text-sm text-primary">Libertad Acción</span> </div>
+                                <div class="flex items-center"> <input type="text" id="categoria_adulto_char" maxlength="1" class="${singleCharInputClasses}"> <span class="ml-2 text-sm text-primary">Adulto</span> </div>
+                                <div class="flex items-center"> <input type="text" id="categoria_femenina_char" maxlength="1" class="${singleCharInputClasses}"> <span class="ml-2 text-sm text-primary">Femenina</span> </div>
+                                <div class="flex items-center"> <input type="text" id="categoria_infantil_char" maxlength="1" class="${singleCharInputClasses}"> <span class="ml-2 text-sm text-primary">Infantil</span> </div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div>
+                                <label for="procede-club" class="block text-sm font-medium text-secondary mb-1">Procede del Club:</label>
+                                <input type="text" id="procede-club" class="${inputBaseClasses}">
+                            </div>
+                            <div>
+                                <label for="procede-asociacion" class="block text-sm font-medium text-secondary mb-1">Asociación de Procedencia:</label>
+                                <input type="text" id="procede-asociacion" class="${inputBaseClasses}">
+                            </div>
+                        </div>
+                        <div class="mt-8 text-right">
+                            <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out">Guardar Trámite</button>
+                        </div>
+                    </form>
+                </div>`;
+
+            const form = document.getElementById('form-tramite');
+            if (form) form.addEventListener('submit', handleTramiteSubmit);
+
+            const ciInput = document.getElementById('ci');
+            if (ciInput) ciInput.addEventListener('input', () => formatRut(ciInput));
+
+            const fechaNacInput = document.getElementById('fecha-nac');
+            if (fechaNacInput) fechaNacInput.addEventListener('input', () => formatFechaNacimiento(fechaNacInput));
+
+            // Convertir a mayúsculas inputs de texto normales
+            const inputsToUpper = ['apellido-paterno', 'apellido-materno', 'nombres', 'procede-club', 'procede-asociacion'];
+            inputsToUpper.forEach(id => {
+                const input = document.getElementById(id);
+                if (input) input.addEventListener('input', (e) => { e.target.value = e.target.value.toUpperCase(); });
+            });
+            // Convertir a mayúsculas inputs de 1 letra
+            const singleCharInputs = document.querySelectorAll('.single-char-input');
+            singleCharInputs.forEach(input => {
+                input.addEventListener('input', (e) => { e.target.value = e.target.value.toUpperCase(); });
+            });
+        }
+
+        /**
+         * Renderiza el formulario para Autorización.
+         */
+        function renderAutorizacionForm() {
+            const mainTitle = document.getElementById('main-title');
+            const contentArea = document.getElementById('content-area');
+            if (!mainTitle || !contentArea) return;
+
+            mainTitle.innerText = 'Autorización de Jugadores';
+            const inputBaseClasses = "form-input-base";
+            const selectBaseClasses = inputBaseClasses + " form-select-base"; // Combina clases base para select
+
+            contentArea.innerHTML = `
+                <div class="bg-secondary p-4 sm:p-6 rounded-lg shadow-md max-w-4xl mx-auto">
+                    <h2 class="text-xl sm:text-2xl font-semibold mb-6 text-primary">Datos de Autorización</h2>
+                    <form id="form-autorizacion">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6 items-end">
+                            <div class="md:col-span-2">
+                                <label for="apoderado-nombre" class="block text-sm font-medium text-secondary mb-1">Nombre del Apoderado/Tutor:</label>
+                                <input type="text" id="apoderado-nombre" class="${inputBaseClasses}" required>
+                            </div>
+                            <div>
+                                <label for="apoderado-ci" class="block text-sm font-medium text-secondary mb-1">Cédula Identidad Apoderado:</label>
+                                <input type="text" id="apoderado-ci" class="${inputBaseClasses}" placeholder="Ej: 12.345.678-9" required>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6 items-end">
+                            <div class="md:col-span-2">
+                                <label for="jugador-nombre-auth" class="block text-sm font-medium text-secondary mb-1">Nombre del Jugador:</label>
+                                <input type="text" id="jugador-nombre-auth" class="${inputBaseClasses}" required>
+                            </div>
+                            <div>
+                                <label for="parentesco" class="block text-sm font-medium text-secondary mb-1">Parentesco:</label>
+                                <select id="parentesco" class="${selectBaseClasses}" required>
+                                    <option value="">Seleccione...</option>
+                                    <option value="Padre">Padre</option>
+                                    <option value="Madre">Madre</option>
+                                    <option value="Hermana">Hermana</option>
+                                    <option value="Hermano">Hermano</option>
+                                    <option value="Tutor Legal">Tutor Legal</option>
+                                    <option value="Abuelo">Abuelo</option>
+                                    <option value="Abuela">Abuela</option>
+                                    <option value="Otro">Otro</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mt-8 text-right">
+                            <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out">Guardar Autorización</button>
+                        </div>
+                    </form>
+                </div>`;
+
+            const form = document.getElementById('form-autorizacion');
+            if (form) form.addEventListener('submit', handleAutorizacionSubmit);
+
+            const apoderadoCiInput = document.getElementById('apoderado-ci');
+            if (apoderadoCiInput) apoderadoCiInput.addEventListener('input', () => formatRut(apoderadoCiInput));
+
+            // Convertir a mayúsculas campos de nombre
+            ['apoderado-nombre', 'jugador-nombre-auth'].forEach(id => {
+                const input = document.getElementById(id);
+                if (input) input.addEventListener('input', (e) => { e.target.value = e.target.value.toUpperCase(); });
+            });
+        }
+
+        /**
+         * Renderiza el formulario y la lista para Gestión de Usuarios.
+         */
+        function renderUserManagementForm() {
+            const mainTitle = document.getElementById('main-title');
+            const contentArea = document.getElementById('content-area');
+            if (!mainTitle || !contentArea) return;
+
+            mainTitle.innerText = 'Gestión de Usuarios';
+            const inputBaseClasses = "form-input-base";
+
+            let formHtml = `
+                <div class="bg-secondary p-4 sm:p-6 rounded-lg shadow-md mb-8">
+                    <h2 id="user-form-title" class="text-lg sm:text-xl font-semibold mb-4 text-primary">Agregar Nuevo Usuario</h2>
+                    <form id="form-add-user">
+                        <input type="hidden" id="edit-user-index" value="-1"> <div class="mb-4">
+                            <label for="new-fullname" class="block text-sm font-medium text-secondary mb-1">Nombre Completo:</label>
+                            <input type="text" id="new-fullname" class="${inputBaseClasses}" required>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 items-end">
+                            <div>
+                                <label for="new-username" class="block text-sm font-medium text-secondary mb-1">Usuario (Cédula):</label>
+                                <input type="text" id="new-username" class="${inputBaseClasses}" placeholder="Ej: 12.345.678-9" required>
+                            </div>
+                            <div>
+                                <label for="new-password" class="block text-sm font-medium text-secondary mb-1">Clave:</label>
+                                <input type="password" id="new-password" class="${inputBaseClasses}" placeholder="Clave" required>
+                            </div>
+                            <div class="flex flex-col">
+                                <button type="submit" id="user-submit-button" class="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white focus:outline-none focus:ring-2 focus:ring-offset-2">
+                                    <span id="user-submit-button-text">Agregar</span>
+                                </button>
+                                <button type="button" id="user-cancel-button" class="hidden w-full mt-2 inline-flex justify-center py-2 px-4 border shadow-sm text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                    Cancelar Edición
+                                </button>
+                            </div>
+                        </div>
+                         <div id="add-user-error" class="text-sm mt-1 min-h-[1.25rem]"></div>
+                    </form>
+                </div>`;
+
+            let listHtml = `
+                <div class="bg-secondary p-4 sm:p-6 rounded-lg shadow-md">
+                    <h2 class="text-lg sm:text-xl font-semibold mb-4 text-primary">Usuarios Registrados</h2>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-border-color border border-border-input">
+                            <thead class="bg-primary">
+                                <tr>
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-secondary uppercase tracking-wider border-r border-border-color">Nombre Completo</th>
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-secondary uppercase tracking-wider border-r border-border-color">Usuario (Cédula)</th>
+                                    <th scope="col" class="px-4 py-3 text-center text-xs font-semibold text-secondary uppercase tracking-wider border-r border-border-color">Editar</th>
+                                    <th scope="col" class="px-4 py-3 text-center text-xs font-semibold text-secondary uppercase tracking-wider">Eliminar</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-secondary">`; // Removed divide-y from tbody for custom row borders
+
+            if (users.length === 0) {
+                listHtml += '<tr><td colspan="4" class="px-6 py-4 text-center text-secondary">No hay usuarios registrados.</td></tr>';
+            } else {
+                users.forEach((user, index) => {
+                    listHtml += `<tr class="hover:bg-primary">
+                                    <td class="px-4 py-4 whitespace-nowrap text-sm text-primary border-r border-border-color">${user.nombreCompleto || ''}</td>
+                                    <td class="px-4 py-4 whitespace-nowrap text-sm text-primary border-r border-border-color">${user.username}</td>
+                                    <td class="px-4 py-4 text-center border-r border-border-color">
+                                        <button class="action-button" data-action="edit" data-type="user" data-index="${index}" title="Editar Usuario">
+                                            <i class="fas fa-edit fa-lg"></i>
+                                        </button>
+                                    </td>
+                                    <td class="px-4 py-4 text-center">
+                                        <button class="action-button" data-action="delete" data-type="user" data-index="${index}" title="Eliminar Usuario">
+                                            <i class="fas fa-user-times fa-lg"></i>
+                                        </button>
+                                    </td>
+                                 </tr>`;
+                });
+            }
+            listHtml += `</tbody></table></div></div>`;
+            contentArea.innerHTML = formHtml + listHtml;
+            resetUserForm(); // Asegura que el formulario esté en modo "Agregar" inicialmente
+
+            const addUserForm = document.getElementById('form-add-user');
+            if (addUserForm) addUserForm.addEventListener('submit', handleAddUserSubmit);
+
+            const cancelEditButton = document.getElementById('user-cancel-button');
+            if(cancelEditButton) cancelEditButton.addEventListener('click', resetUserForm);
+
+            const newUsernameInput = document.getElementById('new-username');
+            if (newUsernameInput) newUsernameInput.addEventListener('input', () => formatRut(newUsernameInput));
+
+            const newFullnameInput = document.getElementById('new-fullname');
+            if (newFullnameInput) newFullnameInput.addEventListener('input', (e) => { e.target.value = e.target.value.toUpperCase(); });
+        }
+
+        /**
+         * Renderiza el formulario para la Foto Carnet.
+         */
+        function renderFotoCarnetForm() {
+            const mainTitle = document.getElementById('main-title');
+            const contentArea = document.getElementById('content-area');
+            if (!mainTitle || !contentArea) return;
+
+            if (cropperInstance) { // Destruye instancia previa si existe
+                try { cropperInstance.destroy(); } catch (e) { console.warn("Error al destruir Cropper (puede ser normal si no estaba inicializado):", e); }
+                cropperInstance = null;
+            }
+
+            mainTitle.innerText = 'Generar Foto Carnet';
+            const inputBaseClasses = "form-input-base";
+
+            contentArea.innerHTML = `
+                <div class="bg-secondary p-4 sm:p-6 rounded-lg shadow-md max-w-4xl mx-auto">
+                    <div class="form-section pt-0 border-t-0"> <h2 class="text-lg sm:text-xl font-semibold mb-4 text-primary">1. Sube y Ajusta tu Foto</h2>
+                        <div class="mb-4 button-group">
+                            <input type="file" id="image-upload" class="hidden-file-input" accept="image/*">
+                            <label for="image-upload" class="file-input-label">
+                                <i class="fas fa-upload"></i> <span>Seleccionar Foto</span>
+                            </label>
+                        </div>
+                        <div class="cropper-container-wrapper mb-4 bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+                             <img id="cropper-image" src="" alt="Área para ajustar foto. Sube una imagen para empezar.">
+                        </div>
+                    </div>
+
+                    <div class="form-section"> <h2 class="text-lg sm:text-xl font-semibold mb-4 text-primary">2. Ingresa tus Datos</h2>
+                        <div class="grid grid-cols-1 gap-4 mb-4">
+                            <div>
+                                <label for="foto-nombres" class="block text-sm font-medium text-secondary mb-1">Nombres:</label>
+                                <input type="text" id="foto-nombres" class="${inputBaseClasses}" required>
+                            </div>
+                            <div>
+                                <label for="foto-apellidos" class="block text-sm font-medium text-secondary mb-1">Apellidos:</label>
+                                <input type="text" id="foto-apellidos" class="${inputBaseClasses}" required>
+                            </div>
+                            <div>
+                                <label for="foto-rut" class="block text-sm font-medium text-secondary mb-1">Cédula de Identidad (RUT):</label>
+                                <input type="text" id="foto-rut" class="${inputBaseClasses}" placeholder="Ej: 12.345.678-9" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section"> <h2 class="text-lg sm:text-xl font-semibold mb-4 text-primary">3. Generar Foto</h2>
+                        <div class="button-group mb-4">
+                            <button type="button" id="generate-button" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50" disabled>
+                                <i class="fas fa-cogs mr-2"></i>Generar Foto Carnet
+                            </button>
+                        </div>
+                        <div class="result-canvas-container">
+                            <canvas id="result-canvas"></canvas>
+                            <p id="canvas-placeholder" class="text-secondary">Aquí aparecerá la foto generada.</p>
+                        </div>
+                    </div>
+                </div>`;
+
+            // Cargar dinámicamente Cropper.js y luego inicializar listeners
+            loadScript('https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js', setupFotoCarnetListeners);
+        }
+
+        /**
+         * Carga un script dinámicamente y ejecuta un callback al cargar.
+         * @param {string} src - URL del script.
+         * @param {function} callback - Función a ejecutar después de cargar el script.
+         */
+        function loadScript(src, callback) {
+            const existingScript = document.querySelector(`script[src="${src}"]`);
+            if (existingScript) {
+                console.log(`Script ${src} ya presente.`);
+                if (src.includes('cropper')) isCropperScriptLoaded = true;
+
+                // Asegurar que el objeto global esté disponible antes de llamar al callback
+                const checkGlobalVar = (varName, cb) => {
+                    if (typeof window[varName] !== 'undefined') {
+                        console.log(`${varName} disponible.`);
+                        if (cb) cb();
+                    } else {
+                        console.warn(`Script tag presente, pero ${varName} no definido. Reintentando en 100ms...`);
+                        setTimeout(() => checkGlobalVar(varName, cb), 100);
+                    }
+                };
+
+                if (src.includes('cropper')) checkGlobalVar('Cropper', callback);
+                else if (callback) callback(); // Para otros scripts si se usa esta función
+                return;
+            }
+
+            console.log(`Cargando script: ${src}`);
+            const script = document.createElement('script');
+            script.src = src;
+            script.defer = true;
+            script.onload = () => {
+                console.log(`Script ${src} cargado dinámicamente.`);
+                if (src.includes('cropper')) isCropperScriptLoaded = true;
+                if (callback) callback();
+            };
+            script.onerror = () => {
+                console.error(`Error al cargar el script: ${src}`);
+                alert(`Error crítico: No se pudo cargar la librería ${src}. La funcionalidad dependiente no estará disponible.`);
+                if (src.includes('cropper')) {
+                    const generateButton = document.getElementById('generate-button');
+                    const imageUploadLabel = document.querySelector('label[for="image-upload"]');
+                    if(generateButton) generateButton.disabled = true;
+                    if(imageUploadLabel) imageUploadLabel.style.display = 'none';
+                    const cropperContainer = document.querySelector('.cropper-container-wrapper');
+                    if(cropperContainer) cropperContainer.innerHTML = '<p class="text-red-600 font-bold text-center p-4">Error: La herramienta de recorte no pudo cargarse. Intenta recargar la página.</p>';
+                }
+            };
+            document.body.appendChild(script);
+        }
+
+        /**
+         * Configura los listeners para la sección Foto Carnet después de que Cropper.js esté cargado.
+         */
+        function setupFotoCarnetListeners() {
+            if (typeof Cropper === 'undefined') {
+                console.error("setupFotoCarnetListeners: Cropper no está definido. No se añadirán listeners.");
+                const contentArea = document.getElementById('content-area');
+                if(contentArea?.querySelector) { // Chequeo opcional por si contentArea no existe
+                    const container = contentArea.querySelector('.cropper-container-wrapper');
+                    if(container) {
+                        container.innerHTML = '<p class="text-red-600 font-bold text-center p-4">Error: La herramienta de recorte no pudo cargarse. Intenta recargar la página.</p>';
+                    }
+                }
+                return;
+            }
+            console.log("Configurando listeners de Foto Carnet...");
+
+            const imageUpload = document.getElementById('image-upload');
+            const generateButton = document.getElementById('generate-button');
+            const rutInput = document.getElementById('foto-rut');
+            const textInputs = ['foto-nombres', 'foto-apellidos', 'foto-rut']; // Incluye RUT para el check general
+
+            if (imageUpload) imageUpload.addEventListener('change', handleImageUploadWithCropper);
+            if (generateButton) generateButton.addEventListener('click', generateFotoCarnetWithCropper);
+
+            if (rutInput) {
+                rutInput.addEventListener('input', () => {
+                    formatRut(rutInput);
+                    checkEnableGenerateButton(); // Verifica si se puede habilitar el botón
+                });
+            }
+            // Listeners para nombres y apellidos (y RUT, aunque ya tiene uno) para habilitar el botón
+            textInputs.forEach(id => {
+                const input = document.getElementById(id);
+                if (input) {
+                    input.addEventListener('input', (e) => {
+                        if (id !== 'foto-rut') { // RUT ya se formatea y convierte a mayúsculas en formatRut
+                           e.target.value = e.target.value.toUpperCase();
+                        }
+                        checkEnableGenerateButton();
+                    });
+                }
+            });
+            checkEnableGenerateButton(); // Estado inicial del botón
+        }
+
+        /**
+         * Verifica si se debe habilitar el botón "Generar Foto Carnet".
+         */
+        function checkEnableGenerateButton() {
+            const generateButton = document.getElementById('generate-button');
+            if (!generateButton) return;
+
+            const nombres = document.getElementById('foto-nombres')?.value.trim();
+            const apellidos = document.getElementById('foto-apellidos')?.value.trim();
+            const rut = document.getElementById('foto-rut')?.value.trim();
+            const isCropperReady = cropperInstance !== null && typeof cropperInstance.getCroppedCanvas === 'function';
+
+            generateButton.disabled = !(isCropperReady && nombres && apellidos && rut);
+        }
+
+        /**
+         * Maneja la carga de la imagen y inicializa Cropper.js.
+         */
+        function handleImageUploadWithCropper(event) {
+            const file = event.target.files[0];
+            const imageElement = document.getElementById('cropper-image');
+            const resultCanvas = document.getElementById('result-canvas');
+            const canvasPlaceholder = document.getElementById('canvas-placeholder');
+
+            if (cropperInstance) { // Destruye instancia previa
+                try { cropperInstance.destroy(); } catch(e) { console.warn("Error al destruir Cropper:", e); }
+                cropperInstance = null;
+            }
+            if (resultCanvas) { // Limpia canvas previo
+                const ctx = resultCanvas.getContext('2d');
+                ctx.clearRect(0, 0, resultCanvas.width, resultCanvas.height);
+                resultCanvas.style.display = 'none';
+                if(canvasPlaceholder) canvasPlaceholder.style.display = 'block';
+            }
+            checkEnableGenerateButton(); // Actualiza estado del botón
+
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    imageElement.src = e.target.result;
+                    imageElement.alt = "Imagen cargada para recortar"; // Actualizar alt
+
+                    if (typeof Cropper === 'undefined') {
+                        console.error("Cropper no está definido al intentar inicializar.");
+                        alert("Error: La librería de recorte no se cargó correctamente. Intenta recargar la página o verifica tu conexión.");
+                        return;
+                    }
+
+                    try {
+                        cropperInstance = new Cropper(imageElement, {
+                            aspectRatio: 3 / 4, // Proporción para foto carnet
+                            viewMode: 1,        // Restringe el área de recorte al canvas
+                            dragMode: 'move',   // Permite mover la imagen
+                            autoCropArea: 0.9,  // Área inicial de recorte
+                            background: false,  // Sin fondo de cuadrícula en el cropper
+                            zoomable: true,
+                            movable: true,
+                            cropBoxResizable: true, // Permitir redimensionar el crop box
+                            ready: () => {
+                                checkEnableGenerateButton();
+                                console.log("Cropper listo y área de recorte visible.");
+                            },
+                            crop: () => { // Se dispara cuando el área de recorte cambia
+                                checkEnableGenerateButton();
+                            }
+                        });
+                    } catch (error) {
+                        console.error("Error al inicializar Cropper:", error);
+                        alert(`Error al inicializar la herramienta de recorte: ${error.message}`);
+                        imageElement.src = ""; // Limpiar si falla
+                        imageElement.alt = "Error al cargar imagen. Intenta de nuevo.";
+                    }
+                };
+                reader.readAsDataURL(file);
+            } else {
+                imageElement.src = "";
+                imageElement.alt = "Área para ajustar foto. Sube una imagen para empezar.";
+                if(file) alert("Por favor, selecciona un archivo de imagen válido (JPEG, PNG, etc.).");
+                checkEnableGenerateButton();
+            }
+        }
+
+        /**
+         * Genera la imagen final combinando la foto recortada y el texto.
+         */
+        function generateFotoCarnetWithCropper() {
+            console.log("generateFotoCarnetWithCropper iniciado");
+            if (!cropperInstance || typeof cropperInstance.getCroppedCanvas !== 'function') {
+                alert("Primero sube y ajusta una imagen utilizando el área de recorte.");
+                return;
+            }
+
+            const nombres = document.getElementById('foto-nombres').value.trim();
+            const apellidos = document.getElementById('foto-apellidos').value.trim();
+            const rut = document.getElementById('foto-rut').value.trim();
+
+            if (!nombres || !apellidos || !rut) {
+                alert("Por favor, completa Nombres, Apellidos y RUT.");
+                return;
+            }
+            console.log("Datos para foto carnet:", {nombres, apellidos, rut});
+
+            let croppedCanvas;
+            try {
+                croppedCanvas = cropperInstance.getCroppedCanvas({
+                    width: 300, // Ancho deseado para la foto (puede ajustarse)
+                    // height: 400, // Alto (300 * 4/3 = 400)
+                    imageSmoothingEnabled: true,
+                    imageSmoothingQuality: 'high',
+                });
+                console.log("Canvas recortado obtenido:", croppedCanvas.width, croppedCanvas.height);
+                if (!croppedCanvas.width || !croppedCanvas.height) {
+                    throw new Error("El área recortada tiene dimensiones inválidas (0). Asegúrate de que el recorte sea visible.");
+                }
+            } catch (error) {
+                console.error("Error en getCroppedCanvas:", error);
+                alert(`Error al recortar la imagen: ${error.message}. Asegúrate de que el área de recorte sea válida y visible dentro de la imagen.`);
+                return;
+            }
+
+            const resultCanvas = document.getElementById('result-canvas');
+            const canvasPlaceholder = document.getElementById('canvas-placeholder');
+            const ctx = resultCanvas.getContext('2d');
+
+            // --- Calcular dimensiones y dibujar ---
+            const photoWidth = croppedCanvas.width; // e.g., 300
+            const photoHeight = croppedCanvas.height; // e.g., 400
+
+            // Ajustes para franja negra y texto
+            const textLineHeight = Math.max(18, photoWidth * 0.06); // 6% del ancho de la foto, mínimo 18px
+            const textPaddingVertical = Math.max(10, photoWidth * 0.033); // 3.3% del ancho, mínimo 10px
+            const fontSize = Math.max(16, photoWidth * 0.053); // 5.3% del ancho, mínimo 16px
+            const numTextLines = 3;
+            const textStripHeight = (textLineHeight * numTextLines) + (textPaddingVertical * 2);
+
+            resultCanvas.width = photoWidth;
+            resultCanvas.height = photoHeight; // El canvas final tendrá la altura de la foto recortada
+
+            console.log(`Dimensiones canvas resultado: ${resultCanvas.width}x${resultCanvas.height}`);
+
+            ctx.clearRect(0, 0, resultCanvas.width, resultCanvas.height);
+            // Dibuja la foto recortada ocupando todo el canvas de resultado
+            ctx.drawImage(croppedCanvas, 0, 0, resultCanvas.width, resultCanvas.height);
+            console.log("Foto recortada dibujada en canvas final");
+
+            // Dibuja la franja negra en la parte inferior de la foto
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.85)'; // Negro semi-transparente para mejor integración
+            const stripY = resultCanvas.height - textStripHeight; // Posición Y de la franja
+            ctx.fillRect(0, stripY, resultCanvas.width, textStripHeight);
+            console.log("Franja negra dibujada sobre la imagen");
+
+            // Configuración del texto
+            ctx.fillStyle = 'white';
+            ctx.font = `bold ${fontSize}px Inter, sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+
+            // Calcular posiciones Y para cada línea de texto, centradas en la franja
+            const textBaseY = stripY + textPaddingVertical;
+            const textY1 = textBaseY + (textLineHeight / 2);
+            const textY2 = textY1 + textLineHeight;
+            const textY3 = textY2 + textLineHeight;
+
+            ctx.fillText(nombres.toUpperCase(), resultCanvas.width / 2, textY1);
+            ctx.fillText(apellidos.toUpperCase(), resultCanvas.width / 2, textY2);
+            ctx.font = `${fontSize}px Inter, sans-serif`; // RUT no necesariamente en negrita, o sí, a gusto
+            ctx.fillText(rut.toUpperCase(), resultCanvas.width / 2, textY3);
+            console.log("Texto dibujado sobre la franja");
+
+            resultCanvas.style.display = 'block';
+            if(canvasPlaceholder) canvasPlaceholder.style.display = 'none';
+            console.log("Generación completa, canvas visible");
+        }
+
+
+        // --- Funciones Handler (Manejadores de Eventos) ---
+        /**
+         * Maneja el envío del formulario de login.
+         */
+        function handleLoginSubmit(event) {
+            event.preventDefault();
+            const usernameInput = document.getElementById('username');
+            const passwordInput = document.getElementById('password');
+            const errorMessage = document.getElementById('login-error-message');
+            errorMessage.textContent = ''; // Limpia errores previos
+
+            const username = usernameInput.value; // RUT para login
+            const password = passwordInput.value;
+
+            // *** SIMULACIÓN DE LOGIN (SIN BACKEND - INSEGURO PARA PRODUCCIÓN) ***
+            const foundUser = users.find(user => user.username === username && user.password === password);
+
+            if (foundUser) {
+                console.log("Login exitoso para:", foundUser.nombreCompleto);
+                usernameInput.value = ''; // Limpia campos
+                passwordInput.value = '';
+                showAppScreen(); // Muestra la pantalla principal de la app
+            } else {
+                console.log("Login fallido para usuario:", username);
+                errorMessage.textContent = 'Usuario o clave incorrectos.';
+            }
+        }
+
+        /**
+         * Maneja el cierre de sesión.
+         */
+        function handleLogout() {
+            // Aquí podrías limpiar cualquier dato de sesión si fuera una app real
+            console.log("Cerrando sesión...");
+            showLoginScreen();
+        }
+
+        /**
+         * Maneja el envío del formulario para agregar/editar usuarios.
+         */
+        function handleAddUserSubmit(event) {
+            event.preventDefault();
+            const form = event.target;
+            const fullnameInput = document.getElementById('new-fullname');
+            const usernameInput = document.getElementById('new-username'); // RUT del usuario
+            const passwordInput = document.getElementById('new-password');
+            const errorDiv = document.getElementById('add-user-error');
+            const editIndexInput = document.getElementById('edit-user-index');
+            errorDiv.textContent = '';
+
+            const fullname = fullnameInput.value.trim();
+            const username = usernameInput.value; // RUT
+            const password = passwordInput.value;
+            const editIndex = parseInt(editIndexInput.value, 10);
+
+            if (!fullname || !username) {
+                errorDiv.textContent = 'Debe ingresar Nombre Completo y Usuario (Cédula).';
+                return;
+            }
+
+            if (editIndex > -1) { // Modo Edición
+                if (editIndex >= 0 && editIndex < users.length) {
+                    // Verifica si el nuevo RUT (username) ya está en uso por OTRO usuario
+                    const existingUserIndex = users.findIndex((user, index) => user.username === username && index !== editIndex);
+                    if (existingUserIndex !== -1) {
+                        errorDiv.textContent = 'El nuevo usuario (Cédula) ya está en uso por otro usuario.';
+                        return;
+                    }
+                    users[editIndex].nombreCompleto = fullname;
+                    users[editIndex].username = username;
+                    if (password) { // Solo actualiza si se ingresó nueva clave
+                        users[editIndex].password = password;
+                        console.log(`Usuario ${username} actualizado (clave cambiada).`);
+                    } else {
+                        console.log(`Usuario ${username} actualizado (clave NO cambiada).`);
+                    }
+                    alert('Usuario actualizado exitosamente.');
+                    renderUserManagementForm(); // Recarga para mostrar cambios y resetear form
+                } else {
+                    errorDiv.textContent = 'Error: Índice de usuario a editar inválido.';
+                    resetUserForm(); // Resetea el formulario si hay error de índice
+                }
+            } else { // Modo Agregar
+                if (!password) {
+                    errorDiv.textContent = 'Debe ingresar la clave para un nuevo usuario.';
+                    return;
+                }
+                const userExists = users.some(user => user.username === username);
+                if (userExists) {
+                    errorDiv.textContent = 'El usuario (Cédula) ya existe.';
+                    return;
+                }
+                users.push({ username: username, password: password, nombreCompleto: fullname });
+                console.log("Usuario agregado:", { username: username, nombreCompleto: fullname, password: '***' });
+                alert('Usuario agregado exitosamente.');
+                renderUserManagementForm(); // Recarga para mostrar nuevo usuario y resetear form
+            }
+        }
+
+        /**
+         * Popula el formulario de usuario para edición.
+         * @param {number} index - Índice del usuario en el array 'users'.
+         */
+        function populateUserEditForm(index) {
+            if (index < 0 || index >= users.length) { console.error("Índice inválido para editar usuario:", index); return; }
+            const user = users[index];
+
+            const fullnameInput = document.getElementById('new-fullname');
+            const usernameInput = document.getElementById('new-username');
+            const passwordInput = document.getElementById('new-password');
+            const editIndexInput = document.getElementById('edit-user-index');
+            const formTitle = document.getElementById('user-form-title');
+            const submitButton = document.getElementById('user-submit-button');
+            const submitButtonText = document.getElementById('user-submit-button-text');
+            const cancelButton = document.getElementById('user-cancel-button');
+            const errorDiv = document.getElementById('add-user-error');
+
+            if (!fullnameInput || !usernameInput || !passwordInput || !editIndexInput || !formTitle || !submitButton || !submitButtonText || !cancelButton || !errorDiv) {
+                console.error("Error: Faltan elementos del formulario para editar."); return;
+            }
+
+            fullnameInput.value = user.nombreCompleto || '';
+            usernameInput.value = user.username;
+            passwordInput.value = ''; // Limpiar campo de clave
+            passwordInput.placeholder = 'Ingrese NUEVA clave (o dejar en blanco)';
+            passwordInput.required = false; // No es requerida al editar, solo si se quiere cambiar
+            editIndexInput.value = index;
+
+            formTitle.textContent = 'Editar Usuario';
+            submitButton.classList.remove('bg-button-green-bg', 'hover:bg-button-green-hover-bg');
+            submitButton.classList.add('edit-user-button'); // Usa clases de CSS para estilo de edición
+            submitButtonText.textContent = 'Guardar Cambios';
+            cancelButton.classList.remove('hidden');
+            errorDiv.textContent = '';
+
+            fullnameInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            fullnameInput.focus();
+        }
+
+        /**
+         * Resetea el formulario de agregar/editar usuario a su estado inicial (modo agregar).
+         */
+        function resetUserForm() {
+            const form = document.getElementById('form-add-user');
+            const editIndexInput = document.getElementById('edit-user-index');
+            const formTitle = document.getElementById('user-form-title');
+            const submitButton = document.getElementById('user-submit-button');
+            const submitButtonText = document.getElementById('user-submit-button-text');
+            const cancelButton = document.getElementById('user-cancel-button');
+            const passwordInput = document.getElementById('new-password');
+            const errorDiv = document.getElementById('add-user-error');
+
+            if (form) form.reset();
+            if (editIndexInput) editIndexInput.value = '-1';
+            if (formTitle) formTitle.textContent = 'Agregar Nuevo Usuario';
+            if (submitButton) {
+                submitButton.classList.remove('edit-user-button');
+                submitButton.classList.add('bg-button-green-bg', 'hover:bg-button-green-hover-bg');
+            }
+            if (submitButtonText) submitButtonText.textContent = 'Agregar';
+            if (cancelButton) cancelButton.classList.add('hidden');
+            if (passwordInput) {
+                passwordInput.placeholder = 'Clave';
+                passwordInput.required = true;
+            }
+            if (errorDiv) errorDiv.textContent = '';
+        }
+
+        /**
+         * Maneja el envío del formulario de Trámite Individual.
+         */
+        function handleTramiteSubmit(event) {
+            event.preventDefault();
+            const formElement = event.target;
+
+            const ci = document.getElementById('ci').value;
+            const fechaNac = document.getElementById('fecha-nac').value;
+            const apellidoPaterno = document.getElementById('apellido-paterno').value;
+            const apellidoMaterno = document.getElementById('apellido-materno').value;
+            const nombres = document.getElementById('nombres').value;
+            const procedeClub = document.getElementById('procede-club').value;
+            const procedeAsociacion = document.getElementById('procede-asociacion').value;
+
+            // Leer valores de los inputs de 1 letra para "Solicita" y "Categoría"
+            const solicita_inscripcion = document.getElementById('solicita_inscripcion_char').value;
+            const solicita_pase_interno = document.getElementById('solicita_pase_interno_char').value;
+            const solicita_pase_regional = document.getElementById('solicita_pase_regional_char').value;
+            const solicita_pase_externo = document.getElementById('solicita_pase_externo_char').value;
+            const categoria_extranjero = document.getElementById('categoria_extranjero_char').value;
+            const categoria_libertad = document.getElementById('categoria_libertad_char').value;
+            const categoria_adulto = document.getElementById('categoria_adulto_char').value;
+            const categoria_femenina = document.getElementById('categoria_femenina_char').value;
+            const categoria_infantil = document.getElementById('categoria_infantil_char').value;
+
+            const dateRegex = /^\d{2}-\d{2}-\d{4}$/; // dd-mm-aaaa
+            if (!dateRegex.test(fechaNac)) {
+                alert('Formato de Fecha Nacimiento incorrecto. Use DD-MM-AAAA.');
+                return;
+            }
+            // Validación: al menos un campo de solicita y uno de categoría debe tener algo (ej. "X")
+            const solicitaValue = [solicita_inscripcion, solicita_pase_interno, solicita_pase_regional, solicita_pase_externo].some(val => val.trim() !== '');
+            const categoriaValue = [categoria_extranjero, categoria_libertad, categoria_adulto, categoria_femenina, categoria_infantil].some(val => val.trim() !== '');
+
+            if (!solicitaValue) {
+                alert('Debe marcar (ej. con "X") al menos una opción en la sección "Solicita".');
+                return;
+            }
+             if (!categoriaValue) {
+                alert('Debe marcar (ej. con "X") al menos una opción en la sección "Categoría".');
+                return;
+            }
+
+            players.push({
+                ci, apellidoPaterno, apellidoMaterno, nombres, fechaNac,
+                solicita_inscripcion: solicita_inscripcion.trim().toUpperCase(),
+                solicita_pase_interno: solicita_pase_interno.trim().toUpperCase(),
+                solicita_pase_regional: solicita_pase_regional.trim().toUpperCase(),
+                solicita_pase_externo: solicita_pase_externo.trim().toUpperCase(),
+                categoria_extranjero: categoria_extranjero.trim().toUpperCase(),
+                categoria_libertad: categoria_libertad.trim().toUpperCase(),
+                categoria_adulto: categoria_adulto.trim().toUpperCase(),
+                categoria_femenina: categoria_femenina.trim().toUpperCase(),
+                categoria_infantil: categoria_infantil.trim().toUpperCase(),
+                procedeClub, procedeAsociacion,
+            });
+            if (formElement) formElement.reset(); // Limpia el formulario
+            renderPlayerList(); // Actualiza y muestra la lista (que ahora incluye el nuevo trámite)
+            alert('Trámite guardado exitosamente.');
+        }
+
+        /**
+         * Maneja el envío del formulario de Autorización.
+         */
+        function handleAutorizacionSubmit(event) {
+            event.preventDefault();
+            const formElement = event.target;
+            const apoderadoNombre = document.getElementById('apoderado-nombre').value;
+            const jugadorNombre = document.getElementById('jugador-nombre-auth').value;
+            const parentesco = document.getElementById('parentesco').value;
+            const apoderadoCi = document.getElementById('apoderado-ci').value;
+
+            if (parentesco === "") { // Valida que se haya seleccionado un parentesco
+                alert("Por favor, seleccione un parentesco.");
+                return;
+            }
+            autorizaciones.push({ apoderadoNombre, jugadorNombre, parentesco, apoderadoCi });
+            if (formElement) formElement.reset();
+            renderPlayerList(); // Actualiza y muestra la lista
+            alert('Autorización guardada exitosamente.');
+        }
+
+        // --- Funciones de Acción (Generar PDF, Eliminar) ---
+
+        /**
+         * Genera un PDF rellenando una plantilla con datos.
+         * @param {string} type - 'tramite' o 'autorizacion'.
+         * @param {number} index - Índice del dato en el array 'players' o 'autorizaciones'.
+         */
+        async function generatePdf(type, index) {
+            // Verifica si pdf-lib está cargado
+            if (typeof PDFLib === 'undefined' || typeof PDFLib.PDFDocument === 'undefined') {
+                alert("La librería PDF (pdf-lib) no está lista. Por favor, espera un momento y vuelve a intentarlo. Si el problema persiste, recarga la página.");
+                console.error("Error: pdf-lib no está definido. Asegúrate de que el script https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js esté cargado.");
+                return;
+            }
+            const { PDFDocument, rgb, StandardFonts } = PDFLib; // Accede a las funciones necesarias de la librería
+
+            // URLs de las plantillas PDF (asegúrate que sean accesibles y con CORS configurado si es necesario)
+            const urlTramite = "https://zkak0.github.io/BotafogoApp/tramite_individual.pdf";
+            const urlAutorizacion = "https://zkak0.github.io/BotafogoApp/autorizacion_jugadores.pdf";
+
+            let pdfUrlToLoad;
+            let dataToFill;
+            let outputFilename;
+            let isTramite = false;
+
+            if (type === 'tramite') {
+                if (index < 0 || index >= players.length) { console.error("Error PDF: Índice de trámite inválido:", index); alert("Error: Índice de trámite inválido."); return; }
+                dataToFill = players[index];
+                pdfUrlToLoad = urlTramite;
+                outputFilename = `tramite_individual_${(dataToFill.ci || 'jugador')}_${Date.now()}.pdf`;
+                isTramite = true;
+                console.log("Preparando PDF Trámite para:", dataToFill.ci || dataToFill.nombres);
+            } else if (type === 'autorizacion') {
+                if (index < 0 || index >= autorizaciones.length) { console.error("Error PDF: Índice de autorización inválido:", index); alert("Error: Índice de autorización inválido."); return; }
+                 dataToFill = autorizaciones[index];
+                 pdfUrlToLoad = urlAutorizacion;
+                 outputFilename = `autorizacion_${(dataToFill.jugadorNombre || 'jugador')}_${Date.now()}.pdf`;
+                 isTramite = false;
+                 console.log("Preparando PDF Autorización para:", dataToFill.jugadorNombre);
+            } else {
+                console.error("Error PDF: Tipo desconocido:", type);
+                alert('Error: Tipo de PDF desconocido.');
+                return;
+            }
+
+            try {
+                // 1. Descargar los bytes del PDF original
+                console.log("Descargando plantilla desde:", pdfUrlToLoad);
+                const existingPdfBytes = await fetch(pdfUrlToLoad).then(res => {
+                    if (!res.ok) throw new Error(`Error al descargar plantilla PDF (${res.status}): ${res.statusText}. URL: ${pdfUrlToLoad}`);
+                    return res.arrayBuffer();
+                });
+                console.log("Plantilla PDF descargada (bytes):", existingPdfBytes.byteLength);
+
+                // 2. Cargar el PDF en pdf-lib
+                const pdfDoc = await PDFDocument.load(existingPdfBytes);
+                const form = pdfDoc.getForm();
+                console.log("PDF cargado en pdf-lib. Formulario obtenido.");
+
+                // 3. Rellenar los campos usando los NOMBRES INTERNOS CORRECTOS del PDF
+                if (isTramite) {
+                    // Nombres de campos internos del PDF "tramite_individual.pdf"
+                    const fieldNamesTramite = {
+                        ci: 'CEDULA IDENTIDAD', fechaNac: 'FECHA NAC',
+                        apellidoPaterno: 'APELLIDO PATERNO', apellidoMaterno: 'APELLIDO MATERNO',
+                        nombres: 'NOMBRES', procedeClub: 'PROCEDE DEL CLUB',
+                        procedeAsociacion: 'ASOCIACION',
+                        solicita_inscripcion: 'INSCRIPCION', solicita_pase_interno: 'PASE INTERNO',
+                        solicita_pase_regional: 'PASE REGIONAL', solicita_pase_externo: 'PASE EXTERNO',
+                        categoria_extranjero: 'EXTRANJERO', categoria_libertad: 'LIBERTAD ACCION',
+                        categoria_adulto: 'ADULTO', categoria_femenina: 'FEMENINA',
+                        categoria_infantil: 'INFANTIL'
+                    };
+                    Object.keys(fieldNamesTramite).forEach(dataKey => {
+                        const pdfFieldName = fieldNamesTramite[dataKey];
+                        const valueToSet = dataToFill[dataKey] || ''; // Usa valor del objeto 'dataToFill' o string vacío
+                        try {
+                            const field = form.getTextField(pdfFieldName);
+                            field.setText(valueToSet.toString()); // Asegura que sea string
+                            console.log(`Campo (Trámite) '${pdfFieldName}' rellenado con: '${valueToSet}'`);
+                        } catch (e) {
+                            console.warn(`Advertencia (Trámite): No se encontró o no se pudo rellenar el campo '${pdfFieldName}'. Error: ${e.message}`);
+                        }
+                    });
+                } else { // Es autorización
+                    // Nombres de campos internos del PDF "autorizacion_jugadores.pdf"
+                    const fieldNamesAuth = {
+                        nombreAutorizante: 'NOMBRE AUTORIZANTE',
+                        cedulaIdentidad: 'CEDULA IDENTIDAD', // CI del apoderado
+                        nombreJugador: 'NOMBRE JUGADOR',
+                        parentesco: 'PARENTESCO'
+                    };
+                    // Mapeo de datos de 'autorizaciones' a los nombres de campo del PDF
+                    const authDataMap = {
+                        nombreAutorizante: dataToFill.apoderadoNombre,
+                        cedulaIdentidad: dataToFill.apoderadoCi,
+                        nombreJugador: dataToFill.jugadorNombre,
+                        parentesco: dataToFill.parentesco
+                    };
+                     Object.keys(fieldNamesAuth).forEach(pdfFieldNameKey => {
+                        const pdfFieldName = fieldNamesAuth[pdfFieldNameKey];
+                        const valueToSet = authDataMap[pdfFieldNameKey] || '';
+                        try {
+                            const field = form.getTextField(pdfFieldName);
+                            field.setText(valueToSet.toString());
+                            console.log(`Campo (Autorización) '${pdfFieldName}' rellenado con: '${valueToSet}'`);
+                        } catch (e) {
+                            console.warn(`Advertencia (Autorización): No se encontró o no se pudo rellenar el campo '${pdfFieldName}'. Error: ${e.message}`);
+                        }
+                    });
+                }
+
+                // Importante: Aplanar el formulario para que los valores sean visibles en la mayoría de los visores
+                try {
+                    form.flatten();
+                    console.log("Formulario aplanado.");
+                } catch (flattenError) {
+                    console.warn("Advertencia: No se pudo aplanar el formulario. Los campos podrían no ser visibles en todos los visores.", flattenError);
+                }
+
+                // 4. Guardar los cambios en bytes
+                const pdfBytes = await pdfDoc.save();
+                console.log("PDF modificado guardado en bytes.");
+
+                // 5. Crear Blob y URL para abrir/descargar
+                const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+                const blobUrl = URL.createObjectURL(blob);
+
+                // 6. Abrir en nueva ventana o descargar
+                // window.open(blobUrl, '_blank'); // Abrir en nueva pestaña
+                const link = document.createElement('a');
+                link.href = blobUrl;
+                link.download = outputFilename;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(blobUrl); // Liberar memoria
+                console.log(`PDF '${outputFilename}' generado y descarga iniciada.`);
+
+            } catch (error) {
+                console.error("Error detallado en generatePdf con pdf-lib:", error);
+                alert(`Error al procesar el PDF: ${error.message}. Verifica la consola para más detalles, la URL de la plantilla y los nombres de los campos internos del PDF.`);
+            }
+        }
+
+        /**
+         * Elimina un trámite del array 'players'.
+         * @param {number} index - Índice del trámite a eliminar.
+         */
+        function deleteTramite(index) {
+            console.log(`Intentando eliminar trámite idx: ${index}`);
+            if (index >= 0 && index < players.length) {
+                if (confirm(`¿Estás seguro de que deseas eliminar el trámite de ${players[index].nombres || 'este jugador'}?`)) {
+                    players.splice(index, 1);
+                    renderPlayerList(); // Actualiza la lista en la UI
+                    console.log("Trámite eliminado.");
+                }
+            } else {
+                console.error("Error deleteTramite: Índice inválido:", index);
+                alert('Error: No se pudo eliminar el trámite (índice inválido).');
+            }
+        }
+
+        /**
+         * Elimina una autorización del array 'autorizaciones'.
+         * @param {number} index - Índice de la autorización a eliminar.
+         */
+        function deleteAutorizacion(index) {
+            console.log(`Intentando eliminar autorización idx: ${index}`);
+            if (index >= 0 && index < autorizaciones.length) {
+                 if (confirm(`¿Estás seguro de que deseas eliminar la autorización para ${autorizaciones[index].jugadorNombre || 'este jugador'}?`)) {
+                    autorizaciones.splice(index, 1);
+                    renderPlayerList(); // Actualiza la lista en la UI
+                    console.log("Autorización eliminada.");
+                }
+            } else {
+                console.error("Error deleteAutorizacion: Índice inválido:", index);
+                alert('Error: No se pudo eliminar la autorización (índice inválido).');
+            }
+        }
+
+        /**
+         * Elimina un usuario del array 'users' (simulación local).
+         * @param {number} index - Índice del usuario a eliminar.
+         */
+        function deleteUser(index) {
+            console.log(`Intentando eliminar usuario idx: ${index}`);
+            if (index >= 0 && index < users.length) {
+                // Evitar eliminar los usuarios por defecto si es necesario
+                const userToDelete = users[index];
+                if (userToDelete.username === '15974472-8' || userToDelete.username === '16776631-5') {
+                     alert(`No se puede eliminar el usuario por defecto: ${userToDelete.nombreCompleto}.`);
+                     return;
+                }
+                if (confirm(`¿Estás seguro de que deseas eliminar al usuario ${userToDelete.nombreCompleto || userToDelete.username}?`)) {
+                    users.splice(index, 1);
+                    renderUserManagementForm(); // Actualiza la lista en la UI
+                    console.log("Usuario eliminado (localmente).");
+                }
+            } else {
+                console.error("Error deleteUser: Índice inválido:", index);
+                alert('Error: No se pudo eliminar el usuario (índice inválido).');
+            }
+        }
+
+
+        // --- Función Toggle Sidebar ---
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            if (!sidebar) return;
+            sidebar.classList.toggle('sidebar-collapsed');
+            // Opcional: Guardar estado en localStorage si se desea persistencia
+            // localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('sidebar-collapsed'));
+        }
+
+        // --- Inicialización y Listeners Globales ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const loginForm = document.getElementById('login-form');
+            const menuTramite = document.getElementById('menu-tramite');
+            const menuAutorizacion = document.getElementById('menu-autorizacion');
+            const menuUsuarios = document.getElementById('menu-usuarios');
+            const menuLista = document.getElementById('menu-lista');
+            const menuFotoCarnet = document.getElementById('menu-fotocarnet');
+            const collapseToggle = document.getElementById('collapse-toggle');
+            const contentArea = document.getElementById('content-area'); // Para delegación de eventos
+            const logoutButton = document.getElementById('logout-button');
+            const darkModeToggle = document.getElementById('dark-mode-toggle');
+
+            // --- Lógica Dark Mode ---
+            const htmlElement = document.documentElement;
+            const darkModeIcon = darkModeToggle.querySelector('i');
+
+            const applyDarkMode = (isDark) => {
+                if (isDark) {
+                    htmlElement.classList.add('dark');
+                    darkModeIcon.classList.remove('fa-moon');
+                    darkModeIcon.classList.add('fa-sun');
+                } else {
+                    htmlElement.classList.remove('dark');
+                    darkModeIcon.classList.remove('fa-sun');
+                    darkModeIcon.classList.add('fa-moon');
+                }
+            };
+
+            const preferredDarkMode = localStorage.getItem('darkMode');
+            // Si no hay preferencia, usa la del sistema (si es posible detectarla)
+            // const systemPrefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            // let initialDarkModeState = preferredDarkMode === 'enabled' || (preferredDarkMode === null && systemPrefersDark);
+            let initialDarkModeState = preferredDarkMode === 'enabled';
+
+
+            applyDarkMode(initialDarkModeState);
+
+            darkModeToggle.addEventListener('click', () => {
+                const isDark = htmlElement.classList.toggle('dark');
+                localStorage.setItem('darkMode', isDark ? 'enabled' : 'disabled');
+                applyDarkMode(isDark);
+            });
+            // --- Fin Lógica Dark Mode ---
+
+            // --- Lógica Sidebar Colapsado (Opcional persistencia) ---
+            // if (localStorage.getItem('sidebarCollapsed') === 'true') {
+            //     document.getElementById('sidebar')?.classList.add('sidebar-collapsed');
+            // }
+            // --- Fin Lógica Sidebar ---
+
+
+            if (loginForm) loginForm.addEventListener('submit', handleLoginSubmit);
+            if (menuTramite) menuTramite.addEventListener('click', (e) => { e.preventDefault(); renderTramiteForm(); });
+            if (menuAutorizacion) menuAutorizacion.addEventListener('click', (e) => { e.preventDefault(); renderAutorizacionForm(); });
+            if (menuUsuarios) menuUsuarios.addEventListener('click', (e) => { e.preventDefault(); renderUserManagementForm(); });
+            if (menuLista) menuLista.addEventListener('click', (e) => { e.preventDefault(); renderPlayerList(); });
+            if (menuFotoCarnet) menuFotoCarnet.addEventListener('click', (e) => { e.preventDefault(); renderFotoCarnetForm(); });
+            if (collapseToggle) collapseToggle.addEventListener('click', toggleSidebar);
+            if (logoutButton) logoutButton.addEventListener('click', handleLogout);
+
+            // Delegación de eventos para botones de acción en tablas
+            if (contentArea) {
+                contentArea.addEventListener('click', (event) => {
+                    const actionButton = event.target.closest('button[data-action]');
+                    if (actionButton) {
+                        const action = actionButton.dataset.action;
+                        const type = actionButton.dataset.type;
+                        const indexStr = actionButton.dataset.index;
+                        const index = parseInt(indexStr, 10);
+
+                        if (isNaN(index) && action !== 'generate-pdf-all') { // Permitir acciones sin índice si se implementan
+                            console.error("Índice inválido o no proporcionado para la acción:", indexStr, action, type);
+                            return;
+                        }
+                        console.log(`Clic en acción - Acción: ${action}, Tipo: ${type}, Índice: ${index}`);
+
+                        if (type === 'user') {
+                            if (action === 'delete') deleteUser(index);
+                            else if (action === 'edit') populateUserEditForm(index);
+                        } else if (type === 'tramite' && action === 'delete') {
+                            deleteTramite(index);
+                        } else if (type === 'autorizacion' && action === 'delete') {
+                            deleteAutorizacion(index);
+                        } else if (action === 'generate-pdf') {
+                            generatePdf(type, index);
+                        } else {
+                            console.warn(`Acción/Tipo no manejado: ${action}/${type}`);
+                        }
+                    }
+                });
+            }
+
+            showLoginScreen(); // Muestra la pantalla de login al cargar
+        }); // Fin DOMContentLoaded
+    </script>
+</body>
+</html>
