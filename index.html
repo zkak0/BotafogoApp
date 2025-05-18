@@ -1424,6 +1424,8 @@
                         try {
                             const field = form.getTextField(pdfFieldName);
                             field.setText(valueToSet.toString()); // Asegura que sea string
+                            // Añadir justificación centrada
+                            field.setAlignment(PDFLib.TextAlignment.Center); // <-- Línea añadida
                             console.log(`Campo (Trámite) '${pdfFieldName}' rellenado con: '${valueToSet}'`);
                         } catch (e) {
                             console.warn(`Advertencia (Trámite): No se encontró o no se pudo rellenar el campo '${pdfFieldName}'. Error: ${e.message}`);
@@ -1450,8 +1452,10 @@
                         try {
                             const field = form.getTextField(pdfFieldName);
                             field.setText(valueToSet.toString());
+                            // Añadir justificación centrada
+                            field.setAlignment(PDFLib.TextAlignment.Center); // <-- Línea añadida
                             console.log(`Campo (Autorización) '${pdfFieldName}' rellenado con: '${valueToSet}'`);
-                        } catch (e) {
+                            } catch (e) {
                             console.warn(`Advertencia (Autorización): No se encontró o no se pudo rellenar el campo '${pdfFieldName}'. Error: ${e.message}`);
                         }
                     });
