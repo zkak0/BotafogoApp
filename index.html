@@ -957,26 +957,36 @@
             const ctx = resultCanvas.getContext('2d');
             const photoWidth = croppedCanvas.width;
             const photoHeight = croppedCanvas.height;
-            const textLineHeight = Math.max(18, photoWidth * 0.06);
-            const textPaddingVertical = Math.max(10, photoWidth * 0.033);
-            const fontSize = Math.max(16, photoWidth * 0.053);
-            const textStripHeight = (textLineHeight * 3) + (textPaddingVertical * 2);
+            
+            const textLineHeight = Math.max(22, photoWidth * 0.08); 
+            const textPaddingVertical = Math.max(15, photoWidth * 0.05); 
+            const fontSize = Math.max(20, photoWidth * 0.065); 
+            const numTextLines = 3; 
+            const textStripHeight = (textLineHeight * numTextLines) + (textPaddingVertical * 2);
+
             resultCanvas.width = photoWidth; resultCanvas.height = photoHeight;
             ctx.clearRect(0, 0, resultCanvas.width, resultCanvas.height);
             ctx.drawImage(croppedCanvas, 0, 0, resultCanvas.width, resultCanvas.height);
             ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
             const stripY = resultCanvas.height - textStripHeight;
             ctx.fillRect(0, stripY, resultCanvas.width, textStripHeight);
-            ctx.fillStyle = 'white'; ctx.font = `bold ${fontSize}px Inter, sans-serif`;
-            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            
+            ctx.fillStyle = 'white'; 
+            ctx.textAlign = 'center'; 
+            ctx.textBaseline = 'middle';
+            
             const textBaseY = stripY + textPaddingVertical;
             const textY1 = textBaseY + (textLineHeight / 2);
             const textY2 = textY1 + textLineHeight;
             const textY3 = textY2 + textLineHeight;
+
+            ctx.font = `bold ${fontSize}px Inter, sans-serif`; // Nombres y Apellidos en negrita
             ctx.fillText(nombres.toUpperCase(), resultCanvas.width / 2, textY1);
             ctx.fillText(apellidos.toUpperCase(), resultCanvas.width / 2, textY2);
-            ctx.font = `${fontSize}px Inter, sans-serif`;
+            
+            ctx.font = `bold ${fontSize}px Inter, sans-serif`; // RUT también en negrita
             ctx.fillText(rut.toUpperCase(), resultCanvas.width / 2, textY3);
+            
             resultCanvas.style.display = 'block';
             if(canvasPlaceholder) canvasPlaceholder.style.display = 'none';
         }
@@ -1149,7 +1159,12 @@
             event.preventDefault();
             console.log('[handleTramiteSubmit] Botón Guardar Trámite presionado.'); 
             const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-            if (!currentUser) { alert("Debes iniciar sesión."); showLoginScreen(); return; }
+            if (!currentUser || !currentUser.id) { 
+                alert("Debes iniciar sesión para guardar un trámite. Falta ID de usuario.");
+                console.error('[handleTramiteSubmit] currentUser o currentUser.id no definido:', currentUser);
+                showLoginScreen();
+                return;
+            }
             const tramiteData = {
                 ci: document.getElementById('ci').value,
                 fecha_nac: document.getElementById('fecha-nac').value,
@@ -1190,9 +1205,9 @@
 
         async function handleAutorizacionSubmit(event) { 
             event.preventDefault();
-            console.log('[handleAutorizacionSubmit] Botón Guardar Autorización presionado.'); // Log para depuración
+            console.log('[handleAutorizacionSubmit] Botón Guardar Autorización presionado.'); 
             const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-            if (!currentUser || !currentUser.id) { // Verificación más robusta
+            if (!currentUser || !currentUser.id) { 
                 alert("Debes iniciar sesión para guardar una autorización. Falta ID de usuario.");
                 console.error('[handleAutorizacionSubmit] currentUser o currentUser.id no definido:', currentUser);
                 showLoginScreen();
