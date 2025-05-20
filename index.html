@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
     <style>
-        /* --- Estilos CSS (sin cambios significativos respecto a la versión anterior) --- */
+        /* --- Estilos CSS --- */
         :root {
             --bg-primary: #f9fafb; /* gray-50 */
             --bg-secondary: #ffffff; /* white */
@@ -37,6 +37,7 @@
             --button-cancel-hover-bg: #f3f4f6; /* gray-100 */
             --button-generic-bg: #e5e7eb;
             --button-generic-hover-bg: #d1d5db;
+            --slider-track-bg: #d1d5db; /* Color para la pista del slider en modo claro */
         }
         html.dark {
             --bg-primary: #111827; /* gray-900 */
@@ -63,6 +64,7 @@
             --button-cancel-hover-bg: #374151; /* gray-700 */
             --button-generic-bg: #374151;
             --button-generic-hover-bg: #4b5563;
+            --slider-track-bg: #4b5563; /* Color para la pista del slider en modo oscuro */
         }
         body { font-family: 'Inter', sans-serif; background-color: var(--bg-primary); color: var(--text-primary); transition: background-color 0.3s ease, color 0.3s ease; }
         #login-screen { display: flex; justify-content: center; align-items: center; min-height: 100vh; background-color: var(--bg-primary); }
@@ -185,13 +187,52 @@
         html.dark #cancel-delete-btn { background-color: var(--button-generic-bg); color: var(--text-primary); border-color: var(--border-input); }
         html.dark #cancel-delete-btn:hover { background-color: var(--button-generic-hover-bg); }
 
+        /* Estilos para controles de ajuste de imagen */
+        .adjustment-control {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem; /* Equivalente a space-y-1 de Tailwind */
+            padding: 0.75rem; /* p-3 */
+            border: 1px solid var(--border-input); /* Borde suave */
+            border-radius: 0.375rem; /* rounded-md */
+            background-color: var(--bg-secondary); /* Fondo para que contraste con el slider */
+        }
+        .slider {
+            width: 100%;
+            height: 0.5rem; /* h-2 */
+            border-radius: 0.5rem; /* rounded-lg */
+            -webkit-appearance: none;
+            appearance: none;
+            cursor: pointer;
+            background-color: var(--slider-track-bg); /* Color de la pista del slider */
+        }
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 1rem; /* w-4 */
+            height: 1rem; /* h-4 */
+            border-radius: 9999px; /* rounded-full */
+            background-color: var(--button-action-bg); 
+            cursor: pointer;
+            border: 2px solid var(--bg-secondary); /* Borde para mejor visibilidad del thumb */
+            box-shadow: 0 0 2px rgba(0,0,0,0.3);
+        }
+        .slider::-moz-range-thumb { /* Firefox */
+            width: 1rem;
+            height: 1rem;
+            border-radius: 9999px;
+            background-color: var(--button-action-bg);
+            cursor: pointer;
+            border: 2px solid var(--bg-secondary);
+            box-shadow: 0 0 2px rgba(0,0,0,0.3);
+        }
     </style>
 </head>
 <body class="bg-primary">
     <div id="login-screen">
         <div class="login-box">
             <img src="https://i.imgur.com/IAVAqup.jpeg" alt="Logo Botafogo" class="login-logo" onerror="this.src='https://placehold.co/200x100/cccccc/333333?text=LOGO'; this.onerror=null;">
-            <h2 class="text-2xl font-bold text-primary mb-6">Bienvenido a BotafogoApp v2.9</h2>
+            <h2 class="text-2xl font-bold text-primary mb-6">Bienvenido a BotafogoApp v2.9.1</h2>
             <form id="login-form">
                 <div>
                     <label for="username" class="sr-only">Usuario</label>
@@ -210,7 +251,7 @@
     <div id="app-screen" class="min-h-screen flex-container">
         <aside class="w-64 bg-sidebar text-sidebar p-6 space-y-6 rounded-r-lg flex flex-col justify-between sidebar" id="sidebar">
             <div>
-                <div class="text-2xl font-bold mb-6 sidebar-title text-sidebar-title">BotafogoApp v2.9</div>
+                <div class="text-2xl font-bold mb-6 sidebar-title text-sidebar-title">BotafogoApp v2.9.1</div>
                 <nav class="sidebar-nav">
                     <ul class="space-y-2">
                         <li><a href="#" class="block rounded transition duration-200 px-4 py-2.5 text-sm font-medium hover:bg-sidebar-hover hover:text-sidebar-hover menu-item-text" id="menu-tramite"><i class="fas fa-file-contract text-lg"></i> <span>Trámite Individual</span></a></li>
@@ -264,7 +305,7 @@
         // --- Datos Globales ---
         let cropperInstance = null;
         let isCropperScriptLoaded = false;
-        let itemToDelete = { id: null, type: null, name: '' }; 
+        let itemToDelete = { id: null, type: null, name: '' };
 
         // --- Funciones Auxiliares ---
         function formatRut(rutInput) {
@@ -353,7 +394,7 @@
         function hideDeleteConfirmModal() {
             const modal = document.getElementById('delete-confirm-modal');
             if (modal) modal.style.display = 'none';
-            itemToDelete = { id: null, type: null, name: '' }; // Reset
+            itemToDelete = { id: null, type: null, name: '' }; 
         }
 
         async function proceedWithDeletion() {
@@ -395,7 +436,8 @@
             }
             hideDeleteConfirmModal();
         }
-
+        
+        // --- Funciones de Navegación y Estado de la UI ---
         function showLoginScreen() {
             document.getElementById('login-screen').style.display = 'flex';
             document.getElementById('app-screen').style.display = 'none';
@@ -404,6 +446,7 @@
                 menuUsuariosLi.style.display = 'none';
             }
         }
+
         function showAppScreen() {
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('app-screen').style.display = 'flex';
@@ -411,6 +454,7 @@
             const contentArea = document.getElementById('content-area');
             if(mainTitle) mainTitle.innerText = 'Bienvenido';
             if(contentArea) contentArea.innerHTML = '<p class="text-lg">Selecciona una opción del menú lateral para comenzar.</p>';
+            
             const currentUser = JSON.parse(localStorage.getItem('currentUser'));
             const menuUsuariosLi = document.getElementById('li-menu-usuarios');
             if (menuUsuariosLi) {
@@ -418,6 +462,7 @@
             }
         }
 
+        // --- Funciones de Renderizado de Contenido ---
         async function renderPlayerList() {
             const currentUser = JSON.parse(localStorage.getItem('currentUser'));
             if (!currentUser) { showLoginScreen(); return; }
@@ -439,6 +484,7 @@
             const { data: autorizacionesData, error: authError } = await autorizacionesQuery;
 
             let listHtml = `<div class="bg-secondary p-4 sm:p-6 rounded-lg shadow-md">`;
+            
             listHtml += `
                 <div class="mb-8 p-4 border border-border-color rounded-lg bg-primary">
                     <h2 class="text-xl sm:text-2xl font-semibold mb-4 text-primary">Trámites Individuales</h2>
@@ -686,8 +732,8 @@
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 items-end">
                             <div>
-                                <label for="new-username" class="block text-sm font-medium text-secondary mb-1">Usuario:</label>
-                                <input type="text" id="new-username" class="${inputBaseClasses}" placeholder="" required>
+                                <label for="new-username" class="block text-sm font-medium text-secondary mb-1">Usuario (RUT sin puntos, con guion):</label>
+                                <input type="text" id="new-username" class="${inputBaseClasses}" placeholder="Ej: 12345678-K" required>
                             </div>
                             <div>
                                 <label for="new-password" class="block text-sm font-medium text-secondary mb-1">Clave:</label>
@@ -836,7 +882,7 @@
             };
             script.onerror = () => {
                 console.error(`Error al cargar el script: ${src}`);
-                alert(`Error crítico: No se pudo cargar la librería ${src}.`);
+                alert(`Error crítico: No se pudo cargar la librería ${src}. Algunas funcionalidades podrían no estar disponibles.`);
                 if (src.includes('cropper')) {
                     const generateButton = document.getElementById('generate-button');
                     if(generateButton) generateButton.disabled = true;
@@ -846,18 +892,20 @@
             };
             document.body.appendChild(script);
         }
-
+        
         function setupFotoCarnetListeners() {
             if (typeof Cropper === 'undefined') {
-                console.error("Cropper no está definido.");
+                console.error("Cropper no está definido. La funcionalidad de recorte de imagen no estará disponible.");
                 return;
             }
             const imageUpload = document.getElementById('image-upload');
             const generateButton = document.getElementById('generate-button');
             const rutInput = document.getElementById('foto-rut');
             const textInputs = ['foto-nombres', 'foto-apellidos', 'foto-rut'];
+
             if (imageUpload) imageUpload.addEventListener('change', handleImageUploadWithCropper);
             if (generateButton) generateButton.addEventListener('click', generateFotoCarnetWithCropper);
+            
             if (rutInput) {
                 rutInput.addEventListener('input', () => {
                     formatRut(rutInput);
@@ -891,6 +939,7 @@
             const imageElement = document.getElementById('cropper-image');
             const resultCanvas = document.getElementById('result-canvas');
             const canvasPlaceholder = document.getElementById('canvas-placeholder');
+
             if (cropperInstance) {
                 try { cropperInstance.destroy(); } catch(e) { console.warn("Error al destruir Cropper:", e); }
                 cropperInstance = null;
@@ -902,89 +951,106 @@
                 if(canvasPlaceholder) canvasPlaceholder.style.display = 'block';
             }
             checkEnableGenerateButton();
+
             if (file && file.type.startsWith('image/')) {
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     imageElement.src = e.target.result;
                     imageElement.alt = "Imagen cargada para recortar";
                     if (typeof Cropper === 'undefined') {
-                        alert("Error: La librería de recorte no se cargó.");
+                        alert("Error: La librería de recorte no se cargó correctamente. Intente recargar la página.");
                         return;
                     }
                     try {
                         cropperInstance = new Cropper(imageElement, {
-                            aspectRatio: 3 / 4, viewMode: 1, dragMode: 'move', autoCropArea: 0.9,
-                            background: false, zoomable: true, movable: true, cropBoxResizable: true,
-                            ready: checkEnableGenerateButton, crop: checkEnableGenerateButton
+                            aspectRatio: 3 / 4, 
+                            viewMode: 1,       
+                            dragMode: 'move',   
+                            autoCropArea: 0.9, 
+                            background: false, 
+                            zoomable: true,
+                            movable: true,
+                            cropBoxResizable: true,
+                            ready: checkEnableGenerateButton,
+                            crop: checkEnableGenerateButton 
                         });
                     } catch (error) {
-                        alert(`Error al inicializar recorte: ${error.message}`);
+                        alert(`Error al inicializar la herramienta de recorte: ${error.message}`);
                         imageElement.src = ""; imageElement.alt = "Error al cargar imagen.";
                     }
                 };
                 reader.readAsDataURL(file);
             } else {
-                imageElement.src = ""; imageElement.alt = "Área para ajustar foto.";
-                if(file) alert("Por favor, selecciona un archivo de imagen válido.");
+                imageElement.src = ""; 
+                imageElement.alt = "Área para ajustar foto. Sube una imagen para empezar.";
+                if(file) alert("Por favor, selecciona un archivo de imagen válido (ej: JPG, PNG).");
                 checkEnableGenerateButton();
             }
         }
 
         function generateFotoCarnetWithCropper() {
             if (!cropperInstance || typeof cropperInstance.getCroppedCanvas !== 'function') {
-                alert("Sube y ajusta una imagen primero.");
+                alert("Por favor, sube y ajusta una imagen primero.");
                 return;
             }
             const nombres = document.getElementById('foto-nombres').value.trim();
             const apellidos = document.getElementById('foto-apellidos').value.trim();
             const rut = document.getElementById('foto-rut').value.trim();
             if (!nombres || !apellidos || !rut) {
-                alert("Completa Nombres, Apellidos y RUT.");
+                alert("Por favor, completa los campos de Nombres, Apellidos y RUT.");
                 return;
             }
+
             let croppedCanvas;
             try {
                 croppedCanvas = cropperInstance.getCroppedCanvas({
-                    width: 300, imageSmoothingEnabled: true, imageSmoothingQuality: 'high',
+                    width: 300,
+                    imageSmoothingEnabled: true,
+                    imageSmoothingQuality: 'high',
                 });
-                if (!croppedCanvas.width || !croppedCanvas.height) throw new Error("Área recortada inválida.");
+                if (!croppedCanvas.width || !croppedCanvas.height) throw new Error("El área recortada es inválida o demasiado pequeña.");
             } catch (error) {
-                alert(`Error al recortar: ${error.message}.`);
+                alert(`Error al obtener la imagen recortada: ${error.message}. Intenta ajustar el recorte de nuevo.`);
                 return;
             }
+            
             const resultCanvas = document.getElementById('result-canvas');
             const canvasPlaceholder = document.getElementById('canvas-placeholder');
             const ctx = resultCanvas.getContext('2d');
+
             const photoWidth = croppedCanvas.width;
             const photoHeight = croppedCanvas.height;
             
-            const textLineHeight = Math.max(22, photoWidth * 0.08); 
-            const textPaddingVertical = Math.max(15, photoWidth * 0.05); 
-            const fontSize = Math.max(20, photoWidth * 0.065); 
+            const textLineHeight = Math.max(22, photoWidth * 0.08);
+            const textPaddingVertical = Math.max(15, photoWidth * 0.05);
+            const fontSize = Math.max(20, photoWidth * 0.065);
             const numTextLines = 3; 
             const textStripHeight = (textLineHeight * numTextLines) + (textPaddingVertical * 2);
 
-            resultCanvas.width = photoWidth; resultCanvas.height = photoHeight;
+            resultCanvas.width = photoWidth;
+            resultCanvas.height = photoHeight; 
+
             ctx.clearRect(0, 0, resultCanvas.width, resultCanvas.height);
             ctx.drawImage(croppedCanvas, 0, 0, resultCanvas.width, resultCanvas.height);
+
             ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
             const stripY = resultCanvas.height - textStripHeight;
             ctx.fillRect(0, stripY, resultCanvas.width, textStripHeight);
             
-            ctx.fillStyle = 'white'; 
-            ctx.textAlign = 'center'; 
+            ctx.fillStyle = 'white';
+            ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            
+
             const textBaseY = stripY + textPaddingVertical;
             const textY1 = textBaseY + (textLineHeight / 2);
             const textY2 = textY1 + textLineHeight;
             const textY3 = textY2 + textLineHeight;
 
-            ctx.font = `bold ${fontSize}px Inter, sans-serif`; // Nombres y Apellidos en negrita
+            ctx.font = `bold ${fontSize}px Inter, sans-serif`;
             ctx.fillText(nombres.toUpperCase(), resultCanvas.width / 2, textY1);
             ctx.fillText(apellidos.toUpperCase(), resultCanvas.width / 2, textY2);
             
-            ctx.font = `bold ${fontSize}px Inter, sans-serif`; // RUT también en negrita
+            ctx.font = `bold ${fontSize}px Inter, sans-serif`;
             ctx.fillText(rut.toUpperCase(), resultCanvas.width / 2, textY3);
             
             resultCanvas.style.display = 'block';
@@ -996,7 +1062,6 @@
             event.preventDefault();
             const cedulaInput = document.getElementById('username');
             let cedula = cedulaInput.value; 
-            
             cedula = cedula.replace(/\./g, ""); 
 
             const password = document.getElementById('password').value;
@@ -1011,7 +1076,7 @@
                 .eq('username', cedula) 
                 .single();
 
-            if (error || !user) { 
+            if (error || !user) {
                 console.error('[handleLoginSubmit] Error de Supabase o usuario no encontrado:', error);
                 errorMessage.textContent = 'Credenciales inválidas o error de conexión.';
                 return;
@@ -1038,7 +1103,7 @@
             localStorage.removeItem('currentUser');
             showLoginScreen();
         }
-
+        
         async function handleAddUserSubmit(event) {
             event.preventDefault();
             const currentUser = JSON.parse(localStorage.getItem('currentUser'));
@@ -1047,33 +1112,33 @@
             }
 
             const nombre_completo = document.getElementById('new-fullname').value.trim();
-            const cedula = document.getElementById('new-username').value.trim(); 
+            const cedula = document.getElementById('new-username').value.trim();
             const password = document.getElementById('new-password').value;
             const role = document.getElementById('new-role').value;
             const errorDiv = document.getElementById('add-user-error');
-            const editUserId = document.getElementById('edit-user-id').value; 
+            const editUserId = document.getElementById('edit-user-id').value;
             errorDiv.textContent = '';
 
             if (!nombre_completo || !cedula || !role) {
-                errorDiv.textContent = 'Nombre Completo, Usuario y Rol son requeridos.';
+                errorDiv.textContent = 'Nombre Completo, Usuario (RUT) y Rol son requeridos.';
                 return;
             }
 
             let password_hash = null;
-            if (password) { 
+            if (password) {
                 const encoder = new TextEncoder();
                 const data = encoder.encode(password);
                 const hashBuffer = await crypto.subtle.digest('SHA-256', data);
                 password_hash = Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
             }
 
-            if (editUserId) { 
+            if (editUserId) {
                 const userDataToUpdate = {
                     nombre_completo: nombre_completo,
-                    username: cedula, 
+                    username: cedula,
                     role: role,
                 };
-                if (password_hash) { 
+                if (password_hash) {
                     userDataToUpdate.password_hash = password_hash;
                 }
                 const { error: updateError } = await supabaseClient
@@ -1088,15 +1153,15 @@
                     alert('Usuario actualizado exitosamente.');
                     renderUserManagementForm();
                 }
-            } else { 
-                if (!password_hash) { 
+            } else {
+                if (!password_hash) {
                     errorDiv.textContent = 'Debe ingresar la clave para un nuevo usuario.';
                     return;
                 }
                 const { data, error: insertError } = await supabaseClient
                     .from('users') 
                     .insert([{
-                        username: cedula, 
+                        username: cedula,
                         password_hash: password_hash, 
                         nombre_completo: nombre_completo,
                         role: role
@@ -1105,7 +1170,7 @@
                 if (insertError) {
                     console.error("Error al registrar usuario:", insertError);
                     if (insertError.message.includes('duplicate key value violates unique constraint')) {
-                         errorDiv.textContent = 'Error: El usuario ya existe.';
+                         errorDiv.textContent = 'Error: El usuario (RUT) ya existe.';
                     } else {
                         errorDiv.textContent = 'Error al registrar usuario: ' + insertError.message;
                     }
@@ -1119,12 +1184,14 @@
         async function populateUserEditForm(userId) { 
             const { data: user, error } = await supabaseClient.from('users').select('*').eq('id', userId).single();
             if (error || !user) { alert('No se pudo cargar el usuario para editar.'); return; }
+
             document.getElementById('new-fullname').value = user.nombre_completo || '';
-            document.getElementById('new-username').value = user.username; 
+            document.getElementById('new-username').value = user.username;
             document.getElementById('new-password').value = '';
             document.getElementById('new-password').placeholder = 'Nueva Clave (o dejar en blanco)';
             document.getElementById('new-role').value = user.role || 'user';
-            document.getElementById('edit-user-id').value = user.id; 
+            document.getElementById('edit-user-id').value = user.id;
+            
             document.getElementById('user-form-title').textContent = 'Editar Usuario';
             const submitButton = document.getElementById('user-submit-button');
             submitButton.classList.remove('bg-button-green-bg', 'hover:bg-button-green-hover-bg');
@@ -1132,6 +1199,7 @@
             document.getElementById('user-submit-button-text').textContent = 'Guardar Cambios';
             document.getElementById('user-cancel-button').classList.remove('hidden');
             document.getElementById('add-user-error').textContent = '';
+
             document.getElementById('new-fullname').scrollIntoView({ behavior: 'smooth', block: 'center' });
             document.getElementById('new-fullname').focus();
         }
@@ -1141,6 +1209,7 @@
             if (form) form.reset();
             document.getElementById('edit-user-id').value = '';
             document.getElementById('user-form-title').textContent = 'Agregar Nuevo Usuario';
+            
             const submitButton = document.getElementById('user-submit-button');
             if (submitButton) {
                 submitButton.classList.remove('edit-user-button');
@@ -1148,6 +1217,7 @@
             }
             document.getElementById('user-submit-button-text').textContent = 'Agregar';
             document.getElementById('user-cancel-button').classList.add('hidden');
+            
             const passwordInput = document.getElementById('new-password');
             if (passwordInput) passwordInput.placeholder = '';
             const roleInput = document.getElementById('new-role');
@@ -1165,6 +1235,7 @@
                 showLoginScreen();
                 return;
             }
+
             const tramiteData = {
                 ci: document.getElementById('ci').value,
                 fecha_nac: document.getElementById('fecha-nac').value,
@@ -1184,22 +1255,24 @@
                 procede_asociacion: document.getElementById('procede-asociacion').value,
                 user_id: currentUser.id
             };
+
             const dateRegex = /^\d{2}-\d{2}-\d{4}$/;
-            if (!dateRegex.test(tramiteData.fecha_nac)) { alert('Formato Fecha Nacimiento: DD-MM-AAAA.'); return; }
+            if (!dateRegex.test(tramiteData.fecha_nac)) { alert('Formato de Fecha de Nacimiento incorrecto. Use DD-MM-AAAA.'); return; }
             const solicitaValue = Object.keys(tramiteData).filter(k => k.startsWith('solicita_') && tramiteData[k]).length > 0;
             const categoriaValue = Object.keys(tramiteData).filter(k => k.startsWith('categoria_') && tramiteData[k]).length > 0;
-            if (!solicitaValue) { alert('Marque una opción en "Solicita".'); return; }
-            if (!categoriaValue) { alert('Marque una opción en "Categoría".'); return; }
+            if (!solicitaValue) { alert('Debe marcar al menos una opción en "Solicita".'); return; }
+            if (!categoriaValue) { alert('Debe marcar al menos una opción en "Categoría".'); return; }
             
             console.log('[handleTramiteSubmit] Datos del trámite a guardar:', tramiteData);
             const { error } = await supabaseClient.from('players').insert([tramiteData]);
+
             if (error) {
                 console.error('[handleTramiteSubmit] Error al guardar trámite:', error);
                 alert('Error al guardar trámite: ' + error.message);
             } else { 
                 alert('Trámite guardado exitosamente!'); 
-                document.getElementById('form-tramite').reset(); 
-                renderPlayerList(); 
+                document.getElementById('form-tramite').reset();
+                renderPlayerList();
             }
         }
 
@@ -1219,7 +1292,7 @@
                 apoderado_ci: document.getElementById('apoderado-ci').value,
                 jugador_nombre: document.getElementById('jugador-nombre-auth').value,
                 parentesco: document.getElementById('parentesco').value,
-                user_id: currentUser.id 
+                user_id: currentUser.id
             };
 
             if (autorizacionData.parentesco === "") {
@@ -1237,12 +1310,12 @@
             } else {
                 alert('Autorización guardada exitosamente en Supabase!');
                 document.getElementById('form-autorizacion').reset();
-                renderPlayerList(); 
+                renderPlayerList();
             }
         }
 
         async function generatePdf(type, id) { 
-            if (typeof PDFLib === 'undefined' || !PDFLib.PDFDocument) { alert("Librería PDF no lista."); return; }
+            if (typeof PDFLib === 'undefined' || !PDFLib.PDFDocument) { alert("La librería PDF no está lista. Intente de nuevo."); return; }
             const { PDFDocument } = PDFLib;
             const urlTramite = "https://zkak0.github.io/BotafogoApp/tramite_individual.pdf";
             const urlAutorizacion = "https://zkak0.github.io/BotafogoApp/autorizacion_jugadores.pdf";
@@ -1251,22 +1324,23 @@
             if (type === 'tramite') {
                 isTramite = true;
                 const { data, error } = await supabaseClient.from('players').select('*').eq('id', id).single();
-                if (error || !data) { alert("Error: Trámite no encontrado."); return; }
+                if (error || !data) { alert("Error: Trámite no encontrado en la base de datos."); return; }
                 dataToFill = data; pdfUrlToLoad = urlTramite;
-                outputFilename = `tramite_${(data.ci || 'jugador')}_${Date.now()}.pdf`;
+                outputFilename = `tramite_${(data.ci || 'jugador').replace(/[^a-zA-Z0-9]/g, '_')}_${Date.now()}.pdf`;
             } else if (type === 'autorizacion') {
                 const { data, error } = await supabaseClient.from('autorizaciones').select('*').eq('id', id).single();
-                if (error || !data) { alert("Error: Autorización no encontrada."); return; }
+                if (error || !data) { alert("Error: Autorización no encontrada en la base de datos."); return; }
                 dataToFill = data; pdfUrlToLoad = urlAutorizacion;
-                outputFilename = `autorizacion_${(dataToFill.jugador_nombre || 'jugador')}_${Date.now()}.pdf`;
+                outputFilename = `autorizacion_${(dataToFill.jugador_nombre || 'jugador').replace(/[^a-zA-Z0-9]/g, '_')}_${Date.now()}.pdf`;
             } else { alert('Error: Tipo de PDF desconocido.'); return; }
 
             try {
                 const existingPdfBytes = await fetch(pdfUrlToLoad).then(res => {
-                    if (!res.ok) throw new Error(`Error descarga plantilla (${res.status})`); return res.arrayBuffer();
+                    if (!res.ok) throw new Error(`Error al descargar la plantilla PDF (${res.status})`); return res.arrayBuffer();
                 });
                 const pdfDoc = await PDFDocument.load(existingPdfBytes);
                 const form = pdfDoc.getForm();
+
                 if (isTramite) {
                     const fieldMap = {
                         ci: 'CEDULA IDENTIDAD', fechaNac: 'FECHA NAC', apellidoPaterno: 'APELLIDO PATERNO',
@@ -1277,7 +1351,7 @@
                         categoria_libertad: 'LIBERTAD ACCION', categoria_adulto: 'ADULTO',
                         categoria_femenina: 'FEMENINA', categoria_infantil: 'INFANTIL'
                     };
-                    const dataForPdf = { 
+                    const dataForPdf = {
                         ci: dataToFill.ci, fechaNac: dataToFill.fecha_nac, apellidoPaterno: dataToFill.apellido_paterno,
                         apellidoMaterno: dataToFill.apellido_materno, nombres: dataToFill.nombres,
                         procedeClub: dataToFill.procede_club, procedeAsociacion: dataToFill.procede_asociacion,
@@ -1292,7 +1366,7 @@
                             const field = form.getTextField(fieldMap[key]);
                             field.setText((dataForPdf[key] || '').toString());
                             field.setAlignment(PDFLib.TextAlignment.Center);
-                        } catch (e) { console.warn(`Campo no encontrado/rellenado (Trámite) '${fieldMap[key]}': ${e.message}`); }
+                        } catch (e) { console.warn(`Campo no encontrado o error al rellenar (Trámite) '${fieldMap[key]}': ${e.message}`); }
                     });
                 } else { 
                     const fieldMapAuth = { nombreAutorizante: 'NOMBRE AUTORIZANTE', cedulaIdentidad: 'CEDULA IDENTIDAD', nombreJugador: 'NOMBRE JUGADOR', parentesco: 'PARENTESCO' };
@@ -1307,17 +1381,18 @@
                             const field = form.getTextField(fieldMapAuth[key]);
                             field.setText((authDataMap[key] || '').toString());
                             field.setAlignment(PDFLib.TextAlignment.Center);
-                        } catch (e) { console.warn(`Campo no encontrado/rellenado (Autorización) '${fieldMapAuth[key]}': ${e.message}`); }
+                        } catch (e) { console.warn(`Campo no encontrado o error al rellenar (Autorización) '${fieldMapAuth[key]}': ${e.message}`); }
                     });
                 }
-                try { form.flatten(); } catch (e) { console.warn("Error al aplanar PDF:", e); }
+                try { form.flatten(); } catch (e) { console.warn("Error al aplanar el PDF (flatten):", e); } 
+                
                 const pdfBytes = await pdfDoc.save();
                 const blob = new Blob([pdfBytes], { type: 'application/pdf' });
                 const link = document.createElement('a');
                 link.href = URL.createObjectURL(blob); link.download = outputFilename;
                 document.body.appendChild(link); link.click(); document.body.removeChild(link);
                 URL.revokeObjectURL(link.href);
-            } catch (error) { alert(`Error al procesar PDF: ${error.message}.`); }
+            } catch (error) { alert(`Error al procesar el PDF: ${error.message}. Asegúrese de que las plantillas PDF son accesibles.`); }
         }
 
         async function deleteTramite(tramiteId) {
@@ -1336,7 +1411,7 @@
             if (tramiteData) {
                 itemName = `el trámite de ${tramiteData.nombres || tramiteData.ci}`;
             } else if (fetchError && fetchError.code !== 'PGRST116') {
-                console.error('Error al buscar trámite para eliminar:', fetchError);
+                console.error('Error al buscar información del trámite para eliminar:', fetchError);
             }
             showDeleteConfirmModal(tramiteId, 'tramite', itemName);
         }
@@ -1357,7 +1432,7 @@
             if (authData && authData.jugador_nombre) {
                 itemName = `la autorización para ${authData.jugador_nombre}`;
             } else if (fetchError && fetchError.code !== 'PGRST116') {
-                 console.error('Error al buscar autorización para eliminar:', fetchError);
+                 console.error('Error al buscar información de la autorización para eliminar:', fetchError);
             }
             showDeleteConfirmModal(autorizacionId, 'autorizacion', itemName);
         }
@@ -1371,7 +1446,7 @@
                 alert('Debes iniciar sesión.');
                 return;
             }
-             if (currentUser.username === cedula) { 
+            if (currentUser.username === cedula) { 
                 alert('No puedes eliminar tu propia cuenta.');
                 console.warn('[deleteUser] Intento de autoeliminación por Cédula:', currentUser.username);
                 return;
@@ -1399,14 +1474,14 @@
                  console.error('[deleteUser] Error al buscar información del usuario a eliminar:', fetchErr);
             }
             
-            showDeleteConfirmModal(cedula, 'user', itemName); 
+            showDeleteConfirmModal(cedula, 'user', itemName);
         }
 
         function toggleSidebar() {
             document.getElementById('sidebar')?.classList.toggle('sidebar-collapsed');
         }
 
-        // --- INICIO: Lógica para Cédula Identidad (sin cambios) ---
+        // --- INICIO: Lógica para Cédula Identidad (Corrección de Perspectiva) ---
         let ci_perspectiveImage = new Image();
         let ci_perspectivePoints = [];
         let ci_perspectiveOriginalCanvas, ci_perspectiveTransformedCanvas;
@@ -1415,17 +1490,25 @@
         let ci_currentSelectedFoto = 'foto1';
         const CI_FINAL_WIDTH = 340;
         const CI_FINAL_HEIGHT = 227;
+        // Variables globales para los ajustes de imagen de la cédula
+        let ci_currentAdjustments = {
+            brightness: 0,  // Rango -50 a 50, valor real
+            contrast: 1,    // Rango 0.5 a 1.5 (50% a 150%), valor real (slider / 100)
+            sharpness: 0,   // Rango 0 a 100
+            temperature: 0 // Rango -100 a 100, valor real
+        };
+
 
         function renderCedulaIdentidadForm() {
             const mainTitle = document.getElementById('main-title');
             const contentArea = document.getElementById('content-area');
             if (!mainTitle || !contentArea) return;
-            mainTitle.innerText = 'Corrector de Perspectiva para Cédulas';
+            mainTitle.innerText = 'Modificación de Cédula de Identidad';
             contentArea.innerHTML = `
                 <div id="cedula-identidad-section" class="bg-secondary p-4 sm:p-6 rounded-lg shadow-md max-w-4xl mx-auto">
                     <div class="flex flex-wrap items-center gap-4 mb-6">
                         <div class="flex items-center space-x-2 sm:space-x-4">
-                            <span class="text-sm font-medium text-primary">Subir:</span>
+                            <span class="text-sm font-medium text-primary">Subir para:</span>
                             <label class="flex items-center cursor-pointer">
                                 <input type="radio" name="fotoCedulaSelect" value="foto1" class="form-radio h-4 w-4 text-blue-600" checked>
                                 <span class="ml-2 text-sm text-primary">Foto 1 (Anverso)</span>
@@ -1453,6 +1536,24 @@
                             <div class="perspective-canvas-wrapper"><canvas id="ciPerspectiveTransformedCanvas"></canvas></div>
                         </div>
                     </div>
+                    <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 mb-6">
+                        <div class="adjustment-control">
+                            <label for="ciBrightness" class="block text-sm font-medium text-primary">Brillo: <span id="ciBrightnessValue">0</span>%</label>
+                            <input type="range" id="ciBrightness" min="-50" max="50" value="0" class="slider">
+                        </div>
+                        <div class="adjustment-control">
+                            <label for="ciContrast" class="block text-sm font-medium text-primary">Contraste: <span id="ciContrastValue">100</span>%</label>
+                            <input type="range" id="ciContrast" min="50" max="150" value="100" class="slider">
+                        </div>
+                        <div class="adjustment-control">
+                            <label for="ciSharpness" class="block text-sm font-medium text-primary">Nitidez: <span id="ciSharpnessValue">0</span>%</label>
+                            <input type="range" id="ciSharpness" min="0" max="100" value="0" class="slider">
+                        </div>
+                        <div class="adjustment-control">
+                            <label for="ciTemperature" class="block text-sm font-medium text-primary">Temperatura: <span id="ciTemperatureValue">0</span></label>
+                            <input type="range" id="ciTemperature" min="-100" max="100" value="0" class="slider">
+                        </div>
+                    </div>
                     <div class="mt-6 flex flex-wrap gap-2">
                         <button id="ci-perspective-save-btn" class="px-4 py-2 rounded-md disabled:opacity-50" disabled><i class="fas fa-save mr-2"></i>Guardar Imagen</button>
                         <button id="ci-perspective-reset-points-btn" class="px-4 py-2 rounded-md"><i class="fas fa-undo mr-2"></i>Reiniciar Puntos</button>
@@ -1467,47 +1568,112 @@
         }
 
         function initializeCedulaIdentidadLogic() {
-            if (typeof numeric === 'undefined') { alert("Error: Falta librería de perspectiva."); return; }
+            if (typeof numeric === 'undefined') { alert("Error: Falta la librería 'numeric.js' para la corrección de perspectiva."); return; }
             ci_perspectiveImage = new Image(); ci_perspectivePoints = []; ci_savedFoto1DataUrl = null; ci_savedFoto2DataUrl = null; ci_currentSelectedFoto = 'foto1';
+            // Resetear ajustes al inicializar la sección
+            ci_currentAdjustments = { brightness: 0, contrast: 1, sharpness: 0, temperature: 0 };
+            
             ci_perspectiveOriginalCanvas = document.getElementById('ciPerspectiveOriginalCanvas');
             ci_perspectiveTransformedCanvas = document.getElementById('ciPerspectiveTransformedCanvas');
-            if (!ci_perspectiveOriginalCanvas || !ci_perspectiveTransformedCanvas) { console.error("Error: Canvas de cédula no encontrado."); return; }
+            if (!ci_perspectiveOriginalCanvas || !ci_perspectiveTransformedCanvas) { console.error("Error: Canvas de cédula no encontrado en el DOM."); return; }
             ci_perspectiveCtxOriginal = ci_perspectiveOriginalCanvas.getContext('2d');
             ci_perspectiveCtxTransformed = ci_perspectiveTransformedCanvas.getContext('2d');
+
             document.getElementById('ciPerspectiveImageInput')?.addEventListener('change', ci_handleImageUpload);
             ci_perspectiveOriginalCanvas.addEventListener('click', ci_handleCanvasClick);
             document.getElementById('ci-perspective-save-btn')?.addEventListener('click', ci_saveImage);
             document.getElementById('ci-generate-cedula-pdf-btn')?.addEventListener('click', ci_generatePDF);
             document.getElementById('ci-perspective-reset-points-btn')?.addEventListener('click', () => {
-                ci_perspectivePoints = []; ci_drawPerspectivePointsAndLines();
+                ci_perspectivePoints = []; 
+                ci_drawPerspectivePointsAndLines();
                 if(ci_perspectiveCtxTransformed && ci_perspectiveTransformedCanvas) ci_perspectiveCtxTransformed.clearRect(0,0, ci_perspectiveTransformedCanvas.width, ci_perspectiveTransformedCanvas.height);
                 const saveButton = document.getElementById('ci-perspective-save-btn'); if(saveButton) saveButton.disabled = true;
+                // Resetear sliders y valores de ajuste
+                document.getElementById('ciBrightness').value = 0;
+                document.getElementById('ciContrast').value = 100;
+                document.getElementById('ciSharpness').value = 0;
+                document.getElementById('ciTemperature').value = 0;
+                ci_currentAdjustments = { brightness: 0, contrast: 1, sharpness: 0, temperature: 0 };
+                document.getElementById('ciBrightnessValue').textContent = '0';
+                document.getElementById('ciContrastValue').textContent = '100';
+                document.getElementById('ciSharpnessValue').textContent = '0';
+                document.getElementById('ciTemperatureValue').textContent = '0';
+
             });
             document.querySelectorAll('input[name="fotoCedulaSelect"]').forEach(radio => {
                 radio.addEventListener('change', (e) => {
-                    ci_currentSelectedFoto = e.target.value; ci_resetPerspectiveView(false);
+                    ci_currentSelectedFoto = e.target.value; 
+                    ci_resetPerspectiveView(false); 
                     if (ci_perspectiveImage.src) ci_drawImage();
                 });
             });
+
+            // Event listeners para los controles de ajuste de imagen
+            document.getElementById('ciBrightness').addEventListener('input', (e) => {
+                ci_currentAdjustments.brightness = parseInt(e.target.value);
+                document.getElementById('ciBrightnessValue').textContent = e.target.value;
+                if (ci_perspectiveTransformedCanvas.width > 0 && ci_perspectiveImage.src && ci_perspectivePoints.length === 4) {
+                    ci_applyPerspectiveTransform();
+                }
+            });
+            document.getElementById('ciContrast').addEventListener('input', (e) => {
+                ci_currentAdjustments.contrast = parseInt(e.target.value) / 100;
+                document.getElementById('ciContrastValue').textContent = e.target.value;
+                 if (ci_perspectiveTransformedCanvas.width > 0 && ci_perspectiveImage.src && ci_perspectivePoints.length === 4) {
+                    ci_applyPerspectiveTransform();
+                }
+            });
+            document.getElementById('ciSharpness').addEventListener('input', (e) => {
+                ci_currentAdjustments.sharpness = parseInt(e.target.value);
+                document.getElementById('ciSharpnessValue').textContent = e.target.value;
+                if (ci_perspectiveTransformedCanvas.width > 0 && ci_perspectiveImage.src && ci_perspectivePoints.length === 4) {
+                    ci_applyPerspectiveTransform();
+                }
+            });
+            document.getElementById('ciTemperature').addEventListener('input', (e) => {
+                ci_currentAdjustments.temperature = parseInt(e.target.value);
+                document.getElementById('ciTemperatureValue').textContent = e.target.value;
+                if (ci_perspectiveTransformedCanvas.width > 0 && ci_perspectiveImage.src && ci_perspectivePoints.length === 4) {
+                    ci_applyPerspectiveTransform();
+                }
+            });
+
+
             const initialRadio = document.querySelector('input[name="fotoCedulaSelect"]:checked');
             if (initialRadio) ci_currentSelectedFoto = initialRadio.value;
-            ci_updatePDFButtonState(); ci_updateSavedImagesList();
+            ci_updatePDFButtonState();
+            ci_updateSavedImagesList();
         }
 
         function ci_handleImageUpload(e) {
             const file = e.target.files[0]; if (!file) return;
-            if (!file.type.match('image.*')) { alert('Archivo de imagen inválido.'); return; }
-            if (file.size > 5 * 1024 * 1024) { alert('Tamaño máximo 5MB.'); e.target.value = ''; return; }
+            if (!file.type.match('image.*')) { alert('Por favor, selecciona un archivo de imagen.'); return; }
+            if (file.size > 5 * 1024 * 1024) { alert('El archivo es demasiado grande (máximo 5MB).'); e.target.value = ''; return; }
+
             const reader = new FileReader();
             reader.onload = (event) => {
                 ci_perspectiveImage.onload = () => {
-                    ci_updateCanvasDimensions(); ci_drawImage();
+                    ci_updateCanvasDimensions(); 
+                    ci_drawImage(); 
                     document.getElementById('ciCanvasPlaceholderCedula')?.style.setProperty('display', 'none', 'important');
-                    ci_perspectivePoints = [];
+                    ci_perspectivePoints = []; 
                     if(ci_perspectiveCtxTransformed && ci_perspectiveTransformedCanvas) ci_perspectiveCtxTransformed.clearRect(0,0, ci_perspectiveTransformedCanvas.width, ci_perspectiveTransformedCanvas.height);
                     const saveButton = document.getElementById('ci-perspective-save-btn'); if(saveButton) saveButton.disabled = true;
+                     // Resetear sliders y valores de ajuste al cargar nueva imagen
+                    document.getElementById('ciBrightness').value = 0;
+                    document.getElementById('ciContrast').value = 100;
+                    document.getElementById('ciSharpness').value = 0;
+                    document.getElementById('ciTemperature').value = 0;
+                    ci_currentAdjustments = { brightness: 0, contrast: 1, sharpness: 0, temperature: 0 };
+                    document.getElementById('ciBrightnessValue').textContent = '0';
+                    document.getElementById('ciContrastValue').textContent = '100';
+                    document.getElementById('ciSharpnessValue').textContent = '0';
+                    document.getElementById('ciTemperatureValue').textContent = '0';
                 };
-                ci_perspectiveImage.onerror = () => document.getElementById('ciCanvasPlaceholderCedula')?.style.setProperty('display', 'flex', 'important');
+                ci_perspectiveImage.onerror = () => {
+                    document.getElementById('ciCanvasPlaceholderCedula')?.style.setProperty('display', 'flex', 'important');
+                    alert("Error al cargar la imagen. Intente con otro archivo.");
+                }
                 ci_perspectiveImage.src = event.target.result;
             };
             reader.readAsDataURL(file);
@@ -1515,11 +1681,20 @@
 
         function ci_updateCanvasDimensions() {
             const container = document.getElementById('ciOriginalCanvasContainer');
-            if (!container || !ci_perspectiveImage.width || !ci_perspectiveImage.height) return;
-            const ar = ci_perspectiveImage.width / ci_perspectiveImage.height;
-            let nw = container.clientWidth, nh = nw / ar;
-            if (nh > container.clientHeight) { nh = container.clientHeight; nw = nh * ar; }
-            if (ci_perspectiveOriginalCanvas) { ci_perspectiveOriginalCanvas.width = nw; ci_perspectiveOriginalCanvas.height = nh; }
+            if (!container || !ci_perspectiveImage.width || !ci_perspectiveImage.height) return; 
+            
+            const aspectRatio = ci_perspectiveImage.width / ci_perspectiveImage.height;
+            let newWidth = container.clientWidth;
+            let newHeight = newWidth / aspectRatio;
+
+            if (newHeight > container.clientHeight) {
+                newHeight = container.clientHeight;
+                newWidth = newHeight * aspectRatio;
+            }
+            if (ci_perspectiveOriginalCanvas) { 
+                ci_perspectiveOriginalCanvas.width = newWidth; 
+                ci_perspectiveOriginalCanvas.height = newHeight; 
+            }
         }
 
         function ci_drawImage() {
@@ -1530,11 +1705,16 @@
 
         function ci_handleCanvasClick(e) {
             if (ci_perspectivePoints.length >= 4 || !ci_perspectiveImage.src || !ci_perspectiveOriginalCanvas) return;
+            
             const rect = ci_perspectiveOriginalCanvas.getBoundingClientRect();
-            const sx = ci_perspectiveOriginalCanvas.width / rect.width, sy = ci_perspectiveOriginalCanvas.height / rect.height;
-            const x = (e.clientX - rect.left) * sx, y = (e.clientY - rect.top) * sy;
+            const scaleX = ci_perspectiveOriginalCanvas.width / rect.width;
+            const scaleY = ci_perspectiveOriginalCanvas.height / rect.height;
+            const x = (e.clientX - rect.left) * scaleX;
+            const y = (e.clientY - rect.top) * scaleY;
+            
             ci_perspectivePoints.push({ x, y });
             ci_drawPerspectivePointsAndLines();
+            
             if (ci_perspectivePoints.length === 4) {
                 ci_applyPerspectiveTransform();
                 const saveButton = document.getElementById('ci-perspective-save-btn'); if (saveButton) saveButton.disabled = false;
@@ -1544,120 +1724,320 @@
         function ci_drawPerspectivePointsAndLines() {
             if (!ci_perspectiveCtxOriginal || !ci_perspectiveOriginalCanvas) return;
             ci_drawImage();
-            ci_perspectiveCtxOriginal.strokeStyle = 'rgba(255,0,0,0.9)'; ci_perspectiveCtxOriginal.lineWidth = 2; ci_perspectiveCtxOriginal.fillStyle = 'rgba(255,0,0,0.7)';
+            
+            ci_perspectiveCtxOriginal.strokeStyle = 'rgba(255,0,0,0.9)'; 
+            ci_perspectiveCtxOriginal.lineWidth = 2; 
+            ci_perspectiveCtxOriginal.fillStyle = 'rgba(255,0,0,0.7)';
+            
             ci_perspectivePoints.forEach((p, i) => {
-                ci_perspectiveCtxOriginal.beginPath(); ci_perspectiveCtxOriginal.arc(p.x, p.y, 6, 0, Math.PI*2); ci_perspectiveCtxOriginal.fill(); ci_perspectiveCtxOriginal.stroke();
-                if (i > 0) { ci_perspectiveCtxOriginal.beginPath(); ci_perspectiveCtxOriginal.moveTo(ci_perspectivePoints[i-1].x, ci_perspectivePoints[i-1].y); ci_perspectiveCtxOriginal.lineTo(p.x, p.y); ci_perspectiveCtxOriginal.stroke(); }
+                ci_perspectiveCtxOriginal.beginPath(); 
+                ci_perspectiveCtxOriginal.arc(p.x, p.y, 6, 0, Math.PI*2);
+                ci_perspectiveCtxOriginal.fill(); 
+                ci_perspectiveCtxOriginal.stroke();
+                if (i > 0) {
+                    ci_perspectiveCtxOriginal.beginPath(); 
+                    ci_perspectiveCtxOriginal.moveTo(ci_perspectivePoints[i-1].x, ci_perspectivePoints[i-1].y); 
+                    ci_perspectiveCtxOriginal.lineTo(p.x, p.y); 
+                    ci_perspectiveCtxOriginal.stroke();
+                }
             });
-            if (ci_perspectivePoints.length === 4) { ci_perspectiveCtxOriginal.beginPath(); ci_perspectiveCtxOriginal.moveTo(ci_perspectivePoints[3].x, ci_perspectivePoints[3].y); ci_perspectiveCtxOriginal.lineTo(ci_perspectivePoints[0].x, ci_perspectivePoints[0].y); ci_perspectiveCtxOriginal.stroke(); }
+            if (ci_perspectivePoints.length === 4) { 
+                ci_perspectiveCtxOriginal.beginPath(); 
+                ci_perspectiveCtxOriginal.moveTo(ci_perspectivePoints[3].x, ci_perspectivePoints[3].y); 
+                ci_perspectiveCtxOriginal.lineTo(ci_perspectivePoints[0].x, ci_perspectivePoints[0].y); 
+                ci_perspectiveCtxOriginal.stroke(); 
+            }
         }
-
+        
         async function ci_applyPerspectiveTransform() {
-            if (ci_perspectivePoints.length<4 || !ci_perspectiveImage.src || !numeric) return;
-            const ordered = ci_orderPoints(ci_perspectivePoints);
-            if (!ordered || ordered.some(p=>p===undefined)) { alert("Error ordenando puntos."); ci_perspectivePoints=[]; ci_drawPerspectivePointsAndLines(); return; }
-            const srcPts = ordered.map(p => ({ x: (p.x / ci_perspectiveOriginalCanvas.width) * ci_perspectiveImage.width, y: (p.y / ci_perspectiveOriginalCanvas.height) * ci_perspectiveImage.height }));
-            const dstPts = [{x:0,y:0},{x:CI_FINAL_WIDTH,y:0},{x:CI_FINAL_WIDTH,y:CI_FINAL_HEIGHT},{x:0,y:CI_FINAL_HEIGHT}];
+            if (ci_perspectivePoints.length < 4 || !ci_perspectiveImage.src || !numeric) return;
+            
+            const orderedPoints = ci_orderPoints(ci_perspectivePoints);
+            if (!orderedPoints || orderedPoints.some(p => p === undefined)) { 
+                alert("Error al ordenar los puntos de perspectiva. Intente seleccionarlos de nuevo en orden (ej: superior-izq, superior-der, inferior-der, inferior-izq)."); 
+                ci_perspectivePoints = []; ci_drawPerspectivePointsAndLines(); return; 
+            }
+
+            const srcPoints = orderedPoints.map(p => ({ 
+                x: (p.x / ci_perspectiveOriginalCanvas.width) * ci_perspectiveImage.width, 
+                y: (p.y / ci_perspectiveOriginalCanvas.height) * ci_perspectiveImage.height 
+            }));
+            const dstPoints = [
+                {x:0, y:0}, {x:CI_FINAL_WIDTH, y:0}, 
+                {x:CI_FINAL_WIDTH, y:CI_FINAL_HEIGHT}, {x:0, y:CI_FINAL_HEIGHT}
+            ];
+            
             try {
-                const matrix = ci_computePerspectiveMatrix(srcPts, dstPts); if (!matrix) { alert("Error calculando transformación."); return; }
-                const tempC = document.createElement('canvas'); tempC.width = ci_perspectiveImage.width; tempC.height = ci_perspectiveImage.height;
-                const tempCtx = tempC.getContext('2d'); tempCtx.drawImage(ci_perspectiveImage, 0, 0);
-                ci_perspectiveTransformedCanvas.width = CI_FINAL_WIDTH; ci_perspectiveTransformedCanvas.height = CI_FINAL_HEIGHT;
+                const matrix = ci_computePerspectiveMatrix(srcPoints, dstPoints);
+                if (!matrix) { alert("Error al calcular la matriz de transformación. Verifique los puntos."); return; }
+
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = ci_perspectiveImage.width; 
+                tempCanvas.height = ci_perspectiveImage.height;
+                const tempCtx = tempCanvas.getContext('2d');
+                tempCtx.drawImage(ci_perspectiveImage, 0, 0);
+
+                ci_perspectiveTransformedCanvas.width = CI_FINAL_WIDTH;
+                ci_perspectiveTransformedCanvas.height = CI_FINAL_HEIGHT;
                 ci_perspectiveCtxTransformed.clearRect(0,0,CI_FINAL_WIDTH,CI_FINAL_HEIGHT);
-                const imgData = ci_perspectiveCtxTransformed.getImageData(0,0,CI_FINAL_WIDTH,CI_FINAL_HEIGHT); const pixels = imgData.data;
-                const invM = numeric.inv(matrix);
-                for (let y=0; y<CI_FINAL_HEIGHT; y++) {
-                    for (let x=0; x<CI_FINAL_WIDTH; x++) {
-                        const pD = [x,y,1], pSHom = numeric.dot(invM, pD);
-                        const sX = pSHom[0]/pSHom[2], sY = pSHom[1]/pSHom[2];
-                        if (sX>=0 && sX<ci_perspectiveImage.width && sY>=0 && sY<ci_perspectiveImage.height) {
-                            const i = (Math.floor(sY)*ci_perspectiveImage.width + Math.floor(sX))*4;
-                            const j = (y*CI_FINAL_WIDTH + x)*4;
-                            const sPixData = tempCtx.getImageData(Math.floor(sX), Math.floor(sY), 1, 1).data;
-                            pixels[j]=sPixData[0]; pixels[j+1]=sPixData[1]; pixels[j+2]=sPixData[2]; pixels[j+3]=255;
+
+                const imgData = ci_perspectiveCtxTransformed.createImageData(CI_FINAL_WIDTH,CI_FINAL_HEIGHT); 
+                const pixels = imgData.data;
+                const invMatrix = numeric.inv(matrix);
+
+                for (let y = 0; y < CI_FINAL_HEIGHT; y++) {
+                    for (let x = 0; x < CI_FINAL_WIDTH; x++) {
+                        const pDest = [x, y, 1];
+                        const pSrcHom = numeric.dot(invMatrix, pDest);
+                        const srcX = pSrcHom[0] / pSrcHom[2];
+                        const srcY = pSrcHom[1] / pSrcHom[2];
+
+                        if (srcX >= 0 && srcX < ci_perspectiveImage.width && srcY >= 0 && srcY < ci_perspectiveImage.height) {
+                            const srcPixelData = tempCtx.getImageData(Math.floor(srcX), Math.floor(srcY), 1, 1).data;
+                            const destIdx = (y * CI_FINAL_WIDTH + x) * 4;
+                            pixels[destIdx]   = srcPixelData[0];
+                            pixels[destIdx+1] = srcPixelData[1];
+                            pixels[destIdx+2] = srcPixelData[2];
+                            pixels[destIdx+3] = 255;
                         }
                     }
                 }
-                ci_perspectiveCtxTransformed.putImageData(imgData,0,0);
-            } catch(err) { alert("Error transformando imagen."); }
+                ci_perspectiveCtxTransformed.putImageData(imgData, 0, 0); 
+                
+                ci_applyImageAdjustments(); 
+
+            } catch(err) { 
+                alert("Ocurrió un error durante la transformación de la imagen: " + err.message); 
+                console.error("Error en ci_applyPerspectiveTransform:", err);
+            }
         }
 
-        function ci_computePerspectiveMatrix(src, dst) {
-            const A=[], B=[];
-            for(let i=0; i<4; i++) {
-                const x=src[i].x, y=src[i].y, u=dst[i].x, v=dst[i].y;
-                A.push([x,y,1,0,0,0,-u*x,-u*y]); A.push([0,0,0,x,y,1,-v*x,-v*y]);
-                B.push(u); B.push(v);
+        function ci_applyImageAdjustments() {
+            if (!ci_perspectiveTransformedCanvas || ci_perspectiveTransformedCanvas.width === 0) return;
+
+            const imageData = ci_perspectiveCtxTransformed.getImageData(
+                0, 0, 
+                ci_perspectiveTransformedCanvas.width, 
+                ci_perspectiveTransformedCanvas.height
+            );
+            
+            const pixels = imageData.data;
+            
+            const brightness = ci_currentAdjustments.brightness; 
+            const contrast = ci_currentAdjustments.contrast; 
+            
+            for (let i = 0; i < pixels.length; i += 4) {
+                let r = pixels[i];
+                let g = pixels[i+1];
+                let b = pixels[i+2];
+
+                r = (r - 128) * contrast + 128;
+                g = (g - 128) * contrast + 128;
+                b = (b - 128) * contrast + 128;
+
+                r += brightness;
+                g += brightness;
+                b += brightness;
+                
+                pixels[i]   = Math.min(255, Math.max(0, r));
+                pixels[i+1] = Math.min(255, Math.max(0, g));
+                pixels[i+2] = Math.min(255, Math.max(0, b));
             }
-            try { const X = numeric.solve(A,B); return [[X[0],X[1],X[2]],[X[3],X[4],X[5]],[X[6],X[7],1]]; }
-            catch(e) { return null; }
+            
+            const tempAdjust = ci_currentAdjustments.temperature;
+            for (let i = 0; i < pixels.length; i += 4) {
+                pixels[i]   = Math.min(255, Math.max(0, pixels[i] + tempAdjust));
+                pixels[i+2] = Math.min(255, Math.max(0, pixels[i+2] - tempAdjust));
+            }
+            
+            if (ci_currentAdjustments.sharpness > 0) { 
+                ci_applySharpness(imageData);
+            }
+            
+            ci_perspectiveCtxTransformed.putImageData(imageData, 0, 0);
+        }
+
+        function ci_applySharpness(imageData) {
+            const sharpnessFactor = ci_currentAdjustments.sharpness / 100; // Convertir a rango 0-1
+            if (sharpnessFactor <= 0) return; // No aplicar si es 0 o negativo
+
+            const center = 1 + 8 * sharpnessFactor;
+            const surround = -1 * sharpnessFactor;
+
+            const kernel = [
+                surround, surround, surround,
+                surround, center,   surround,
+                surround, surround, surround
+            ];
+        
+            const pixels = imageData.data;
+            const width = imageData.width;
+            const height = imageData.height;
+            const tempData = new Uint8ClampedArray(pixels);
+        
+            for (let y = 1; y < height - 1; y++) {
+                for (let x = 1; x < width - 1; x++) {
+                    for (let c = 0; c < 3; c++) { 
+                        let sum = 0;
+                        let ki = 0;
+                        for (let ky = -1; ky <= 1; ky++) {
+                            for (let kx = -1; kx <= 1; kx++) {
+                                const idx = ((y + ky) * width + (x + kx)) * 4 + c;
+                                sum += tempData[idx] * kernel[ki++];
+                            }
+                        }
+                        const idxCurrent = (y * width + x) * 4 + c;
+                        pixels[idxCurrent] = Math.min(255, Math.max(0, sum));
+                    }
+                }
+            }
+        }
+
+
+        function ci_computePerspectiveMatrix(src, dst) {
+            const A = [], B = [];
+            for(let i = 0; i < 4; i++) {
+                const x = src[i].x, y = src[i].y;
+                const u = dst[i].x, v = dst[i].y;
+                A.push([x, y, 1, 0, 0, 0, -u*x, -u*y]);
+                A.push([0, 0, 0, x, y, 1, -v*x, -v*y]);
+                B.push(u);
+                B.push(v);
+            }
+            try {
+                const X = numeric.solve(A, B);
+                return [[X[0],X[1],X[2]], [X[3],X[4],X[5]], [X[6],X[7],1]];
+            } catch(e) {
+                console.error("Error al resolver la matriz de perspectiva (numeric.solve):", e);
+                return null;
+            }
         }
 
         function ci_orderPoints(points) {
-            points.sort((a,b) => (a.x+a.y) - (b.x+b.y));
+            points.sort((a, b) => (a.x + a.y) - (b.x + b.y));
             let [tl, p2, p3, br] = points;
-            let others = [p2,p3].sort((a,b) => (a.y-a.x) - (b.y-b.x));
+            let others = [p2, p3].sort((a, b) => (a.y - a.x) - (b.y - b.x));
             let tr = others[0], bl = others[1];
-            if ([tl,tr,br,bl].some(p=>p===undefined)) { // Fallback if simple sort fails
+            
+            if ([tl, tr, br, bl].some(p => p === undefined)) {
+                console.warn("Ordenación simple de puntos falló, usando fallback por ángulo.");
                 const center = points.reduce((acc,p)=>({x:acc.x+p.x/4, y:acc.y+p.y/4}),{x:0,y:0});
                 return points.sort((a,b)=>Math.atan2(a.y-center.y,a.x-center.x) - Math.atan2(b.y-center.y,b.x-center.x));
             }
-            return [tl,tr,br,bl];
+            return [tl, tr, br, bl];
         }
 
         function ci_saveImage() {
-            if (!ci_perspectiveTransformedCanvas || ci_perspectiveTransformedCanvas.width===0) { alert("No hay imagen corregida."); return; }
+            if (!ci_perspectiveTransformedCanvas || ci_perspectiveTransformedCanvas.width === 0) { 
+                alert("No hay imagen corregida para guardar. Asegúrese de seleccionar 4 puntos y que la transformación se haya aplicado."); return; 
+            }
             const dataUrl = ci_perspectiveTransformedCanvas.toDataURL('image/png');
-            if (ci_currentSelectedFoto === 'foto1') ci_savedFoto1DataUrl = dataUrl; else ci_savedFoto2DataUrl = dataUrl;
-            ci_updateSavedImagesList(); ci_updatePDFButtonState();
-            const imgInput = document.getElementById('ciPerspectiveImageInput'); if(imgInput) imgInput.value = '';
-            ci_resetPerspectiveView(true);
-            if (ci_currentSelectedFoto === 'foto1' && !ci_savedFoto2DataUrl) { const r = document.querySelector('input[name="fotoCedulaSelect"][value="foto2"]'); if (r) r.checked = true; ci_currentSelectedFoto = 'foto2'; }
-            else if (ci_currentSelectedFoto === 'foto2' && !ci_savedFoto1DataUrl) { const r = document.querySelector('input[name="fotoCedulaSelect"][value="foto1"]'); if (r) r.checked = true; ci_currentSelectedFoto = 'foto1'; }
-            alert("Imagen guardada.");
+            
+            if (ci_currentSelectedFoto === 'foto1') ci_savedFoto1DataUrl = dataUrl; 
+            else ci_savedFoto2DataUrl = dataUrl;
+            
+            ci_updateSavedImagesList();
+            ci_updatePDFButtonState();
+            
+            const imageInput = document.getElementById('ciPerspectiveImageInput'); if(imageInput) imageInput.value = '';
+            ci_resetPerspectiveView(true); 
+
+            if (ci_currentSelectedFoto === 'foto1' && !ci_savedFoto2DataUrl) { 
+                const radioFoto2 = document.querySelector('input[name="fotoCedulaSelect"][value="foto2"]'); 
+                if (radioFoto2) radioFoto2.checked = true; 
+                ci_currentSelectedFoto = 'foto2'; 
+            } else if (ci_currentSelectedFoto === 'foto2' && !ci_savedFoto1DataUrl) {
+                const radioFoto1 = document.querySelector('input[name="fotoCedulaSelect"][value="foto1"]'); 
+                if (radioFoto1) radioFoto1.checked = true; 
+                ci_currentSelectedFoto = 'foto1';
+            }
+            alert("Imagen guardada con los ajustes aplicados.");
         }
 
         function ci_updateSavedImagesList() {
-            const container = document.getElementById('ciSavedImagesList'); if (!container) return; container.innerHTML = '';
-            const phStyle = "width:120px;height:100px;display:flex;align-items:center;justify-content:center;border:1px dashed var(--border-input);border-radius:0.375rem;background-color:var(--bg-primary);";
-            container.innerHTML += ci_savedFoto1DataUrl ? `<div class="saved-image-item"><img src="${ci_savedFoto1DataUrl}" class="saved-image-preview" alt="Anverso"><p class="text-sm text-primary mt-1">Anverso</p></div>` : `<div class="saved-image-item" style="${phStyle}"><span class="text-xs text-secondary">Anverso</span></div>`;
-            container.innerHTML += ci_savedFoto2DataUrl ? `<div class="saved-image-item"><img src="${ci_savedFoto2DataUrl}" class="saved-image-preview" alt="Reverso"><p class="text-sm text-primary mt-1">Reverso</p></div>` : `<div class="saved-image-item" style="${phStyle}"><span class="text-xs text-secondary">Reverso</span></div>`;
+            const container = document.getElementById('ciSavedImagesList'); if (!container) return; 
+            container.innerHTML = '';
+            
+            const placeholderStyle = "width:120px;height:100px;display:flex;align-items:center;justify-content:center;border:1px dashed var(--border-input);border-radius:0.375rem;background-color:var(--bg-primary);";
+            
+            container.innerHTML += ci_savedFoto1DataUrl ? 
+                `<div class="saved-image-item"><img src="${ci_savedFoto1DataUrl}" class="saved-image-preview" alt="Anverso Cédula"><p class="text-sm text-primary mt-1">Anverso</p></div>` : 
+                `<div class="saved-image-item" style="${placeholderStyle}"><span class="text-xs text-secondary">Anverso (Vacío)</span></div>`;
+            
+            container.innerHTML += ci_savedFoto2DataUrl ? 
+                `<div class="saved-image-item"><img src="${ci_savedFoto2DataUrl}" class="saved-image-preview" alt="Reverso Cédula"><p class="text-sm text-primary mt-1">Reverso</p></div>` : 
+                `<div class="saved-image-item" style="${placeholderStyle}"><span class="text-xs text-secondary">Reverso (Vacío)</span></div>`;
         }
 
         async function ci_generatePDF() {
-            if (!ci_savedFoto1DataUrl || !ci_savedFoto2DataUrl) { alert('Guarda ambas caras primero.'); return; }
-            if (!PDFLib || !PDFLib.PDFDocument) { alert("Librería PDF no lista."); return; }
+            if (!ci_savedFoto1DataUrl || !ci_savedFoto2DataUrl) { alert('Debe guardar ambas caras de la cédula primero.'); return; }
+            if (!PDFLib || !PDFLib.PDFDocument) { alert("La librería PDF no está lista. Intente de nuevo."); return; }
             const { PDFDocument } = PDFLib;
+
             try {
-                const pdfDoc = await PDFDocument.create(); const page = pdfDoc.addPage([595, 842]);
-                const margin=50, imgDispW=290;
+                const pdfDoc = await PDFDocument.create();
+                const page = pdfDoc.addPage([595, 842]);
+                
+                const margin = 50;
+                const imageDisplayWidth = 290;
+
                 const anversoBytes = await fetch(ci_savedFoto1DataUrl).then(r=>r.arrayBuffer());
                 const anversoImg = await pdfDoc.embedPng(anversoBytes);
-                const anversoDims = anversoImg.scaleToFit(imgDispW, (imgDispW/CI_FINAL_WIDTH)*CI_FINAL_HEIGHT);
-                page.drawImage(anversoImg, {x:margin,y:page.getHeight()-margin-anversoDims.height, width:anversoDims.width, height:anversoDims.height});
-                page.drawText('Anverso Cédula', {x:margin,y:page.getHeight()-margin-anversoDims.height-15,size:10});
+                const anversoDims = anversoImg.scaleToFit(imageDisplayWidth, (imageDisplayWidth / CI_FINAL_WIDTH) * CI_FINAL_HEIGHT);
+                page.drawImage(anversoImg, {
+                    x: margin,
+                    y: page.getHeight() - margin - anversoDims.height,
+                    width: anversoDims.width,
+                    height: anversoDims.height
+                });
+                page.drawText('Anverso Cédula', {x:margin, y:page.getHeight()-margin-anversoDims.height-15, size:10});
+
                 const reversoBytes = await fetch(ci_savedFoto2DataUrl).then(r=>r.arrayBuffer());
                 const reversoImg = await pdfDoc.embedPng(reversoBytes);
-                const reversoDims = reversoImg.scaleToFit(imgDispW, (imgDispW/CI_FINAL_WIDTH)*CI_FINAL_HEIGHT);
-                page.drawImage(reversoImg, {x:margin,y:page.getHeight()-margin-anversoDims.height-30-reversoDims.height, width:reversoDims.width, height:reversoDims.height});
-                page.drawText('Reverso Cédula', {x:margin,y:page.getHeight()-margin-anversoDims.height-30-reversoDims.height-15,size:10});
-                const pdfBytes = await pdfDoc.save(); const blob = new Blob([pdfBytes],{type:'application/pdf'});
-                const link=document.createElement('a'); link.href=URL.createObjectURL(blob); link.download=`cedula_identidad_${Date.now()}.pdf`;
-                document.body.appendChild(link); link.click(); document.body.removeChild(link); URL.revokeObjectURL(link.href);
-            } catch(e) { alert("Error al generar PDF: "+e.message); }
+                const reversoDims = reversoImg.scaleToFit(imageDisplayWidth, (imageDisplayWidth / CI_FINAL_WIDTH) * CI_FINAL_HEIGHT);
+                page.drawImage(reversoImg, {
+                    x: margin,
+                    y: page.getHeight() - margin - anversoDims.height - 30 - reversoDims.height,
+                    width: reversoDims.width,
+                    height: reversoDims.height
+                });
+                page.drawText('Reverso Cédula', {x:margin, y:page.getHeight()-margin-anversoDims.height-30-reversoDims.height-15, size:10});
+
+                const pdfBytes = await pdfDoc.save();
+                const blob = new Blob([pdfBytes], {type:'application/pdf'});
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `cedula_identidad_${Date.now()}.pdf`;
+                document.body.appendChild(link); link.click(); document.body.removeChild(link);
+                URL.revokeObjectURL(link.href);
+            } catch(e) { 
+                alert("Error al generar el PDF de la cédula: " + e.message); 
+                console.error("Error en ci_generatePDF:", e);
+            }
         }
 
         function ci_updatePDFButtonState() {
-            const btn = document.getElementById('ci-generate-cedula-pdf-btn'); if(btn) btn.disabled = !(ci_savedFoto1DataUrl && ci_savedFoto2DataUrl);
+            const btn = document.getElementById('ci-generate-cedula-pdf-btn'); 
+            if(btn) btn.disabled = !(ci_savedFoto1DataUrl && ci_savedFoto2DataUrl);
         }
 
-        function ci_resetPerspectiveView(clearFull = true) {
-            if (clearFull && ci_perspectiveImage) { ci_perspectiveImage.src = ''; document.getElementById('ciCanvasPlaceholderCedula')?.style.setProperty('display', 'flex', 'important'); }
-            if (ci_perspectiveOriginalCanvas && ci_perspectiveCtxOriginal && clearFull) ci_perspectiveCtxOriginal.clearRect(0,0,ci_perspectiveOriginalCanvas.width,ci_perspectiveOriginalCanvas.height);
+        function ci_resetPerspectiveView(clearFullImage = true) {
+            if (clearFullImage && ci_perspectiveImage) { 
+                ci_perspectiveImage.src = '';
+                document.getElementById('ciCanvasPlaceholderCedula')?.style.setProperty('display', 'flex', 'important');
+            }
+            if (ci_perspectiveOriginalCanvas && ci_perspectiveCtxOriginal && clearFullImage) {
+                ci_perspectiveCtxOriginal.clearRect(0,0,ci_perspectiveOriginalCanvas.width,ci_perspectiveOriginalCanvas.height);
+            }
             ci_perspectivePoints = [];
-            if (ci_perspectiveTransformedCanvas && ci_perspectiveCtxTransformed) ci_perspectiveCtxTransformed.clearRect(0,0,ci_perspectiveTransformedCanvas.width,ci_perspectiveTransformedCanvas.height);
+            if (ci_perspectiveTransformedCanvas && ci_perspectiveCtxTransformed) {
+                ci_perspectiveCtxTransformed.clearRect(0,0,ci_perspectiveTransformedCanvas.width,ci_perspectiveTransformedCanvas.height);
+            }
             const saveBtn = document.getElementById('ci-perspective-save-btn'); if(saveBtn) saveBtn.disabled = true;
-            if (!clearFull && ci_perspectiveImage.src && ci_perspectiveCtxOriginal) ci_drawImage();
+
+            if (!clearFullImage && ci_perspectiveImage.src && ci_perspectiveCtxOriginal) {
+                ci_drawImage();
+            }
         }
         // --- FIN: Lógica para Cédula Identidad ---
 
@@ -1676,14 +2056,11 @@
             const logoutButton = document.getElementById('logout-button');
             const darkModeToggle = document.getElementById('dark-mode-toggle');
 
-            // Modal de confirmación
-            const confirmModal = document.getElementById('delete-confirm-modal');
             const confirmDeleteButton = document.getElementById('confirm-delete-btn');
             const cancelDeleteButton = document.getElementById('cancel-delete-btn');
 
             if(confirmDeleteButton) confirmDeleteButton.addEventListener('click', proceedWithDeletion);
             if(cancelDeleteButton) cancelDeleteButton.addEventListener('click', hideDeleteConfirmModal);
-
 
             const htmlElement = document.documentElement;
             const darkModeIcon = darkModeToggle.querySelector('i');
@@ -1709,6 +2086,7 @@
             if (menuLista) menuLista.addEventListener('click', (e) => { e.preventDefault(); renderPlayerList(); });
             if (menuFotoCarnet) menuFotoCarnet.addEventListener('click', (e) => { e.preventDefault(); renderFotoCarnetForm(); });
             if (menuCedulaIdentidad) menuCedulaIdentidad.addEventListener('click', (e) => { e.preventDefault(); renderCedulaIdentidadForm(); });
+            
             if (collapseToggle) collapseToggle.addEventListener('click', toggleSidebar);
             if (logoutButton) logoutButton.addEventListener('click', handleLogout);
 
@@ -1719,12 +2097,12 @@
                 
                     const action = targetButton.dataset.action;
                     const type = targetButton.dataset.type;
-                    const id = targetButton.dataset.id; 
-                    const name = targetButton.dataset.name || `elemento ID ${id ? (typeof id === 'string' ? id.substring(0,8) + "..." : id) : "desconocido"}`; 
-                                        
+                    const id = targetButton.dataset.id;
+                    const name = targetButton.dataset.name || `elemento ID ${id ? (typeof id === 'string' ? id.substring(0,8) + "..." : id) : "desconocido"}`;
+                                            
                     if (action === 'delete') {
                         if (type === 'user' && id) { 
-                            deleteUser(id); 
+                            deleteUser(id);
                         } else if (type === 'tramite' && id) { 
                             deleteTramite(id); 
                         } else if (type === 'autorizacion' && id) { 
@@ -1737,14 +2115,20 @@
                     }
                 });
             }
+
             const storedUser = localStorage.getItem('currentUser');
             if (storedUser) {
                 try { 
-                    const user = JSON.parse(storedUser); 
-                    showAppScreen(); 
+                    const user = JSON.parse(storedUser);
+                    showAppScreen();
                 }
-                catch (e) { localStorage.removeItem('currentUser'); showLoginScreen(); }
-            } else showLoginScreen();
+                catch (e) {
+                    localStorage.removeItem('currentUser'); 
+                    showLoginScreen(); 
+                }
+            } else {
+                showLoginScreen();
+            }
         });
     </script>
 </body>
