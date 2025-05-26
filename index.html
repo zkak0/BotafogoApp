@@ -10,8 +10,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/numeric/1.2.6/numeric.min.js"></script> 
     <style>
-        /* --- Estilos CSS --- */
+        /* --- Estilos CSS (sin cambios respecto a la versión anterior) --- */
         :root {
             --bg-primary: #f9fafb; /* gray-50 */
             --bg-secondary: #ffffff; /* white */
@@ -70,7 +71,7 @@
         #login-screen { display: flex; justify-content: center; align-items: center; min-height: 100vh; background-color: var(--bg-primary); }
         .login-box { background-color: var(--bg-secondary); box-shadow: 0 10px 15px -3px var(--shadow-color), 0 4px 6px -2px var(--shadow-color); padding: 2.5rem; border-radius: 0.5rem; width: 100%; max-width: 28rem; text-align: center;}
         .login-logo { max-width: 200px; height: auto; margin-bottom: 1.5rem; margin-left: auto; margin-right: auto; }
-        .login-input { border-color: var(--border-input); background-color: var(--bg-secondary); color: var(--text-primary); appearance-none; display: block; width: 100%; padding: 0.75rem; border-radius: 0.375rem; box-shadow: inset 0 1px 2px rgba(0,0,0,0.075); margin-bottom: 1rem; transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;}
+        .login-input { border-color: var(--border-input); background-color: var(--bg-secondary); color: var(--text-primary); appearance: none; display: block; width: 100%; padding: 0.75rem; border-radius: 0.375rem; box-shadow: inset 0 1px 2px rgba(0,0,0,0.075); margin-bottom: 1rem; transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;}
         .login-input::placeholder { color: var(--text-secondary); }
         .login-input:focus { outline: none; border-color: var(--border-input-focus); box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.3); }
         .login-button { display: inline-flex; justify-content: center; width: 100%; padding: 0.75rem 1rem; border: 1px solid transparent; background-color: var(--button-action-bg); color: white; font-weight: 600; font-size: 0.875rem; border-radius: 0.375rem; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); cursor: pointer; transition: background-color 0.15s ease-in-out; }
@@ -105,17 +106,19 @@
         #content-area .text-gray-500 { color: var(--text-secondary); }
         #content-area .bg-gray-50 { background-color: var(--bg-primary); border-color: var(--border-color); }
         #content-area table { border-color: var(--border-input); }
-        #content-area thead { background-color: var(--bg-secondary); }
+        #content-area thead { background-color: var(--bg-secondary); } 
+        html.dark #content-area thead { background-color: var(--bg-primary); } 
         #content-area th { color: var(--text-secondary); border-color: var(--border-color); font-weight: 600; }
         #content-area tbody { background-color: var(--bg-secondary); }
         #content-area tbody tr { border-bottom: 1px solid var(--border-color); }
         #content-area tbody tr:last-child { border-bottom: none; }
         #content-area td { color: var(--text-primary); border-color: var(--border-color); }
         #content-area tr:hover { background-color: var(--bg-primary); }
+        html.dark #content-area tr:hover { background-color: #374151; } 
         ::placeholder { color: var(--text-secondary); opacity: 1; }
         :-ms-input-placeholder { color: var(--text-secondary); }
         ::-ms-input-placeholder { color: var(--text-secondary); }
-        .action-button { cursor: pointer; transition: color 0.15s ease-in-out; }
+        .action-button { cursor: pointer; transition: color 0.15s ease-in-out; background: none; border: none; padding: 0.25rem 0.5rem;}
         .hidden-file-input { width: 0.1px; height: 0.1px; opacity: 0; overflow: hidden; position: absolute; z-index: -1; }
         .file-input-label { cursor: pointer; display: inline-flex; align-items: center; padding: 0.5rem 1rem; background-color: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border-input); border-radius: 0.375rem; font-weight: 500; transition: background-color 0.2s ease-in-out; }
         .file-input-label:hover { background-color: var(--bg-primary); }
@@ -129,19 +132,19 @@
         .edit-user-button:hover { background-color: #f59e0b; }
         html.dark .edit-user-button { background-color: #fcd34d; color: #78350f; }
         html.dark .edit-user-button:hover { background-color: #fbbf24; }
-        #add-user-error { color: #dc2626; min-height: 1.25rem; }
+        #add-user-error, #foto-carnet-message, #cedula-message { min-height: 1.25rem; margin-top: 0.5rem;} 
         .action-button[data-action="generate-pdf"] { color: var(--link-color); }
         .action-button[data-action="generate-pdf"]:hover { color: var(--link-hover-color); }
-        .action-button[data-action="edit"] { color: #ca8a04; }
-        .action-button[data-action="edit"]:hover { color: #a16207; }
-        html.dark .action-button[data-action="edit"] { color: #fcd34d; }
-        html.dark .action-button[data-action="edit"]:hover { color: #fbbf24; }
+        .action-button[data-action="edit"] { color: #ca8a04; } 
+        .action-button[data-action="edit"]:hover { color: #a16207; } 
+        html.dark .action-button[data-action="edit"] { color: #fcd34d; } 
+        html.dark .action-button[data-action="edit"]:hover { color: #fbbf24; } 
         .action-button[data-action="delete"], .delete-btn { color: #dc2626; } 
         .action-button[data-action="delete"]:hover, .delete-btn:hover { color: #b91c1c; } 
         html.dark .action-button[data-action="delete"], html.dark .delete-btn { color: #f87171; } 
         html.dark .action-button[data-action="delete"]:hover, html.dark .delete-btn:hover { color: #fb7185; } 
-        #form-tramite button[type=submit], #form-autorizacion button[type=submit], #form-add-user #user-submit-button[class*="bg-green"], #generate-button { background-color: var(--button-action-bg); color: white; }
-        #form-tramite button[type=submit]:hover, #form-autorizacion button[type=submit]:hover, #form-add-user #user-submit-button[class*="bg-green"]:hover, #generate-button:hover { background-color: var(--button-action-hover-bg); }
+        #form-tramite button[type=submit], #form-autorizacion button[type=submit], #form-add-user #user-submit-button[class*="bg-green"], #preview-foto-carnet-button, #save-foto-carnet-button { background-color: var(--button-action-bg); color: white; }
+        #form-tramite button[type=submit]:hover, #form-autorizacion button[type=submit]:hover, #form-add-user #user-submit-button[class*="bg-green"]:hover, #preview-foto-carnet-button:hover, #save-foto-carnet-button:hover { background-color: var(--button-action-hover-bg); }
         #form-add-user #user-submit-button { background-color: var(--button-green-bg); color: white; }
         #form-add-user #user-submit-button:hover { background-color: var(--button-green-hover-bg); }
         #form-add-user #user-cancel-button { border-color: var(--border-input); background-color: var(--bg-secondary); color: var(--text-secondary); }
@@ -171,72 +174,64 @@
         .saved-images-container { margin-top: 2rem; padding: 1rem; border-top: 1px solid var(--border-color); }
         .saved-image-item { display: inline-block; margin: 0.5rem; text-align: center; }
         .saved-image-preview { width: 120px; height: auto; max-height: 80px; object-fit: contain; border: 1px solid var(--border-input); margin-bottom: 0.5rem; background-color: var(--bg-primary); }
+        .list-thumbnail { max-width: 80px; max-height: 60px; height: auto; object-fit: cover; border-radius: 0.25rem; border: 1px solid var(--border-color); }
         
-        /* Estilos para el Modal de Confirmación */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 1000; }
         .modal-content { background-color: var(--bg-secondary); color: var(--text-primary); padding: 2rem; border-radius: 0.5rem; box-shadow: 0 5px 15px rgba(0,0,0,0.3); text-align: center; max-width: 90%; width: 400px; }
         .modal-content h3 { font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem; color: var(--text-primary); }
         .modal-content p { margin-bottom: 1.5rem; color: var(--text-secondary); }
         .modal-buttons button { padding: 0.5rem 1rem; border-radius: 0.375rem; font-weight: 500; cursor: pointer; transition: background-color 0.2s; }
-        #confirm-delete-btn { background-color: #dc2626; /* red-600 */ color: white; margin-right: 0.5rem; }
-        #confirm-delete-btn:hover { background-color: #b91c1c; /* red-700 */ }
+        #confirm-delete-btn { background-color: #dc2626; color: white; margin-right: 0.5rem; }
+        #confirm-delete-btn:hover { background-color: #b91c1c; }
         #cancel-delete-btn { background-color: var(--button-generic-bg); color: var(--text-primary); border: 1px solid var(--border-input); }
         #cancel-delete-btn:hover { background-color: var(--button-generic-hover-bg); }
-        html.dark #confirm-delete-btn { background-color: #f87171; /* red-400 */ }
-        html.dark #confirm-delete-btn:hover { background-color: #ef4444; /* red-500 */ }
+        html.dark #confirm-delete-btn { background-color: #f87171; }
+        html.dark #confirm-delete-btn:hover { background-color: #ef4444; }
         html.dark #cancel-delete-btn { background-color: var(--button-generic-bg); color: var(--text-primary); border-color: var(--border-input); }
         html.dark #cancel-delete-btn:hover { background-color: var(--button-generic-hover-bg); }
 
-        /* Estilos para controles de ajuste de imagen */
-        .adjustment-control {
-            display: flex;
-            flex-direction: column;
-            gap: 0.25rem; /* Equivalente a space-y-1 de Tailwind */
-            padding: 0.75rem; /* p-3 */
-            border: 1px solid var(--border-input); /* Borde suave */
-            border-radius: 0.375rem; /* rounded-md */
-            background-color: var(--bg-secondary); /* Fondo para que contraste con el slider */
+        .adjustment-control { display: flex; flex-direction: column; gap: 0.25rem; padding: 0.75rem; border: 1px solid var(--border-input); border-radius: 0.375rem; background-color: var(--bg-secondary); }
+        .slider { width: 100%; height: 0.5rem; border-radius: 0.5rem; -webkit-appearance: none; appearance: none; cursor: pointer; background-color: var(--slider-track-bg); }
+        .slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 1rem; height: 1rem; border-radius: 9999px; background-color: var(--button-action-bg); cursor: pointer; border: 2px solid var(--bg-secondary); box-shadow: 0 0 2px rgba(0,0,0,0.3); }
+        .slider::-moz-range-thumb { width: 1rem; height: 1rem; border-radius: 9999px; background-color: var(--button-action-bg); cursor: pointer; border: 2px solid var(--bg-secondary); box-shadow: 0 0 2px rgba(0,0,0,0.3); }
+    
+        /* Estilos para layout de dos columnas en Foto Carnet */
+        .foto-carnet-layout {
+            /* display: flex; Ya no es flex container principal */
+            /* flex-wrap: wrap; */
+            /* gap: 1.5rem; */
         }
-        .slider {
+        .foto-carnet-col-main {
+            /* flex: 2; */
+            /* min-width: 300px; */
+        }
+        .foto-carnet-col-sidebar { 
+            /* Ya no se usa para los controles de ajuste principales */
+        }
+        .foto-carnet-ajustes-container { 
             width: 100%;
-            height: 0.5rem; /* h-2 */
-            border-radius: 0.5rem; /* rounded-lg */
-            -webkit-appearance: none;
-            appearance: none;
-            cursor: pointer;
-            background-color: var(--slider-track-bg); /* Color de la pista del slider */
+            margin-top: 1.5rem;
+            padding: 1rem;
+            border: 1px solid var(--border-input);
+            border-radius: 0.375rem;
+            background-color: var(--bg-secondary);
         }
-        .slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 1rem; /* w-4 */
-            height: 1rem; /* h-4 */
-            border-radius: 9999px; /* rounded-full */
-            background-color: var(--button-action-bg); 
-            cursor: pointer;
-            border: 2px solid var(--bg-secondary); /* Borde para mejor visibilidad del thumb */
-            box-shadow: 0 0 2px rgba(0,0,0,0.3);
+        .foto-carnet-ajustes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
         }
-        .slider::-moz-range-thumb { /* Firefox */
-            width: 1rem;
-            height: 1rem;
-            border-radius: 9999px;
-            background-color: var(--button-action-bg);
-            cursor: pointer;
-            border: 2px solid var(--bg-secondary);
-            box-shadow: 0 0 2px rgba(0,0,0,0.3);
-        }
+
     </style>
 </head>
 <body class="bg-primary">
     <div id="login-screen">
         <div class="login-box">
-            <img src="https://i.imgur.com/IAVAqup.jpeg" alt="Logo Botafogo" class="login-logo" onerror="this.src='https://placehold.co/200x100/cccccc/333333?text=LOGO'; this.onerror=null;">
-            <h2 class="text-2xl font-bold text-primary mb-6">Bienvenido a BotafogoApp v2.9.1</h2>
-            <form id="login-form">
+            <img src="https://i.imgur.com/IAVAqup.jpeg" alt="[Imagen del] Logo Botafogo" class="login-logo" onerror="this.src='https://placehold.co/200x100/cccccc/333333?text=LOGO'; this.onerror=null;">
+            <h2 class="text-2xl font-bold text-primary mb-6">Bienvenido a BotafogoApp v3</h2> <form id="login-form">
                 <div>
-                    <label for="username" class="sr-only">Usuario</label>
-                    <input type="text" id="username" name="username" class="login-input" placeholder="Usuario" required>
+                    <label for="username" class="sr-only">Usuario (RUT)</label>
+                    <input type="text" id="username" name="username" class="login-input" placeholder="Usuario (RUT)" required>
                 </div>
                 <div>
                     <label for="password" class="sr-only">Clave</label>
@@ -251,14 +246,13 @@
     <div id="app-screen" class="min-h-screen flex-container">
         <aside class="w-64 bg-sidebar text-sidebar p-6 space-y-6 rounded-r-lg flex flex-col justify-between sidebar" id="sidebar">
             <div>
-                <div class="text-2xl font-bold mb-6 sidebar-title text-sidebar-title">BotafogoApp v2.9.1</div>
-                <nav class="sidebar-nav">
+                <div class="text-2xl font-bold mb-6 sidebar-title text-sidebar-title">BotafogoApp v3</div> <nav class="sidebar-nav">
                     <ul class="space-y-2">
                         <li><a href="#" class="block rounded transition duration-200 px-4 py-2.5 text-sm font-medium hover:bg-sidebar-hover hover:text-sidebar-hover menu-item-text" id="menu-tramite"><i class="fas fa-file-contract text-lg"></i> <span>Trámite Individual</span></a></li>
                         <li><a href="#" class="block rounded transition duration-200 px-4 py-2.5 text-sm font-medium hover:bg-sidebar-hover hover:text-sidebar-hover menu-item-text" id="menu-autorizacion"><i class="fas fa-file-signature text-lg"></i> <span>Autorización</span></a></li>
-                        <li><a href="#" class="block rounded transition duration-200 px-4 py-2.5 text-sm font-medium hover:bg-sidebar-hover hover:text-sidebar-hover menu-item-text" id="menu-lista"><i class="fas fa-list-alt text-lg"></i> <span>Listado Jugadores</span></a></li>
                         <li><a href="#" class="block rounded transition duration-200 px-4 py-2.5 text-sm font-medium hover:bg-sidebar-hover hover:text-sidebar-hover menu-item-text" id="menu-fotocarnet"><i class="fas fa-id-badge text-lg"></i> <span>Foto Carnet</span></a></li>
-                        <li><a href="#" class="block rounded transition duration-200 px-4 py-2.5 text-sm font-medium hover:bg-sidebar-hover hover:text-sidebar-hover menu-item-text" id="menu-cedula-identidad"><i class="fas fa-id-card text-lg"></i> <span>Cédula Identidad</span></a></li>
+                        <li><a href="#" class="block rounded transition duration-200 px-4 py-2.5 text-sm font-medium hover:bg-sidebar-hover hover:text-sidebar-hover menu-item-text" id="menu-cedula-identidad"><i class="fas fa-id-card text-lg"></i> <span>Cédula de Identidad</span></a></li>
+                        <li><a href="#" class="block rounded transition duration-200 px-4 py-2.5 text-sm font-medium hover:bg-sidebar-hover hover:text-sidebar-hover menu-item-text" id="menu-lista"><i class="fas fa-list-alt text-lg"></i> <span>Tramites Guardados</span></a></li>
                         <li id="li-menu-usuarios"><a href="#" class="block rounded transition duration-200 px-4 py-2.5 text-sm font-medium hover:bg-sidebar-hover hover:text-sidebar-hover menu-item-text" id="menu-usuarios"><i class="fas fa-users-cog text-lg"></i> <span>Gestión Usuarios</span></a></li>
                     </ul>
                 </nav>
@@ -306,8 +300,17 @@
         let cropperInstance = null;
         let isCropperScriptLoaded = false;
         let itemToDelete = { id: null, type: null, name: '' };
+        // Ajustes para Foto Carnet
+        let fc_currentAdjustments = { brightness: 0, contrast: 1, sharpness: 0, temperature: 0 };
+
 
         // --- Funciones Auxiliares ---
+        function isValidEmail(email) { // Aunque no se usa para login, puede ser útil para validación de email en gestión de usuarios
+            if (!email || typeof email !== 'string') return false;
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
         function formatRut(rutInput) {
             if (!rutInput) return;
             let rut = rutInput.value.replace(/[^0-9kK]/g, '').toLowerCase();
@@ -381,6 +384,18 @@
             }
             dateInput.value = formattedDate.substring(0, 10);
         }
+        
+        function showTemporaryMessage(elementId, message, isError = false, duration = 3000) {
+            const messageDiv = document.getElementById(elementId);
+            if (messageDiv) {
+                messageDiv.textContent = message;
+                messageDiv.className = `text-sm mt-2 min-h-[1.25rem] ${isError ? 'text-red-600' : 'text-green-600'}`;
+                setTimeout(() => {
+                    messageDiv.textContent = '';
+                    messageDiv.className = 'text-sm mt-2 min-h-[1.25rem]'; 
+                }, duration);
+            }
+        }
 
         // --- Funciones del Modal de Confirmación ---
         function showDeleteConfirmModal(id, type, itemName) {
@@ -399,42 +414,55 @@
 
         async function proceedWithDeletion() {
             if (!itemToDelete.id || !itemToDelete.type) return;
-            console.log(`[proceedWithDeletion] Confirmado. Eliminando ${itemToDelete.type} con ID/Username: ${itemToDelete.id}`);
+            console.log(`[proceedWithDeletion] Confirmado. Eliminando ${itemToDelete.type} con ID: ${itemToDelete.id}`);
 
             let error;
-            if (itemToDelete.type === 'user') {
-                const { error: deleteError } = await supabaseClient
-                    .from('users')
-                    .delete()
-                    .eq('username', itemToDelete.id); 
-                error = deleteError;
-            } else if (itemToDelete.type === 'tramite') {
-                const { error: deleteError } = await supabaseClient
-                    .from('players')
-                    .delete()
-                    .eq('id', itemToDelete.id); 
-                error = deleteError;
-            } else if (itemToDelete.type === 'autorizacion') {
-                const { error: deleteError } = await supabaseClient
-                    .from('autorizaciones')
-                    .delete()
-                    .eq('id', itemToDelete.id); 
-                error = deleteError;
+            let tableName = '';
+            let idField = 'id'; 
+
+            switch (itemToDelete.type) {
+                case 'user':
+                    tableName = 'users'; // Tabla public.users
+                    idField = 'username'; // Se elimina por username (RUT) de public.users
+                    break;
+                case 'tramite':
+                    tableName = 'players';
+                    break;
+                case 'autorizacion':
+                    tableName = 'autorizaciones';
+                    break;
+                case 'fotocarnet': 
+                    tableName = 'fotocarnets';
+                    break;
+                case 'cedula': 
+                    tableName = 'cedulas_identidad';
+                    break;
+                default:
+                    console.error("Tipo de eliminación desconocido:", itemToDelete.type);
+                    hideDeleteConfirmModal();
+                    return;
             }
+
+            const { error: deleteError } = await supabaseClient
+                .from(tableName)
+                .delete()
+                .eq(idField, itemToDelete.id);
+            error = deleteError;
 
             if (error) {
                 console.error(`[proceedWithDeletion] Error de Supabase al eliminar ${itemToDelete.type}:`, error);
-                alert(`Error al eliminar ${itemToDelete.type}: ` + error.message);
+                const modalMessage = document.getElementById('delete-modal-message');
+                if(modalMessage) modalMessage.textContent = `Error al eliminar: ${error.message}. Inténtalo de nuevo.`;
+                // No ocultar modal en error para que el usuario vea el mensaje
             } else {
-                alert(`${itemToDelete.type.charAt(0).toUpperCase() + itemToDelete.type.slice(1)} eliminado/a exitosamente.`);
                 console.log(`[proceedWithDeletion] ${itemToDelete.type} eliminado de Supabase:`, itemToDelete.id);
                 if (itemToDelete.type === 'user') {
-                    renderUserManagementForm();
-                } else {
-                    renderPlayerList();
+                    renderUserManagementForm(); // Recargar lista de usuarios
+                } else { 
+                    renderPlayerList(); // Recargar lista de jugadores/autorizaciones/etc.
                 }
+                hideDeleteConfirmModal(); // Ocultar modal solo si tiene éxito
             }
-            hideDeleteConfirmModal();
         }
         
         // --- Funciones de Navegación y Estado de la UI ---
@@ -455,7 +483,7 @@
             if(mainTitle) mainTitle.innerText = 'Bienvenido';
             if(contentArea) contentArea.innerHTML = '<p class="text-lg">Selecciona una opción del menú lateral para comenzar.</p>';
             
-            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            const currentUser = JSON.parse(localStorage.getItem('currentUser')); // Volvemos a usar currentUser
             const menuUsuariosLi = document.getElementById('li-menu-usuarios');
             if (menuUsuariosLi) {
                 menuUsuariosLi.style.display = (currentUser && currentUser.role === 'admin') ? 'list-item' : 'none';
@@ -463,35 +491,50 @@
         }
 
         // --- Funciones de Renderizado de Contenido ---
-        async function renderPlayerList() {
-            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        function downloadDataUrlAsPdf(dataUrl, filename) { // Para PDF
+            if (!dataUrl) return;
+            const link = document.createElement('a');
+            link.href = dataUrl;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function downloadDataUrlAsImage(dataUrl, filename) { // Para Imagen (ej. PNG)
+            if (!dataUrl) return;
+            const link = document.createElement('a');
+            link.href = dataUrl;
+            link.download = filename; // Ej: "foto_carnet.png"
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+        
+        async function renderPlayerList() { 
+            const currentUser = JSON.parse(localStorage.getItem('currentUser')); 
             if (!currentUser) { showLoginScreen(); return; }
 
             const mainTitle = document.getElementById('main-title');
             const contentArea = document.getElementById('content-area');
             if (!mainTitle || !contentArea) return;
-            mainTitle.innerText = 'Listado de Jugadores y Autorizaciones';
+            mainTitle.innerText = 'Tramites Guardados'; 
 
+            let listHtml = `<div class="bg-secondary p-4 sm:p-6 rounded-lg shadow-md space-y-8">`; 
+
+            // --- Sección Trámites Individuales ---
             let playersQuery = supabaseClient.from('players').select('*');
-            let autorizacionesQuery = supabaseClient.from('autorizaciones').select('*');
-
-            if (currentUser.role !== 'admin') {
-                playersQuery = playersQuery.eq('user_id', currentUser.id);
-                autorizacionesQuery = autorizacionesQuery.eq('user_id', currentUser.id);
+            if (currentUser && currentUser.role !== 'admin') { 
+                playersQuery = playersQuery.eq('user_id', currentUser.id); 
             }
-
             const { data: playersData, error: playersError } = await playersQuery;
-            const { data: autorizacionesData, error: authError } = await autorizacionesQuery;
-
-            let listHtml = `<div class="bg-secondary p-4 sm:p-6 rounded-lg shadow-md">`;
             
             listHtml += `
-                <div class="mb-8 p-4 border border-border-color rounded-lg bg-primary">
+                <div class="p-4 border border-border-color rounded-lg bg-primary">
                     <h2 class="text-xl sm:text-2xl font-semibold mb-4 text-primary">Trámites Individuales</h2>
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-border-color border border-border-input">
-                            <thead class="bg-secondary">
-                                <tr>
+                            <thead class="bg-secondary dark:bg-gray-700"> <tr>
                                     <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-secondary uppercase tracking-wider border-r border-border-color">Cédula</th>
                                     <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-secondary uppercase tracking-wider border-r border-border-color">A. Paterno</th>
                                     <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-secondary uppercase tracking-wider border-r border-border-color">A. Materno</th>
@@ -501,14 +544,14 @@
                                     ${currentUser.role === 'admin' ? '<th scope="col" class="px-4 py-3 text-center text-xs font-semibold text-secondary uppercase tracking-wider">Eliminar</th>' : ''}
                                 </tr>
                             </thead>
-                            <tbody class="bg-secondary">`;
+                            <tbody class="bg-secondary divide-y divide-border-color">`;
             if (playersError) {
                 listHtml += `<tr><td colspan="${currentUser.role === 'admin' ? '7' : '6'}" class="px-6 py-4 text-center text-red-500">Error cargando trámites: ${playersError.message}</td></tr>`;
             } else if (!playersData || playersData.length === 0) {
                 listHtml += `<tr><td colspan="${currentUser.role === 'admin' ? '7' : '6'}" class="px-6 py-4 text-center text-secondary">No hay trámites registrados.</td></tr>`;
             } else {
                 playersData.forEach((p) => {
-                    listHtml += `<tr class="hover:bg-primary">
+                    listHtml += `<tr class="hover:bg-primary dark:hover:bg-gray-700">
                                     <td class="px-4 py-4 whitespace-nowrap text-sm text-primary border-r border-border-color">${p.ci || ''}</td>
                                     <td class="px-4 py-4 whitespace-nowrap text-sm text-primary border-r border-border-color">${p.apellido_paterno || ''}</td>
                                     <td class="px-4 py-4 whitespace-nowrap text-sm text-primary border-r border-border-color">${p.apellido_materno || ''}</td>
@@ -524,12 +567,18 @@
             }
             listHtml += `</tbody></table></div></div>`;
 
+            // --- Sección Autorizaciones ---
+            let autorizacionesQuery = supabaseClient.from('autorizaciones').select('*');
+            if (currentUser && currentUser.role !== 'admin') { 
+                autorizacionesQuery = autorizacionesQuery.eq('user_id', currentUser.id); 
+            }
+            const { data: autorizacionesData, error: authError } = await autorizacionesQuery;
             listHtml += `
                 <div class="p-4 border border-border-color rounded-lg bg-primary">
                     <h2 class="text-xl sm:text-2xl font-semibold mb-4 text-primary">Autorizaciones</h2>
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-border-color border border-border-input">
-                            <thead class="bg-secondary">
+                            <thead class="bg-secondary dark:bg-gray-700">
                                 <tr>
                                     <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-secondary uppercase tracking-wider border-r border-border-color">Apoderado</th>
                                     <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-secondary uppercase tracking-wider border-r border-border-color">CI Apod.</th>
@@ -539,14 +588,14 @@
                                     ${currentUser.role === 'admin' ? '<th scope="col" class="px-4 py-3 text-center text-xs font-semibold text-secondary uppercase tracking-wider">Eliminar</th>' : ''}
                                 </tr>
                             </thead>
-                            <tbody class="bg-secondary">`;
+                            <tbody class="bg-secondary divide-y divide-border-color">`;
             if (authError) {
                 listHtml += `<tr><td colspan="${currentUser.role === 'admin' ? '6' : '5'}" class="px-6 py-4 text-center text-red-500">Error cargando autorizaciones: ${authError.message}</td></tr>`;
             } else if (!autorizacionesData || autorizacionesData.length === 0) {
                 listHtml += `<tr><td colspan="${currentUser.role === 'admin' ? '6' : '5'}" class="px-6 py-4 text-center text-secondary">No hay autorizaciones registradas.</td></tr>`;
             } else {
                 autorizacionesData.forEach((a) => {
-                    listHtml += `<tr class="hover:bg-primary">
+                    listHtml += `<tr class="hover:bg-primary dark:hover:bg-gray-700">
                                     <td class="px-4 py-4 whitespace-nowrap text-sm text-primary border-r border-border-color">${a.apoderado_nombre || ''}</td>
                                     <td class="px-4 py-4 whitespace-nowrap text-sm text-primary border-r border-border-color">${a.apoderado_ci || ''}</td>
                                     <td class="px-4 py-4 whitespace-nowrap text-sm text-primary border-r border-border-color">${a.jugador_nombre || ''}</td>
@@ -559,7 +608,101 @@
                                  </tr>`;
                 });
             }
-            listHtml += `</tbody></table></div></div></div>`;
+            listHtml += `</tbody></table></div></div>`;
+
+            // --- Sección Fotos Carnet ---
+            let fotocarnetsQuery = supabaseClient.from('fotocarnets').select('*');
+            if (currentUser && currentUser.role !== 'admin') {
+                fotocarnetsQuery = fotocarnetsQuery.eq('user_id', currentUser.id); 
+            }
+            const { data: fotocarnetsData, error: fotocarnetsError } = await fotocarnetsQuery;
+            listHtml += `
+                <div class="p-4 border border-border-color rounded-lg bg-primary">
+                    <h2 class="text-xl sm:text-2xl font-semibold mb-4 text-primary">Fotos Carnet</h2>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-border-color border border-border-input">
+                            <thead class="bg-secondary dark:bg-gray-700">
+                                <tr>
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-secondary uppercase tracking-wider border-r border-border-color">Nombre Jugador</th>
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-secondary uppercase tracking-wider border-r border-border-color">RUT Jugador</th>
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-secondary uppercase tracking-wider border-r border-border-color">Fecha Creación</th>
+                                    <th scope="col" class="px-4 py-3 text-center text-xs font-semibold text-secondary uppercase tracking-wider border-r border-border-color">Descargar</th>
+                                    ${currentUser.role === 'admin' ? '<th scope="col" class="px-4 py-3 text-center text-xs font-semibold text-secondary uppercase tracking-wider">Eliminar</th>' : ''}
+                                </tr>
+                            </thead>
+                            <tbody class="bg-secondary divide-y divide-border-color">`;
+            if (fotocarnetsError) {
+                listHtml += `<tr><td colspan="${currentUser.role === 'admin' ? '5' : '4'}" class="px-6 py-4 text-center text-red-500">Error cargando fotos carnet: ${fotocarnetsError.message}</td></tr>`;
+            } else if (!fotocarnetsData || fotocarnetsData.length === 0) {
+                listHtml += `<tr><td colspan="${currentUser.role === 'admin' ? '5' : '4'}" class="px-6 py-4 text-center text-secondary">No hay fotos carnet guardadas.</td></tr>`;
+            } else {
+                fotocarnetsData.forEach((fc) => {
+                    const createdAt = fc.created_at ? new Date(fc.created_at).toLocaleDateString('es-CL') : 'N/A';
+                    const downloadImageFilename = `fotocarnet_${(fc.nombre_completo_jugador || 'jugador').replace(/[^a-zA-Z0-9]/g, '_')}_${new Date(fc.created_at || Date.now()).toISOString().split('T')[0]}.png`;
+                    listHtml += `<tr class="hover:bg-primary dark:hover:bg-gray-700">
+                                    <td class="px-4 py-4 whitespace-nowrap text-sm text-primary border-r border-border-color">${fc.nombre_completo_jugador || ''}</td>
+                                    <td class="px-4 py-4 whitespace-nowrap text-sm text-primary border-r border-border-color">${fc.rut_jugador || ''}</td>
+                                    <td class="px-4 py-4 whitespace-nowrap text-sm text-primary border-r border-border-color">${createdAt}</td>
+                                    <td class="px-4 py-4 text-center border-r border-border-color">
+                                        <button class="action-button" onclick="downloadDataUrlAsImage('${fc.imagen_dataurl}', '${downloadImageFilename}')" title="Descargar Foto Carnet">
+                                            <i class="fas fa-download fa-lg"></i>
+                                        </button>
+                                    </td>
+                                    ${currentUser.role === 'admin' ? 
+                                    `<td class="px-4 py-4 text-center"><button class="action-button delete-btn" data-action="delete" data-id="${fc.id}" data-type="fotocarnet" data-name="Foto de ${fc.nombre_completo_jugador}" title="Eliminar Foto Carnet">
+                                        <i class="fas fa-trash fa-lg"></i>
+                                    </button></td>` : ''}
+                                 </tr>`;
+                });
+            }
+            listHtml += `</tbody></table></div></div>`;
+
+            // --- Sección Cédulas de Identidad ---
+            let cedulasQuery = supabaseClient.from('cedulas_identidad').select('*');
+            if (currentUser && currentUser.role !== 'admin') {
+                cedulasQuery = cedulasQuery.eq('user_id', currentUser.id); 
+            }
+            const { data: cedulasData, error: cedulasError } = await cedulasQuery;
+
+            listHtml += `
+                <div class="p-4 border border-border-color rounded-lg bg-primary">
+                    <h2 class="text-xl sm:text-2xl font-semibold mb-4 text-primary">Cédulas de Identidad</h2>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-border-color border border-border-input">
+                            <thead class="bg-secondary dark:bg-gray-700">
+                                <tr>
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-secondary uppercase tracking-wider border-r border-border-color">Nombre Jugador</th>
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-secondary uppercase tracking-wider border-r border-border-color">Fecha Creación</th>
+                                    <th scope="col" class="px-4 py-3 text-center text-xs font-semibold text-secondary uppercase tracking-wider border-r border-border-color">Descargar PDF</th>
+                                    ${currentUser.role === 'admin' ? '<th scope="col" class="px-4 py-3 text-center text-xs font-semibold text-secondary uppercase tracking-wider">Eliminar</th>' : ''}
+                                </tr>
+                            </thead>
+                            <tbody class="bg-secondary divide-y divide-border-color">`;
+            if (cedulasError) {
+                listHtml += `<tr><td colspan="${currentUser.role === 'admin' ? '4' : '3'}" class="px-6 py-4 text-center text-red-500">Error cargando cédulas: ${cedulasError.message}</td></tr>`;
+            } else if (!cedulasData || cedulasData.length === 0) {
+                listHtml += `<tr><td colspan="${currentUser.role === 'admin' ? '4' : '3'}" class="px-6 py-4 text-center text-secondary">No hay cédulas de identidad guardadas.</td></tr>`;
+            } else {
+                cedulasData.forEach((cd) => {
+                    const createdAt = cd.created_at ? new Date(cd.created_at).toLocaleDateString('es-CL') : 'N/A';
+                    const downloadFilename = `cedula_${(cd.nombre_jugador || 'jugador').replace(/[^a-zA-Z0-9]/g, '_')}_${new Date(cd.created_at || Date.now()).toISOString().split('T')[0]}.pdf`;
+                    listHtml += `<tr class="hover:bg-primary dark:hover:bg-gray-700">
+                                    <td class="px-4 py-4 whitespace-nowrap text-sm text-primary border-r border-border-color">${cd.nombre_jugador || ''}</td>
+                                    <td class="px-4 py-4 whitespace-nowrap text-sm text-primary border-r border-border-color">${createdAt}</td>
+                                    <td class="px-4 py-4 text-center border-r border-border-color">
+                                        <button class="action-button" onclick="downloadDataUrlAsPdf('${cd.pdf_dataurl}', '${downloadFilename}')" title="Descargar PDF Cédula">
+                                            <i class="fas fa-file-pdf fa-lg"></i> </button>
+                                    </td>
+                                    ${currentUser.role === 'admin' ? 
+                                    `<td class="px-4 py-4 text-center"><button class="action-button delete-btn" data-action="delete" data-id="${cd.id}" data-type="cedula" data-name="Cédula de ${cd.nombre_jugador}" title="Eliminar Cédula">
+                                        <i class="fas fa-trash fa-lg"></i>
+                                    </button></td>` : ''}
+                                 </tr>`;
+                });
+            }
+            listHtml += `</tbody></table></div></div>`;
+
+            listHtml += `</div>`; 
             contentArea.innerHTML = listHtml;
         }
 
@@ -705,10 +848,10 @@
         }
 
         async function renderUserManagementForm() {
-            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            const currentUser = JSON.parse(localStorage.getItem('currentUser')); // Usar currentUser
             if (!currentUser || currentUser.role !== 'admin') {
-                alert('Acceso restringido a administradores');
-                showAppScreen();
+                const contentArea = document.getElementById('content-area');
+                if (contentArea) contentArea.innerHTML = '<p class="text-red-500 text-center font-semibold p-4">Acceso restringido a administradores.</p>';
                 return;
             }
             const mainTitle = document.getElementById('main-title');
@@ -716,28 +859,30 @@
             if (!mainTitle || !contentArea) return;
             mainTitle.innerText = 'Gestión de Usuarios';
             const inputBaseClasses = "form-input-base";
-            const { data: usersData, error: usersError } = await supabaseClient.from('users').select('*');
+
+            const { data: usersData, error: usersError } = await supabaseClient.from('users').select('*'); // Tabla public.users
             if (usersError) {
                 contentArea.innerHTML = `<p class="text-red-500">Error cargando usuarios: ${usersError.message}</p>`;
                 return;
             }
+
+            // FORMULARIO DE GESTIÓN DE USUARIOS (SIN CAMPO EMAIL_AUTH POR AHORA, YA QUE EL LOGIN NO LO USA)
             let formHtml = `
                 <div class="bg-secondary p-4 sm:p-6 rounded-lg shadow-md mb-8">
                     <h2 id="user-form-title" class="text-lg sm:text-xl font-semibold mb-4 text-primary">Agregar Nuevo Usuario</h2>
                     <form id="form-add-user">
-                        <input type="hidden" id="edit-user-id" value="">
-                        <div class="mb-4">
+                        <input type="hidden" id="edit-user-id" value=""> <div class="mb-4">
                             <label for="new-fullname" class="block text-sm font-medium text-secondary mb-1">Nombre Completo:</label>
                             <input type="text" id="new-fullname" class="${inputBaseClasses}" required>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 items-end">
-                            <div>
-                                <label for="new-username" class="block text-sm font-medium text-secondary mb-1">Usuario (RUT sin puntos, con guion):</label>
+                             <div>
+                                <label for="new-username" class="block text-sm font-medium text-secondary mb-1">Usuario:</label>
                                 <input type="text" id="new-username" class="${inputBaseClasses}" placeholder="Ej: 12345678-K" required>
                             </div>
                             <div>
                                 <label for="new-password" class="block text-sm font-medium text-secondary mb-1">Clave:</label>
-                                <input type="password" id="new-password" class="${inputBaseClasses}" placeholder="(dejar en blanco para no cambiar)">
+                                <input type="password" id="new-password" class="${inputBaseClasses}" placeholder="(En blanco para no cambiar al editar)">
                             </div>
                             <div class="flex flex-col">
                                 <button type="submit" id="user-submit-button" class="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white focus:outline-none focus:ring-2 focus:ring-offset-2">
@@ -748,7 +893,7 @@
                                 </button>
                             </div>
                         </div>
-                        <div class="mb-4">
+                         <div class="mb-4">
                             <label for="new-role" class="block text-sm font-medium text-secondary mb-1">Rol:</label>
                             <select id="new-role" class="${inputBaseClasses} form-select-base">
                                 <option value="user">Usuario</option>
@@ -758,26 +903,27 @@
                         <div id="add-user-error" class="text-sm mt-1 min-h-[1.25rem]"></div>
                     </form>
                 </div>`;
+
             let listHtml = `
                 <div class="bg-secondary p-4 sm:p-6 rounded-lg shadow-md">
                     <h2 class="text-lg sm:text-xl font-semibold mb-4 text-primary">Usuarios Registrados</h2>
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-border-color border border-border-input">
-                            <thead class="bg-primary">
+                            <thead class="bg-primary dark:bg-gray-700">
                                 <tr>
                                     <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-secondary uppercase tracking-wider border-r border-border-color">Nombre Completo</th>
-                                    <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-secondary uppercase tracking-wider border-r border-border-color">Usuario</th>
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-secondary uppercase tracking-wider border-r border-border-color">Usuario (RUT)</th>
                                     <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-secondary uppercase tracking-wider border-r border-border-color">Rol</th>
                                     <th scope="col" class="px-4 py-3 text-center text-xs font-semibold text-secondary uppercase tracking-wider border-r border-border-color">Editar</th>
                                     <th scope="col" class="px-4 py-3 text-center text-xs font-semibold text-secondary uppercase tracking-wider">Eliminar</th>
                                 </tr>
                             </thead>
-                            <tbody class="bg-secondary">`;
+                            <tbody class="bg-secondary divide-y divide-border-color">`;
             if (!usersData || usersData.length === 0) {
                 listHtml += '<tr><td colspan="5" class="px-6 py-4 text-center text-secondary">No hay usuarios registrados.</td></tr>';
             } else {
-                usersData.forEach((user) => {
-                    listHtml += `<tr class="hover:bg-primary">
+                usersData.forEach((user) => { // user de public.users
+                    listHtml += `<tr class="hover:bg-primary dark:hover:bg-gray-700">
                                     <td class="px-4 py-4 whitespace-nowrap text-sm text-primary border-r border-border-color">${user.nombre_completo || ''}</td>
                                     <td class="px-4 py-4 whitespace-nowrap text-sm text-primary border-r border-border-color">${user.username}</td>
                                     <td class="px-4 py-4 whitespace-nowrap text-sm text-primary border-r border-border-color">${user.role || 'user'}</td>
@@ -787,7 +933,7 @@
                                         </button>
                                     </td>
                                     <td class="px-4 py-4 text-center">
-                                        <button class="action-button delete-btn" data-action="delete" data-type="user" data-id="${user.username}" data-name="${user.nombre_completo || user.username}" title="Eliminar Usuario">
+                                        <button class="action-button delete-btn" data-action="delete" data-type="user" data-id="${user.username}" data-name="${user.nombre_completo || user.username}" title="Eliminar Usuario de public.users">
                                             <i class="fas fa-user-times fa-lg"></i>
                                         </button>
                                     </td>
@@ -796,7 +942,7 @@
             }
             listHtml += `</tbody></table></div></div>`;
             contentArea.innerHTML = formHtml + listHtml;
-            resetUserForm();
+            resetUserForm(); 
             const addUserForm = document.getElementById('form-add-user');
             if (addUserForm) addUserForm.addEventListener('submit', handleAddUserSubmit);
             const cancelEditButton = document.getElementById('user-cancel-button');
@@ -811,15 +957,20 @@
             const mainTitle = document.getElementById('main-title');
             const contentArea = document.getElementById('content-area');
             if (!mainTitle || !contentArea) return;
+
             if (cropperInstance) {
                 try { cropperInstance.destroy(); } catch (e) { console.warn("Error al destruir Cropper:", e); }
                 cropperInstance = null;
             }
+            fc_currentAdjustments = { brightness: 0, contrast: 1, sharpness: 0, temperature: 0 };
+
+
             mainTitle.innerText = 'Generar Foto Carnet';
             const inputBaseClasses = "form-input-base";
             contentArea.innerHTML = `
-                <div class="bg-secondary p-4 sm:p-6 rounded-lg shadow-md max-w-4xl mx-auto">
-                    <div class="form-section pt-0 border-t-0"> <h2 class="text-lg sm:text-xl font-semibold mb-4 text-primary">1. Sube y Ajusta tu Foto</h2>
+                <div class="bg-secondary p-4 sm:p-6 rounded-lg shadow-md max-w-5xl mx-auto">
+                    <div class="form-section pt-0 border-t-0">
+                        <h2 class="text-lg sm:text-xl font-semibold mb-4 text-primary">1. Sube y Ajusta tu Foto</h2>
                         <div class="mb-4 button-group">
                             <input type="file" id="image-upload" class="hidden-file-input" accept="image/*">
                             <label for="image-upload" class="file-input-label">
@@ -827,11 +978,13 @@
                             </label>
                         </div>
                         <div class="cropper-container-wrapper mb-4 bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
-                             <img id="cropper-image" src="" alt="Área para ajustar foto. Sube una imagen para empezar.">
+                             <img id="cropper-image" src="" alt=" Sube una imagen para empezar.">
                         </div>
                     </div>
-                    <div class="form-section"> <h2 class="text-lg sm:text-xl font-semibold mb-4 text-primary">2. Ingresa tus Datos</h2>
-                        <div class="grid grid-cols-1 gap-4 mb-4">
+
+                    <div class="form-section">
+                        <h2 class="text-lg sm:text-xl font-semibold mb-4 text-primary">2. Ingresa tus Datos</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                             <div>
                                 <label for="foto-nombres" class="block text-sm font-medium text-secondary mb-1">Nombres:</label>
                                 <input type="text" id="foto-nombres" class="${inputBaseClasses}" required>
@@ -846,21 +999,48 @@
                             </div>
                         </div>
                     </div>
-                    <div class="form-section"> <h2 class="text-lg sm:text-xl font-semibold mb-4 text-primary">3. Generar Foto</h2>
-                        <div class="button-group mb-4">
-                            <button type="button" id="generate-button" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50" disabled>
-                                <i class="fas fa-cogs mr-2"></i>Generar Foto Carnet
-                            </button>
-                        </div>
-                        <div class="result-canvas-container">
+
+                    <div class="form-section">
+                        <h2 class="text-lg sm:text-xl font-semibold mb-4 text-primary">3. Previsualización y Ajustes</h2>
+                        <div class="result-canvas-container mb-6">
                             <canvas id="result-canvas"></canvas>
                             <p id="canvas-placeholder" class="text-secondary">Aquí aparecerá la foto generada.</p>
                         </div>
+                        
+                        <div class="foto-carnet-ajustes-container mb-6">
+                            <h3 class="text-md font-medium text-primary mb-3 text-center">Ajustes de Imagen</h3>
+                            <div class="foto-carnet-ajustes-grid">
+                                <div class="adjustment-control">
+                                    <label for="fcBrightness" class="block text-sm font-medium text-primary">Brillo: <span id="fcBrightnessValue">0</span>%</label>
+                                    <input type="range" id="fcBrightness" min="-50" max="50" value="0" class="slider">
+                                </div>
+                                <div class="adjustment-control">
+                                    <label for="fcContrast" class="block text-sm font-medium text-primary">Contraste: <span id="fcContrastValue">100</span>%</label>
+                                    <input type="range" id="fcContrast" min="50" max="150" value="100" class="slider">
+                                </div>
+                                <div class="adjustment-control">
+                                    <label for="fcSharpness" class="block text-sm font-medium text-primary">Nitidez: <span id="fcSharpnessValue">0</span>%</label>
+                                    <input type="range" id="fcSharpness" min="0" max="100" value="0" class="slider">
+                                </div>
+                                </div>
+                        </div>
+                        <div class="button-group mb-4 flex justify-center">
+                             <button type="button" id="preview-foto-carnet-button" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50" disabled>
+                                <i class="fas fa-eye mr-2"></i>Previsualizar
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-section text-center">
+                         <button type="button" id="save-foto-carnet-button" class="inline-flex items-center px-6 py-3 border border-transparent shadow-sm text-base font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50" disabled>
+                            <i class="fas fa-save mr-2"></i>Guardar Foto
+                        </button>
+                        <div id="foto-carnet-message" class="text-sm mt-2 min-h-[1.25rem]"></div>
                     </div>
                 </div>`;
             loadScript('https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js', setupFotoCarnetListeners);
         }
-
+        
         function loadScript(src, callback) {
             const existingScript = document.querySelector(`script[src="${src}"]`);
             if (existingScript) {
@@ -870,9 +1050,11 @@
                     else { setTimeout(() => checkGlobalVar(varName, cb), 100); }
                 };
                 if (src.includes('cropper')) checkGlobalVar('Cropper', callback);
+                else if (src.includes('numeric')) checkGlobalVar('numeric', callback); 
                 else if (callback) callback();
                 return;
             }
+
             const script = document.createElement('script');
             script.src = src;
             script.defer = true;
@@ -882,10 +1064,16 @@
             };
             script.onerror = () => {
                 console.error(`Error al cargar el script: ${src}`);
-                alert(`Error crítico: No se pudo cargar la librería ${src}. Algunas funcionalidades podrían no estar disponibles.`);
+                const contentArea = document.getElementById('content-area');
+                if (contentArea) {
+                    const errorMsg = document.createElement('p');
+                    errorMsg.className = 'text-red-500 text-center font-bold p-4';
+                    errorMsg.textContent = `Error crítico: No se pudo cargar la librería ${src.split('/').pop()}. Algunas funcionalidades podrían no estar disponibles. Intente recargar la página.`;
+                    contentArea.prepend(errorMsg);
+                }
                 if (src.includes('cropper')) {
-                    const generateButton = document.getElementById('generate-button');
-                    if(generateButton) generateButton.disabled = true;
+                    const previewButton = document.getElementById('preview-foto-carnet-button');
+                    if(previewButton) previewButton.disabled = true;
                     const cropperContainer = document.querySelector('.cropper-container-wrapper');
                     if(cropperContainer) cropperContainer.innerHTML = '<p class="text-red-600 font-bold text-center p-4">Error: Herramienta de recorte no cargada.</p>';
                 }
@@ -896,20 +1084,30 @@
         function setupFotoCarnetListeners() {
             if (typeof Cropper === 'undefined') {
                 console.error("Cropper no está definido. La funcionalidad de recorte de imagen no estará disponible.");
+                const cropperContainer = document.querySelector('.cropper-container-wrapper');
+                if (cropperContainer) {
+                    cropperContainer.innerHTML = '<p class="text-red-600 font-bold text-center p-4">Error: La herramienta de recorte de imagen no pudo cargarse. Intente recargar la página.</p>';
+                }
+                const previewButton = document.getElementById('preview-foto-carnet-button');
+                if (previewButton) previewButton.disabled = true;
+                const saveButton = document.getElementById('save-foto-carnet-button');
+                if (saveButton) saveButton.disabled = true;
                 return;
             }
             const imageUpload = document.getElementById('image-upload');
-            const generateButton = document.getElementById('generate-button');
+            const previewButton = document.getElementById('preview-foto-carnet-button');
+            const saveButton = document.getElementById('save-foto-carnet-button');
             const rutInput = document.getElementById('foto-rut');
             const textInputs = ['foto-nombres', 'foto-apellidos', 'foto-rut'];
 
             if (imageUpload) imageUpload.addEventListener('change', handleImageUploadWithCropper);
-            if (generateButton) generateButton.addEventListener('click', generateFotoCarnetWithCropper);
+            if (previewButton) previewButton.addEventListener('click', () => generateFotoCarnetWithCropper(true)); 
+            if (saveButton) saveButton.addEventListener('click', () => generateFotoCarnetWithCropper(false));
             
             if (rutInput) {
                 rutInput.addEventListener('input', () => {
                     formatRut(rutInput);
-                    checkEnableGenerateButton();
+                    checkEnableFotoCarnetButtons();
                 });
             }
             textInputs.forEach(id => {
@@ -917,22 +1115,57 @@
                 if (input) {
                     input.addEventListener('input', (e) => {
                         if (id !== 'foto-rut') e.target.value = e.target.value.toUpperCase();
-                        checkEnableGenerateButton();
+                        checkEnableFotoCarnetButtons();
                     });
                 }
             });
-            checkEnableGenerateButton();
+
+            // Event listeners para los controles de ajuste de imagen de Foto Carnet
+            document.getElementById('fcBrightness')?.addEventListener('input', (e) => {
+                fc_currentAdjustments.brightness = parseInt(e.target.value);
+                document.getElementById('fcBrightnessValue').textContent = e.target.value;
+                if (cropperInstance && cropperInstance.canvasData) { 
+                     generateFotoCarnetWithCropper(true); 
+                }
+            });
+            document.getElementById('fcContrast')?.addEventListener('input', (e) => {
+                fc_currentAdjustments.contrast = parseInt(e.target.value) / 100;
+                document.getElementById('fcContrastValue').textContent = e.target.value;
+                if (cropperInstance && cropperInstance.canvasData) {
+                     generateFotoCarnetWithCropper(true);
+                }
+            });
+            document.getElementById('fcSharpness')?.addEventListener('input', (e) => {
+                fc_currentAdjustments.sharpness = parseInt(e.target.value);
+                document.getElementById('fcSharpnessValue').textContent = e.target.value;
+                if (cropperInstance && cropperInstance.canvasData) {
+                     generateFotoCarnetWithCropper(true);
+                }
+            });
+            // Listener para Temperatura eliminado
+
+            checkEnableFotoCarnetButtons();
         }
 
-        function checkEnableGenerateButton() {
-            const generateButton = document.getElementById('generate-button');
-            if (!generateButton) return;
+        function checkEnableFotoCarnetButtons() {
+            const previewButton = document.getElementById('preview-foto-carnet-button');
+            const saveButton = document.getElementById('save-foto-carnet-button');
+            
             const nombres = document.getElementById('foto-nombres')?.value.trim();
             const apellidos = document.getElementById('foto-apellidos')?.value.trim();
             const rut = document.getElementById('foto-rut')?.value.trim();
             const isCropperReady = cropperInstance !== null && typeof cropperInstance.getCroppedCanvas === 'function';
-            generateButton.disabled = !(isCropperReady && nombres && apellidos && rut);
+            const resultCanvas = document.getElementById('result-canvas');
+            const isPreviewGenerated = resultCanvas && resultCanvas.style.display === 'block' && resultCanvas.width > 0;
+
+            if (previewButton) {
+                previewButton.disabled = !(isCropperReady && nombres && apellidos && rut);
+            }
+            if (saveButton) {
+                saveButton.disabled = !(isPreviewGenerated && nombres && apellidos && rut);
+            }
         }
+
 
         function handleImageUploadWithCropper(event) {
             const file = event.target.files[0];
@@ -950,562 +1183,256 @@
                 resultCanvas.style.display = 'none';
                 if(canvasPlaceholder) canvasPlaceholder.style.display = 'block';
             }
-            checkEnableGenerateButton();
+            
+            // Resetear sliders y valores de ajuste de Foto Carnet
+            document.getElementById('fcBrightness').value = 0;
+            document.getElementById('fcContrast').value = 100;
+            document.getElementById('fcSharpness').value = 0;
+            // Control de Temperatura ya no existe
+            fc_currentAdjustments = { brightness: 0, contrast: 1, sharpness: 0, temperature: 0 }; // Mantener temperature en 0
+            document.getElementById('fcBrightnessValue').textContent = '0';
+            document.getElementById('fcContrastValue').textContent = '100';
+            document.getElementById('fcSharpnessValue').textContent = '0';
+            // Label de Temperatura ya no existe
+
+            checkEnableFotoCarnetButtons();
 
             if (file && file.type.startsWith('image/')) {
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     imageElement.src = e.target.result;
-                    imageElement.alt = "Imagen cargada para recortar";
+                    imageElement.alt = "[Imagen del] Imagen cargada para recortar";
                     if (typeof Cropper === 'undefined') {
-                        alert("Error: La librería de recorte no se cargó correctamente. Intente recargar la página.");
+                        const errorDiv = document.querySelector('.cropper-container-wrapper') || document.getElementById('content-area');
+                        if (errorDiv) errorDiv.innerHTML = '<p class="text-red-500 text-center font-bold p-2">Error: La librería de recorte no se cargó. Intente recargar.</p>';
                         return;
                     }
                     try {
                         cropperInstance = new Cropper(imageElement, {
                             aspectRatio: 3 / 4, 
                             viewMode: 1,       
-                            dragMode: 'move',   
+                            dragMode: 'move',  
                             autoCropArea: 0.9, 
                             background: false, 
                             zoomable: true,
                             movable: true,
                             cropBoxResizable: true,
-                            ready: checkEnableGenerateButton,
-                            crop: checkEnableGenerateButton 
+                            ready: () => {
+                                checkEnableFotoCarnetButtons();
+                                generateFotoCarnetWithCropper(true); 
+                            },
+                            crop: () => { 
+                                generateFotoCarnetWithCropper(true);
+                                checkEnableFotoCarnetButtons();
+                            }
                         });
                     } catch (error) {
-                        alert(`Error al inicializar la herramienta de recorte: ${error.message}`);
-                        imageElement.src = ""; imageElement.alt = "Error al cargar imagen.";
+                        const errorDiv = document.querySelector('.cropper-container-wrapper') || document.getElementById('content-area');
+                        if (errorDiv) errorDiv.innerHTML = `<p class="text-red-500 text-center font-bold p-2">Error al inicializar recorte: ${error.message}</p>`;
+                        imageElement.src = ""; imageElement.alt = "[Imagen del] Error al cargar imagen.";
                     }
                 };
                 reader.readAsDataURL(file);
             } else {
                 imageElement.src = ""; 
-                imageElement.alt = "Área para ajustar foto. Sube una imagen para empezar.";
-                if(file) alert("Por favor, selecciona un archivo de imagen válido (ej: JPG, PNG).");
-                checkEnableGenerateButton();
+                imageElement.alt = " Sube una imagen para empezar.";
+                if(file) {
+                     const errorDiv = document.querySelector('.cropper-container-wrapper') || document.getElementById('content-area');
+                     if (errorDiv) errorDiv.insertAdjacentHTML('afterbegin', '<p class="text-yellow-500 text-center font-bold p-2">Por favor, selecciona un archivo de imagen válido (ej: JPG, PNG).</p>');
+                }
+                checkEnableFotoCarnetButtons();
+            }
+        }
+        
+        // Funciones de ajuste de imagen para Foto Carnet (fc_)
+        function fc_applyImageAdjustments(imageData) {
+            if (!imageData) return;
+            const pixels = imageData.data;
+            const brightness = fc_currentAdjustments.brightness;
+            const contrast = fc_currentAdjustments.contrast;
+            for (let i = 0; i < pixels.length; i += 4) {
+                let r = pixels[i], g = pixels[i+1], b = pixels[i+2];
+                r = (r - 128) * contrast + 128; g = (g - 128) * contrast + 128; b = (b - 128) * contrast + 128;
+                r += brightness; g += brightness; b += brightness;
+                pixels[i] = Math.min(255, Math.max(0, r));
+                pixels[i+1] = Math.min(255, Math.max(0, g));
+                pixels[i+2] = Math.min(255, Math.max(0, b));
+            }
+            // Ajuste de Temperatura eliminado de aquí también
+            // const tempAdjust = fc_currentAdjustments.temperature;
+            // for (let i = 0; i < pixels.length; i += 4) {
+            //     pixels[i] = Math.min(255, Math.max(0, pixels[i] + tempAdjust));
+            //     pixels[i+2] = Math.min(255, Math.max(0, pixels[i+2] - tempAdjust));
+            // }
+            if (fc_currentAdjustments.sharpness > 0) { 
+                fc_applySharpness(imageData);
             }
         }
 
-        function generateFotoCarnetWithCropper() {
+        function fc_applySharpness(imageData) {
+            const sharpnessFactor = fc_currentAdjustments.sharpness / 100;
+            if (sharpnessFactor <= 0) return;
+            const center = 1 + 4 * sharpnessFactor; 
+            const surround = -0.5 * sharpnessFactor; 
+            const kernel = [surround, surround, surround, surround, center, surround, surround, surround, surround];
+            const pixels = imageData.data;
+            const width = imageData.width;
+            const height = imageData.height;
+            const tempData = new Uint8ClampedArray(pixels); // Copia para leer valores originales
+            for (let y = 1; y < height - 1; y++) {
+                for (let x = 1; x < width - 1; x++) {
+                    for (let c = 0; c < 3; c++) { // Para R, G, B
+                        let sum = 0;
+                        let ki = 0;
+                        for (let ky = -1; ky <= 1; ky++) {
+                            for (let kx = -1; kx <= 1; kx++) {
+                                const idx = ((y + ky) * width + (x + kx)) * 4 + c;
+                                sum += tempData[idx] * kernel[ki++];
+                            }
+                        }
+                        const idxCurrent = (y * width + x) * 4 + c;
+                        pixels[idxCurrent] = Math.min(255, Math.max(0, sum));
+                    }
+                }
+            }
+        }
+
+
+        async function generateFotoCarnetWithCropper(isPreview = false) { 
             if (!cropperInstance || typeof cropperInstance.getCroppedCanvas !== 'function') {
-                alert("Por favor, sube y ajusta una imagen primero.");
+                if (!isPreview) showTemporaryMessage('foto-carnet-message', "Por favor, sube y ajusta una imagen primero.", true);
                 return;
             }
             const nombres = document.getElementById('foto-nombres').value.trim();
             const apellidos = document.getElementById('foto-apellidos').value.trim();
             const rut = document.getElementById('foto-rut').value.trim();
             if (!nombres || !apellidos || !rut) {
-                alert("Por favor, completa los campos de Nombres, Apellidos y RUT.");
-                return;
+                 if (!isPreview) showTemporaryMessage('foto-carnet-message', "Completa Nombres, Apellidos y RUT.", true);
             }
 
             let croppedCanvas;
             try {
                 croppedCanvas = cropperInstance.getCroppedCanvas({
-                    width: 300,
-                    imageSmoothingEnabled: true,
+                    width: 300, 
+                    imageSmoothingEnabled: true, 
                     imageSmoothingQuality: 'high',
                 });
-                if (!croppedCanvas.width || !croppedCanvas.height) throw new Error("El área recortada es inválida o demasiado pequeña.");
+                if (!croppedCanvas || !croppedCanvas.width || !croppedCanvas.height) throw new Error("El área recortada es inválida o el cropper no está listo.");
             } catch (error) {
-                alert(`Error al obtener la imagen recortada: ${error.message}. Intenta ajustar el recorte de nuevo.`);
+                if (!isPreview) showTemporaryMessage('foto-carnet-message', `Error al recortar: ${error.message}.`, true);
+                console.error("Error en getCroppedCanvas:", error);
                 return;
             }
             
             const resultCanvas = document.getElementById('result-canvas');
             const canvasPlaceholder = document.getElementById('canvas-placeholder');
             const ctx = resultCanvas.getContext('2d');
-
-            const photoWidth = croppedCanvas.width;
-            const photoHeight = croppedCanvas.height;
             
-            const textLineHeight = Math.max(22, photoWidth * 0.08);
-            const textPaddingVertical = Math.max(15, photoWidth * 0.05);
-            const fontSize = Math.max(20, photoWidth * 0.065);
-            const numTextLines = 3; 
-            const textStripHeight = (textLineHeight * numTextLines) + (textPaddingVertical * 2);
+            const tempAdjustedCanvas = document.createElement('canvas');
+            tempAdjustedCanvas.width = croppedCanvas.width;
+            tempAdjustedCanvas.height = croppedCanvas.height;
+            const tempAdjustedCtx = tempAdjustedCanvas.getContext('2d');
+            tempAdjustedCtx.drawImage(croppedCanvas, 0, 0);
+            
+            const imageData = tempAdjustedCtx.getImageData(0, 0, tempAdjustedCanvas.width, tempAdjustedCanvas.height);
+            fc_applyImageAdjustments(imageData); 
+            tempAdjustedCtx.putImageData(imageData, 0, 0);
 
+            const photoWidth = 300; 
+            const photoHeight = 400; 
             resultCanvas.width = photoWidth;
-            resultCanvas.height = photoHeight; 
-
+            resultCanvas.height = photoHeight;
             ctx.clearRect(0, 0, resultCanvas.width, resultCanvas.height);
-            ctx.drawImage(croppedCanvas, 0, 0, resultCanvas.width, resultCanvas.height);
+            ctx.drawImage(tempAdjustedCanvas, 0, 0, resultCanvas.width, resultCanvas.height); 
 
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
-            const stripY = resultCanvas.height - textStripHeight;
-            ctx.fillRect(0, stripY, resultCanvas.width, textStripHeight);
-            
-            ctx.fillStyle = 'white';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-
-            const textBaseY = stripY + textPaddingVertical;
-            const textY1 = textBaseY + (textLineHeight / 2);
-            const textY2 = textY1 + textLineHeight;
-            const textY3 = textY2 + textLineHeight;
-
-            ctx.font = `bold ${fontSize}px Inter, sans-serif`;
-            ctx.fillText(nombres.toUpperCase(), resultCanvas.width / 2, textY1);
-            ctx.fillText(apellidos.toUpperCase(), resultCanvas.width / 2, textY2);
-            
-            ctx.font = `bold ${fontSize}px Inter, sans-serif`;
-            ctx.fillText(rut.toUpperCase(), resultCanvas.width / 2, textY3);
+            if (nombres && apellidos && rut) {
+                const textLineHeight = Math.max(22, photoWidth * 0.08);
+                const textPaddingVertical = Math.max(15, photoWidth * 0.05);
+                const fontSize = Math.max(20, photoWidth * 0.065);
+                const numTextLines = 3;
+                const textStripHeight = (textLineHeight * numTextLines) + (textPaddingVertical * 2);
+                
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
+                const stripY = resultCanvas.height - textStripHeight;
+                ctx.fillRect(0, stripY, resultCanvas.width, textStripHeight);
+                ctx.fillStyle = 'white';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                const textBaseY = stripY + textPaddingVertical;
+                const textY1 = textBaseY + (textLineHeight / 2);
+                const textY2 = textY1 + textLineHeight;
+                const textY3 = textY2 + textLineHeight;
+                ctx.font = `bold ${fontSize}px Inter, sans-serif`;
+                ctx.fillText(nombres.toUpperCase(), resultCanvas.width / 2, textY1);
+                ctx.fillText(apellidos.toUpperCase(), resultCanvas.width / 2, textY2);
+                ctx.font = `bold ${fontSize}px Inter, sans-serif`;
+                ctx.fillText(rut.toUpperCase(), resultCanvas.width / 2, textY3);
+            }
             
             resultCanvas.style.display = 'block';
             if(canvasPlaceholder) canvasPlaceholder.style.display = 'none';
-        }
+            checkEnableFotoCarnetButtons(); 
 
-        // --- Funciones Handler (Manejadores de Eventos) ---
-        async function handleLoginSubmit(event) {
-            event.preventDefault();
-            const cedulaInput = document.getElementById('username');
-            let cedula = cedulaInput.value; 
-            cedula = cedula.replace(/\./g, ""); 
-
-            const password = document.getElementById('password').value;
-            const errorMessage = document.getElementById('login-error-message');
-            errorMessage.textContent = '';
-
-            console.log('[handleLoginSubmit] Intentando login con Cédula (username) procesada:', cedula);
-
-            const { data: user, error } = await supabaseClient
-                .from('users') 
-                .select('*')
-                .eq('username', cedula) 
-                .single();
-
-            if (error || !user) {
-                console.error('[handleLoginSubmit] Error de Supabase o usuario no encontrado:', error);
-                errorMessage.textContent = 'Credenciales inválidas o error de conexión.';
-                return;
-            }
-            
-            const encoder = new TextEncoder();
-            const passwordData = encoder.encode(password);
-            const hashBuffer = await crypto.subtle.digest('SHA-256', passwordData);
-            const passwordHash = Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
-
-            if (passwordHash === user.password_hash) {
-                console.log('[handleLoginSubmit] Login exitoso para:', user.username);
-                localStorage.setItem('currentUser', JSON.stringify(user));
-                document.getElementById('username').value = '';
-                document.getElementById('password').value = '';
-                showAppScreen();
-            } else {
-                console.warn('[handleLoginSubmit] Contraseña incorrecta para:', cedula);
-                errorMessage.textContent = 'Credenciales inválidas.';
-            }
-        }
-
-        function handleLogout() {
-            localStorage.removeItem('currentUser');
-            showLoginScreen();
-        }
-        
-        async function handleAddUserSubmit(event) {
-            event.preventDefault();
-            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-            if (!currentUser || currentUser.role !== 'admin') {
-                alert('Acceso no autorizado.'); return;
-            }
-
-            const nombre_completo = document.getElementById('new-fullname').value.trim();
-            const cedula = document.getElementById('new-username').value.trim();
-            const password = document.getElementById('new-password').value;
-            const role = document.getElementById('new-role').value;
-            const errorDiv = document.getElementById('add-user-error');
-            const editUserId = document.getElementById('edit-user-id').value;
-            errorDiv.textContent = '';
-
-            if (!nombre_completo || !cedula || !role) {
-                errorDiv.textContent = 'Nombre Completo, Usuario (RUT) y Rol son requeridos.';
+            if (isPreview) { 
                 return;
             }
 
-            let password_hash = null;
-            if (password) {
-                const encoder = new TextEncoder();
-                const data = encoder.encode(password);
-                const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-                password_hash = Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
-            }
-
-            if (editUserId) {
-                const userDataToUpdate = {
-                    nombre_completo: nombre_completo,
-                    username: cedula,
-                    role: role,
-                };
-                if (password_hash) {
-                    userDataToUpdate.password_hash = password_hash;
-                }
-                const { error: updateError } = await supabaseClient
-                    .from('users')
-                    .update(userDataToUpdate)
-                    .eq('id', editUserId);
-
-                if (updateError) {
-                    console.error("Error al actualizar usuario:", updateError);
-                    errorDiv.textContent = 'Error al actualizar usuario: ' + updateError.message;
-                } else {
-                    alert('Usuario actualizado exitosamente.');
-                    renderUserManagementForm();
-                }
-            } else {
-                if (!password_hash) {
-                    errorDiv.textContent = 'Debe ingresar la clave para un nuevo usuario.';
-                    return;
-                }
-                const { data, error: insertError } = await supabaseClient
-                    .from('users') 
-                    .insert([{
-                        username: cedula,
-                        password_hash: password_hash, 
-                        nombre_completo: nombre_completo,
-                        role: role
-                    }]);
-
-                if (insertError) {
-                    console.error("Error al registrar usuario:", insertError);
-                    if (insertError.message.includes('duplicate key value violates unique constraint')) {
-                         errorDiv.textContent = 'Error: El usuario (RUT) ya existe.';
-                    } else {
-                        errorDiv.textContent = 'Error al registrar usuario: ' + insertError.message;
-                    }
-                } else {
-                    alert('Usuario registrado exitosamente.');
-                    renderUserManagementForm();
-                }
-            }
-        }
-        
-        async function populateUserEditForm(userId) { 
-            const { data: user, error } = await supabaseClient.from('users').select('*').eq('id', userId).single();
-            if (error || !user) { alert('No se pudo cargar el usuario para editar.'); return; }
-
-            document.getElementById('new-fullname').value = user.nombre_completo || '';
-            document.getElementById('new-username').value = user.username;
-            document.getElementById('new-password').value = '';
-            document.getElementById('new-password').placeholder = 'Nueva Clave (o dejar en blanco)';
-            document.getElementById('new-role').value = user.role || 'user';
-            document.getElementById('edit-user-id').value = user.id;
-            
-            document.getElementById('user-form-title').textContent = 'Editar Usuario';
-            const submitButton = document.getElementById('user-submit-button');
-            submitButton.classList.remove('bg-button-green-bg', 'hover:bg-button-green-hover-bg');
-            submitButton.classList.add('edit-user-button');
-            document.getElementById('user-submit-button-text').textContent = 'Guardar Cambios';
-            document.getElementById('user-cancel-button').classList.remove('hidden');
-            document.getElementById('add-user-error').textContent = '';
-
-            document.getElementById('new-fullname').scrollIntoView({ behavior: 'smooth', block: 'center' });
-            document.getElementById('new-fullname').focus();
-        }
-
-        function resetUserForm() {
-            const form = document.getElementById('form-add-user');
-            if (form) form.reset();
-            document.getElementById('edit-user-id').value = '';
-            document.getElementById('user-form-title').textContent = 'Agregar Nuevo Usuario';
-            
-            const submitButton = document.getElementById('user-submit-button');
-            if (submitButton) {
-                submitButton.classList.remove('edit-user-button');
-                submitButton.classList.add('bg-button-green-bg', 'hover:bg-button-green-hover-bg');
-            }
-            document.getElementById('user-submit-button-text').textContent = 'Agregar';
-            document.getElementById('user-cancel-button').classList.add('hidden');
-            
-            const passwordInput = document.getElementById('new-password');
-            if (passwordInput) passwordInput.placeholder = '';
-            const roleInput = document.getElementById('new-role');
-            if (roleInput) roleInput.value = 'user';
-            document.getElementById('add-user-error').textContent = '';
-        }
-
-        async function handleTramiteSubmit(event) {
-            event.preventDefault();
-            console.log('[handleTramiteSubmit] Botón Guardar Trámite presionado.'); 
-            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-            if (!currentUser || !currentUser.id) { 
-                alert("Debes iniciar sesión para guardar un trámite. Falta ID de usuario.");
-                console.error('[handleTramiteSubmit] currentUser o currentUser.id no definido:', currentUser);
-                showLoginScreen();
+            // Lógica de guardado (solo si no es preview)
+            if (!nombres || !apellidos || !rut) { // Re-validar antes de guardar
+                showTemporaryMessage('foto-carnet-message', "Completa Nombres, Apellidos y RUT antes de guardar.", true);
                 return;
             }
 
-            const tramiteData = {
-                ci: document.getElementById('ci').value,
-                fecha_nac: document.getElementById('fecha-nac').value,
-                apellido_paterno: document.getElementById('apellido-paterno').value,
-                apellido_materno: document.getElementById('apellido-materno').value,
-                nombres: document.getElementById('nombres').value,
-                solicita_inscripcion: document.getElementById('solicita_inscripcion_char').value.trim().toUpperCase() || null,
-                solicita_pase_interno: document.getElementById('solicita_pase_interno_char').value.trim().toUpperCase() || null,
-                solicita_pase_regional: document.getElementById('solicita_pase_regional_char').value.trim().toUpperCase() || null,
-                solicita_pase_externo: document.getElementById('solicita_pase_externo_char').value.trim().toUpperCase() || null,
-                categoria_extranjero: document.getElementById('categoria_extranjero_char').value.trim().toUpperCase() || null,
-                categoria_libertad: document.getElementById('categoria_libertad_char').value.trim().toUpperCase() || null,
-                categoria_adulto: document.getElementById('categoria_adulto_char').value.trim().toUpperCase() || null,
-                categoria_femenina: document.getElementById('categoria_femenina_char').value.trim().toUpperCase() || null,
-                categoria_infantil: document.getElementById('categoria_infantil_char').value.trim().toUpperCase() || null,
-                procede_club: document.getElementById('procede-club').value,
-                procede_asociacion: document.getElementById('procede-asociacion').value,
-                user_id: currentUser.id
+            const currentUser = JSON.parse(localStorage.getItem('currentUser')); 
+            if (!currentUser || !currentUser.id) {
+                showTemporaryMessage('foto-carnet-message', "Error de sesión. Intenta reingresar.", true);
+                console.error("Error: currentUser o currentUser.id no disponible en generateFotoCarnetWithCropper");
+                return;
+            }
+
+            const imagen_dataurl = resultCanvas.toDataURL('image/png');
+            const fotoCarnetData = {
+                user_id: currentUser.id, 
+                nombre_completo_jugador: `${nombres} ${apellidos}`.trim(),
+                rut_jugador: rut,
+                imagen_dataurl: imagen_dataurl
             };
 
-            const dateRegex = /^\d{2}-\d{2}-\d{4}$/;
-            if (!dateRegex.test(tramiteData.fecha_nac)) { alert('Formato de Fecha de Nacimiento incorrecto. Use DD-MM-AAAA.'); return; }
-            const solicitaValue = Object.keys(tramiteData).filter(k => k.startsWith('solicita_') && tramiteData[k]).length > 0;
-            const categoriaValue = Object.keys(tramiteData).filter(k => k.startsWith('categoria_') && tramiteData[k]).length > 0;
-            if (!solicitaValue) { alert('Debe marcar al menos una opción en "Solicita".'); return; }
-            if (!categoriaValue) { alert('Debe marcar al menos una opción en "Categoría".'); return; }
-            
-            console.log('[handleTramiteSubmit] Datos del trámite a guardar:', tramiteData);
-            const { error } = await supabaseClient.from('players').insert([tramiteData]);
+            const { data, error } = await supabaseClient
+                .from('fotocarnets')
+                .insert([fotoCarnetData]);
 
             if (error) {
-                console.error('[handleTramiteSubmit] Error al guardar trámite:', error);
-                alert('Error al guardar trámite: ' + error.message);
-            } else { 
-                alert('Trámite guardado exitosamente!'); 
-                document.getElementById('form-tramite').reset();
-                renderPlayerList();
-            }
-        }
-
-        async function handleAutorizacionSubmit(event) { 
-            event.preventDefault();
-            console.log('[handleAutorizacionSubmit] Botón Guardar Autorización presionado.'); 
-            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-            if (!currentUser || !currentUser.id) { 
-                alert("Debes iniciar sesión para guardar una autorización. Falta ID de usuario.");
-                console.error('[handleAutorizacionSubmit] currentUser o currentUser.id no definido:', currentUser);
-                showLoginScreen();
-                return;
-            }
-            
-            const autorizacionData = {
-                apoderado_nombre: document.getElementById('apoderado-nombre').value,
-                apoderado_ci: document.getElementById('apoderado-ci').value,
-                jugador_nombre: document.getElementById('jugador-nombre-auth').value,
-                parentesco: document.getElementById('parentesco').value,
-                user_id: currentUser.id
-            };
-
-            if (autorizacionData.parentesco === "") {
-                alert("Por favor, seleccione un parentesco.");
-                return;
-            }
-            console.log('[handleAutorizacionSubmit] Datos de la autorización a guardar:', autorizacionData);
-            const { error } = await supabaseClient
-                .from('autorizaciones')
-                .insert([autorizacionData]);
-
-            if (error) {
-                console.error('[handleAutorizacionSubmit] Error al guardar autorización:', error);
-                alert('Error al guardar autorización: ' + error.message);
+                console.error("Error al guardar foto carnet en Supabase:", error);
+                showTemporaryMessage('foto-carnet-message', `Error al guardar: ${error.message}`, true);
             } else {
-                alert('Autorización guardada exitosamente en Supabase!');
-                document.getElementById('form-autorizacion').reset();
-                renderPlayerList();
+                showTemporaryMessage('foto-carnet-message', "Foto carnet generada y guardada exitosamente.", false);
             }
-        }
-
-        async function generatePdf(type, id) { 
-            if (typeof PDFLib === 'undefined' || !PDFLib.PDFDocument) { alert("La librería PDF no está lista. Intente de nuevo."); return; }
-            const { PDFDocument } = PDFLib;
-            const urlTramite = "https://zkak0.github.io/BotafogoApp/tramite_individual.pdf";
-            const urlAutorizacion = "https://zkak0.github.io/BotafogoApp/autorizacion_jugadores.pdf";
-            let pdfUrlToLoad, dataToFill, outputFilename, isTramite = false;
-
-            if (type === 'tramite') {
-                isTramite = true;
-                const { data, error } = await supabaseClient.from('players').select('*').eq('id', id).single();
-                if (error || !data) { alert("Error: Trámite no encontrado en la base de datos."); return; }
-                dataToFill = data; pdfUrlToLoad = urlTramite;
-                outputFilename = `tramite_${(data.ci || 'jugador').replace(/[^a-zA-Z0-9]/g, '_')}_${Date.now()}.pdf`;
-            } else if (type === 'autorizacion') {
-                const { data, error } = await supabaseClient.from('autorizaciones').select('*').eq('id', id).single();
-                if (error || !data) { alert("Error: Autorización no encontrada en la base de datos."); return; }
-                dataToFill = data; pdfUrlToLoad = urlAutorizacion;
-                outputFilename = `autorizacion_${(dataToFill.jugador_nombre || 'jugador').replace(/[^a-zA-Z0-9]/g, '_')}_${Date.now()}.pdf`;
-            } else { alert('Error: Tipo de PDF desconocido.'); return; }
-
-            try {
-                const existingPdfBytes = await fetch(pdfUrlToLoad).then(res => {
-                    if (!res.ok) throw new Error(`Error al descargar la plantilla PDF (${res.status})`); return res.arrayBuffer();
-                });
-                const pdfDoc = await PDFDocument.load(existingPdfBytes);
-                const form = pdfDoc.getForm();
-
-                if (isTramite) {
-                    const fieldMap = {
-                        ci: 'CEDULA IDENTIDAD', fechaNac: 'FECHA NAC', apellidoPaterno: 'APELLIDO PATERNO',
-                        apellidoMaterno: 'APELLIDO MATERNO', nombres: 'NOMBRES', procedeClub: 'PROCEDE DEL CLUB',
-                        procedeAsociacion: 'ASOCIACION', solicita_inscripcion: 'INSCRIPCION',
-                        solicita_pase_interno: 'PASE INTERNO', solicita_pase_regional: 'PASE REGIONAL',
-                        solicita_pase_externo: 'PASE EXTERNO', categoria_extranjero: 'EXTRANJERO',
-                        categoria_libertad: 'LIBERTAD ACCION', categoria_adulto: 'ADULTO',
-                        categoria_femenina: 'FEMENINA', categoria_infantil: 'INFANTIL'
-                    };
-                    const dataForPdf = {
-                        ci: dataToFill.ci, fechaNac: dataToFill.fecha_nac, apellidoPaterno: dataToFill.apellido_paterno,
-                        apellidoMaterno: dataToFill.apellido_materno, nombres: dataToFill.nombres,
-                        procedeClub: dataToFill.procede_club, procedeAsociacion: dataToFill.procede_asociacion,
-                        solicita_inscripcion: dataToFill.solicita_inscripcion, solicita_pase_interno: dataToFill.solicita_pase_interno,
-                        solicita_pase_regional: dataToFill.solicita_pase_regional, solicita_pase_externo: dataToFill.solicita_pase_externo,
-                        categoria_extranjero: dataToFill.categoria_extranjero, categoria_libertad: dataToFill.categoria_libertad,
-                        categoria_adulto: dataToFill.categoria_adulto, categoria_femenina: dataToFill.categoria_femenina,
-                        categoria_infantil: dataToFill.categoria_infantil
-                    };
-                    Object.keys(fieldMap).forEach(key => {
-                        try {
-                            const field = form.getTextField(fieldMap[key]);
-                            field.setText((dataForPdf[key] || '').toString());
-                            field.setAlignment(PDFLib.TextAlignment.Center);
-                        } catch (e) { console.warn(`Campo no encontrado o error al rellenar (Trámite) '${fieldMap[key]}': ${e.message}`); }
-                    });
-                } else { 
-                    const fieldMapAuth = { nombreAutorizante: 'NOMBRE AUTORIZANTE', cedulaIdentidad: 'CEDULA IDENTIDAD', nombreJugador: 'NOMBRE JUGADOR', parentesco: 'PARENTESCO' };
-                    const authDataMap = { 
-                        nombreAutorizante: dataToFill.apoderado_nombre, 
-                        cedulaIdentidad: dataToFill.apoderado_ci, 
-                        nombreJugador: dataToFill.jugador_nombre, 
-                        parentesco: dataToFill.parentesco 
-                    };
-                    Object.keys(fieldMapAuth).forEach(key => {
-                        try {
-                            const field = form.getTextField(fieldMapAuth[key]);
-                            field.setText((authDataMap[key] || '').toString());
-                            field.setAlignment(PDFLib.TextAlignment.Center);
-                        } catch (e) { console.warn(`Campo no encontrado o error al rellenar (Autorización) '${fieldMapAuth[key]}': ${e.message}`); }
-                    });
-                }
-                try { form.flatten(); } catch (e) { console.warn("Error al aplanar el PDF (flatten):", e); } 
-                
-                const pdfBytes = await pdfDoc.save();
-                const blob = new Blob([pdfBytes], { type: 'application/pdf' });
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(blob); link.download = outputFilename;
-                document.body.appendChild(link); link.click(); document.body.removeChild(link);
-                URL.revokeObjectURL(link.href);
-            } catch (error) { alert(`Error al procesar el PDF: ${error.message}. Asegúrese de que las plantillas PDF son accesibles.`); }
-        }
-
-        async function deleteTramite(tramiteId) {
-            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-            if (!currentUser || currentUser.role !== 'admin') {
-                alert('Solo los administradores pueden eliminar trámites.');
-                return;
-            }
-            const { data: tramiteData, error: fetchError } = await supabaseClient
-                .from('players')
-                .select('nombres, ci')
-                .eq('id', tramiteId)
-                .single();
-            
-            let itemName = `el trámite ID ${tramiteId.substring(0,8)}...`;
-            if (tramiteData) {
-                itemName = `el trámite de ${tramiteData.nombres || tramiteData.ci}`;
-            } else if (fetchError && fetchError.code !== 'PGRST116') {
-                console.error('Error al buscar información del trámite para eliminar:', fetchError);
-            }
-            showDeleteConfirmModal(tramiteId, 'tramite', itemName);
         }
         
-        async function deleteAutorizacion(autorizacionId) {
-            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-            if (!currentUser || currentUser.role !== 'admin') {
-                alert('Solo los administradores pueden eliminar autorizaciones.');
-                return;
-            }
-            const { data: authData, error: fetchError } = await supabaseClient
-                .from('autorizaciones')
-                .select('jugador_nombre')
-                .eq('id', autorizacionId)
-                .single();
-
-            let itemName = `la autorización ID ${autorizacionId.substring(0,8)}...`;
-            if (authData && authData.jugador_nombre) {
-                itemName = `la autorización para ${authData.jugador_nombre}`;
-            } else if (fetchError && fetchError.code !== 'PGRST116') {
-                 console.error('Error al buscar información de la autorización para eliminar:', fetchError);
-            }
-            showDeleteConfirmModal(autorizacionId, 'autorizacion', itemName);
-        }
-
-        async function deleteUser(cedula) { 
-            console.log('[deleteUser] Iniciando para Cédula/Username:', cedula);
-            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-
-            if (!currentUser) {
-                console.error('[deleteUser] Error: No hay usuario actual.');
-                alert('Debes iniciar sesión.');
-                return;
-            }
-            if (currentUser.username === cedula) { 
-                alert('No puedes eliminar tu propia cuenta.');
-                console.warn('[deleteUser] Intento de autoeliminación por Cédula:', currentUser.username);
-                return;
-            }
-            if (currentUser.role !== 'admin') {
-                alert('Acceso no autorizado.');
-                console.warn('[deleteUser] Intento de eliminación por no-admin:', currentUser.username);
-                return;
-            }
-            
-            const { data: userToDeleteData, error: fetchErr } = await supabaseClient
-                .from('users')
-                .select('nombre_completo') 
-                .eq('username', cedula) 
-                .single();
-
-            let itemName;
-            if (userToDeleteData && userToDeleteData.nombre_completo) {
-                itemName = userToDeleteData.nombre_completo; 
-            } else {
-                itemName = `al usuario con cédula ${cedula}`; 
-            }
-            
-            if (fetchErr && fetchErr.code !== 'PGRST116') { 
-                 console.error('[deleteUser] Error al buscar información del usuario a eliminar:', fetchErr);
-            }
-            
-            showDeleteConfirmModal(cedula, 'user', itemName);
-        }
-
-        function toggleSidebar() {
-            document.getElementById('sidebar')?.classList.toggle('sidebar-collapsed');
-        }
-
-        // --- INICIO: Lógica para Cédula Identidad (Corrección de Perspectiva) ---
+        // --- Lógica para Cédula Identidad (Corrección de Perspectiva y Guardado) ---
         let ci_perspectiveImage = new Image();
-        let ci_perspectivePoints = [];
+        let ci_perspectivePoints = []; 
         let ci_perspectiveOriginalCanvas, ci_perspectiveTransformedCanvas;
         let ci_perspectiveCtxOriginal, ci_perspectiveCtxTransformed;
-        let ci_savedFoto1DataUrl = null, ci_savedFoto2DataUrl = null;
-        let ci_currentSelectedFoto = 'foto1';
-        const CI_FINAL_WIDTH = 340;
-        const CI_FINAL_HEIGHT = 227;
-        // Variables globales para los ajustes de imagen de la cédula
+        let ci_savedFoto1DataUrl = null, ci_savedFoto2DataUrl = null; 
+        let ci_currentSelectedFoto = 'foto1'; 
+        const CI_FINAL_WIDTH = 340; 
+        const CI_FINAL_HEIGHT = 227; 
         let ci_currentAdjustments = {
-            brightness: 0,  // Rango -50 a 50, valor real
-            contrast: 1,    // Rango 0.5 a 1.5 (50% a 150%), valor real (slider / 100)
-            sharpness: 0,   // Rango 0 a 100
-            temperature: 0 // Rango -100 a 100, valor real
+            brightness: 0, contrast: 1, sharpness: 0, temperature: 0
         };
-
 
         function renderCedulaIdentidadForm() {
             const mainTitle = document.getElementById('main-title');
             const contentArea = document.getElementById('content-area');
             if (!mainTitle || !contentArea) return;
-            mainTitle.innerText = 'Modificación de Cédula de Identidad';
+            mainTitle.innerText = 'Modificación y Guardado de Cédula de Identidad';
             contentArea.innerHTML = `
                 <div id="cedula-identidad-section" class="bg-secondary p-4 sm:p-6 rounded-lg shadow-md max-w-4xl mx-auto">
+                    <div class="mb-4"> <label for="nombre-jugador-cedula" class="block text-sm font-medium text-secondary mb-1">Nombre del Jugador (solo para registro):</label>
+                        <input type="text" id="nombre-jugador-cedula" class="form-input-base" placeholder="" required>
+                    </div>
                     <div class="flex flex-wrap items-center gap-4 mb-6">
                         <div class="flex items-center space-x-2 sm:space-x-4">
                             <span class="text-sm font-medium text-primary">Subir para:</span>
@@ -1555,40 +1482,46 @@
                         </div>
                     </div>
                     <div class="mt-6 flex flex-wrap gap-2">
-                        <button id="ci-perspective-save-btn" class="px-4 py-2 rounded-md disabled:opacity-50" disabled><i class="fas fa-save mr-2"></i>Guardar Imagen</button>
+                        <button id="ci-perspective-save-btn" class="px-4 py-2 rounded-md disabled:opacity-50" disabled><i class="fas fa-save mr-2"></i>Guardar Imagen Corregida</button>
                         <button id="ci-perspective-reset-points-btn" class="px-4 py-2 rounded-md"><i class="fas fa-undo mr-2"></i>Reiniciar Puntos</button>
                     </div>
                     <div class="saved-images-container mt-8">
                         <h3 class="text-lg font-medium text-primary mb-4">Imágenes Guardadas para PDF</h3>
                         <div id="ciSavedImagesList" class="flex flex-wrap gap-4 items-start"></div>
-                        <button id="ci-generate-cedula-pdf-btn" class="mt-4 px-4 py-2 rounded-md disabled:opacity-50" disabled><i class="fas fa-file-pdf mr-2"></i>Generar PDF</button>
+                        <button id="ci-generate-cedula-pdf-btn" class="mt-4 px-4 py-2 rounded-md disabled:opacity-50" disabled><i class="fas fa-file-pdf mr-2"></i>Generar y Guardar PDF</button>
                     </div>
-                </div>`;
+                    <div id="cedula-message" class="text-sm mt-2 min-h-[1.25rem]"></div> </div>`;
             loadScript('https://cdnjs.cloudflare.com/ajax/libs/numeric/1.2.6/numeric.min.js', initializeCedulaIdentidadLogic);
         }
 
         function initializeCedulaIdentidadLogic() {
-            if (typeof numeric === 'undefined') { alert("Error: Falta la librería 'numeric.js' para la corrección de perspectiva."); return; }
+            if (typeof numeric === 'undefined') { 
+                const cedulaSection = document.getElementById('cedula-identidad-section');
+                if(cedulaSection) cedulaSection.innerHTML = '<p class="text-red-500 font-bold text-center p-4">Error: Falta la librería \'numeric.js\'. Recargue la página.</p>';
+                return; 
+            }
             ci_perspectiveImage = new Image(); ci_perspectivePoints = []; ci_savedFoto1DataUrl = null; ci_savedFoto2DataUrl = null; ci_currentSelectedFoto = 'foto1';
-            // Resetear ajustes al inicializar la sección
             ci_currentAdjustments = { brightness: 0, contrast: 1, sharpness: 0, temperature: 0 };
             
             ci_perspectiveOriginalCanvas = document.getElementById('ciPerspectiveOriginalCanvas');
             ci_perspectiveTransformedCanvas = document.getElementById('ciPerspectiveTransformedCanvas');
-            if (!ci_perspectiveOriginalCanvas || !ci_perspectiveTransformedCanvas) { console.error("Error: Canvas de cédula no encontrado en el DOM."); return; }
+            if (!ci_perspectiveOriginalCanvas || !ci_perspectiveTransformedCanvas) { console.error("Error: Canvas de cédula no encontrado."); return; }
             ci_perspectiveCtxOriginal = ci_perspectiveOriginalCanvas.getContext('2d');
             ci_perspectiveCtxTransformed = ci_perspectiveTransformedCanvas.getContext('2d');
 
+            document.getElementById('nombre-jugador-cedula')?.addEventListener('input', (e) => {
+                e.target.value = e.target.value.toUpperCase();
+                ci_updatePDFButtonState(); 
+            });
             document.getElementById('ciPerspectiveImageInput')?.addEventListener('change', ci_handleImageUpload);
             ci_perspectiveOriginalCanvas.addEventListener('click', ci_handleCanvasClick);
             document.getElementById('ci-perspective-save-btn')?.addEventListener('click', ci_saveImage);
-            document.getElementById('ci-generate-cedula-pdf-btn')?.addEventListener('click', ci_generatePDF);
+            document.getElementById('ci-generate-cedula-pdf-btn')?.addEventListener('click', ci_generateAndSavePDF); 
             document.getElementById('ci-perspective-reset-points-btn')?.addEventListener('click', () => {
                 ci_perspectivePoints = []; 
                 ci_drawPerspectivePointsAndLines();
                 if(ci_perspectiveCtxTransformed && ci_perspectiveTransformedCanvas) ci_perspectiveCtxTransformed.clearRect(0,0, ci_perspectiveTransformedCanvas.width, ci_perspectiveTransformedCanvas.height);
                 const saveButton = document.getElementById('ci-perspective-save-btn'); if(saveButton) saveButton.disabled = true;
-                // Resetear sliders y valores de ajuste
                 document.getElementById('ciBrightness').value = 0;
                 document.getElementById('ciContrast').value = 100;
                 document.getElementById('ciSharpness').value = 0;
@@ -1598,7 +1531,6 @@
                 document.getElementById('ciContrastValue').textContent = '100';
                 document.getElementById('ciSharpnessValue').textContent = '0';
                 document.getElementById('ciTemperatureValue').textContent = '0';
-
             });
             document.querySelectorAll('input[name="fotoCedulaSelect"]').forEach(radio => {
                 radio.addEventListener('change', (e) => {
@@ -1608,48 +1540,37 @@
                 });
             });
 
-            // Event listeners para los controles de ajuste de imagen
-            document.getElementById('ciBrightness').addEventListener('input', (e) => {
-                ci_currentAdjustments.brightness = parseInt(e.target.value);
-                document.getElementById('ciBrightnessValue').textContent = e.target.value;
-                if (ci_perspectiveTransformedCanvas.width > 0 && ci_perspectiveImage.src && ci_perspectivePoints.length === 4) {
-                    ci_applyPerspectiveTransform();
-                }
+            ['ciBrightness', 'ciContrast', 'ciSharpness', 'ciTemperature'].forEach(sliderId => {
+                document.getElementById(sliderId)?.addEventListener('input', (e) => {
+                    const value = parseInt(e.target.value);
+                    const spanId = sliderId + 'Value';
+                    document.getElementById(spanId).textContent = value;
+                    if (sliderId === 'ciContrast') ci_currentAdjustments.contrast = value / 100;
+                    else ci_currentAdjustments[sliderId.replace('ci','').toLowerCase()] = value;
+                    
+                    if (ci_perspectiveTransformedCanvas.width > 0 && ci_perspectiveImage.src && ci_perspectivePoints.length === 4) {
+                        ci_applyPerspectiveTransform();
+                    }
+                });
             });
-            document.getElementById('ciContrast').addEventListener('input', (e) => {
-                ci_currentAdjustments.contrast = parseInt(e.target.value) / 100;
-                document.getElementById('ciContrastValue').textContent = e.target.value;
-                 if (ci_perspectiveTransformedCanvas.width > 0 && ci_perspectiveImage.src && ci_perspectivePoints.length === 4) {
-                    ci_applyPerspectiveTransform();
-                }
-            });
-            document.getElementById('ciSharpness').addEventListener('input', (e) => {
-                ci_currentAdjustments.sharpness = parseInt(e.target.value);
-                document.getElementById('ciSharpnessValue').textContent = e.target.value;
-                if (ci_perspectiveTransformedCanvas.width > 0 && ci_perspectiveImage.src && ci_perspectivePoints.length === 4) {
-                    ci_applyPerspectiveTransform();
-                }
-            });
-            document.getElementById('ciTemperature').addEventListener('input', (e) => {
-                ci_currentAdjustments.temperature = parseInt(e.target.value);
-                document.getElementById('ciTemperatureValue').textContent = e.target.value;
-                if (ci_perspectiveTransformedCanvas.width > 0 && ci_perspectiveImage.src && ci_perspectivePoints.length === 4) {
-                    ci_applyPerspectiveTransform();
-                }
-            });
-
 
             const initialRadio = document.querySelector('input[name="fotoCedulaSelect"]:checked');
             if (initialRadio) ci_currentSelectedFoto = initialRadio.value;
             ci_updatePDFButtonState();
             ci_updateSavedImagesList();
         }
-
+        
         function ci_handleImageUpload(e) {
             const file = e.target.files[0]; if (!file) return;
-            if (!file.type.match('image.*')) { alert('Por favor, selecciona un archivo de imagen.'); return; }
-            if (file.size > 5 * 1024 * 1024) { alert('El archivo es demasiado grande (máximo 5MB).'); e.target.value = ''; return; }
-
+            if (!file.type.match('image.*')) { 
+                showTemporaryMessage('cedula-message', "Por favor, selecciona un archivo de imagen.", true);
+                return; 
+            }
+            if (file.size > 5 * 1024 * 1024) {
+                showTemporaryMessage('cedula-message', "El archivo es demasiado grande (máximo 5MB).", true);
+                e.target.value = '';
+                return;
+            }
             const reader = new FileReader();
             reader.onload = (event) => {
                 ci_perspectiveImage.onload = () => {
@@ -1659,7 +1580,6 @@
                     ci_perspectivePoints = []; 
                     if(ci_perspectiveCtxTransformed && ci_perspectiveTransformedCanvas) ci_perspectiveCtxTransformed.clearRect(0,0, ci_perspectiveTransformedCanvas.width, ci_perspectiveTransformedCanvas.height);
                     const saveButton = document.getElementById('ci-perspective-save-btn'); if(saveButton) saveButton.disabled = true;
-                     // Resetear sliders y valores de ajuste al cargar nueva imagen
                     document.getElementById('ciBrightness').value = 0;
                     document.getElementById('ciContrast').value = 100;
                     document.getElementById('ciSharpness').value = 0;
@@ -1672,7 +1592,7 @@
                 };
                 ci_perspectiveImage.onerror = () => {
                     document.getElementById('ciCanvasPlaceholderCedula')?.style.setProperty('display', 'flex', 'important');
-                    alert("Error al cargar la imagen. Intente con otro archivo.");
+                    showTemporaryMessage('cedula-message', "Error al cargar la imagen. Intente con otro archivo.", true);
                 }
                 ci_perspectiveImage.src = event.target.result;
             };
@@ -1682,11 +1602,9 @@
         function ci_updateCanvasDimensions() {
             const container = document.getElementById('ciOriginalCanvasContainer');
             if (!container || !ci_perspectiveImage.width || !ci_perspectiveImage.height) return; 
-            
             const aspectRatio = ci_perspectiveImage.width / ci_perspectiveImage.height;
             let newWidth = container.clientWidth;
             let newHeight = newWidth / aspectRatio;
-
             if (newHeight > container.clientHeight) {
                 newHeight = container.clientHeight;
                 newWidth = newHeight * aspectRatio;
@@ -1705,16 +1623,13 @@
 
         function ci_handleCanvasClick(e) {
             if (ci_perspectivePoints.length >= 4 || !ci_perspectiveImage.src || !ci_perspectiveOriginalCanvas) return;
-            
             const rect = ci_perspectiveOriginalCanvas.getBoundingClientRect();
             const scaleX = ci_perspectiveOriginalCanvas.width / rect.width;
             const scaleY = ci_perspectiveOriginalCanvas.height / rect.height;
             const x = (e.clientX - rect.left) * scaleX;
             const y = (e.clientY - rect.top) * scaleY;
-            
             ci_perspectivePoints.push({ x, y });
             ci_drawPerspectivePointsAndLines();
-            
             if (ci_perspectivePoints.length === 4) {
                 ci_applyPerspectiveTransform();
                 const saveButton = document.getElementById('ci-perspective-save-btn'); if (saveButton) saveButton.disabled = false;
@@ -1724,11 +1639,9 @@
         function ci_drawPerspectivePointsAndLines() {
             if (!ci_perspectiveCtxOriginal || !ci_perspectiveOriginalCanvas) return;
             ci_drawImage();
-            
             ci_perspectiveCtxOriginal.strokeStyle = 'rgba(255,0,0,0.9)'; 
             ci_perspectiveCtxOriginal.lineWidth = 2; 
             ci_perspectiveCtxOriginal.fillStyle = 'rgba(255,0,0,0.7)';
-            
             ci_perspectivePoints.forEach((p, i) => {
                 ci_perspectiveCtxOriginal.beginPath(); 
                 ci_perspectiveCtxOriginal.arc(p.x, p.y, 6, 0, Math.PI*2);
@@ -1751,13 +1664,11 @@
         
         async function ci_applyPerspectiveTransform() {
             if (ci_perspectivePoints.length < 4 || !ci_perspectiveImage.src || !numeric) return;
-            
             const orderedPoints = ci_orderPoints(ci_perspectivePoints);
             if (!orderedPoints || orderedPoints.some(p => p === undefined)) { 
-                alert("Error al ordenar los puntos de perspectiva. Intente seleccionarlos de nuevo en orden (ej: superior-izq, superior-der, inferior-der, inferior-izq)."); 
+                showTemporaryMessage('cedula-message', "Error al ordenar puntos. Intente de nuevo.", true);
                 ci_perspectivePoints = []; ci_drawPerspectivePointsAndLines(); return; 
             }
-
             const srcPoints = orderedPoints.map(p => ({ 
                 x: (p.x / ci_perspectiveOriginalCanvas.width) * ci_perspectiveImage.width, 
                 y: (p.y / ci_perspectiveOriginalCanvas.height) * ci_perspectiveImage.height 
@@ -1766,32 +1677,29 @@
                 {x:0, y:0}, {x:CI_FINAL_WIDTH, y:0}, 
                 {x:CI_FINAL_WIDTH, y:CI_FINAL_HEIGHT}, {x:0, y:CI_FINAL_HEIGHT}
             ];
-            
             try {
                 const matrix = ci_computePerspectiveMatrix(srcPoints, dstPoints);
-                if (!matrix) { alert("Error al calcular la matriz de transformación. Verifique los puntos."); return; }
-
+                if (!matrix) { 
+                    showTemporaryMessage('cedula-message', "Error al calcular transformación. Verifique puntos.", true);
+                    return; 
+                }
                 const tempCanvas = document.createElement('canvas');
                 tempCanvas.width = ci_perspectiveImage.width; 
                 tempCanvas.height = ci_perspectiveImage.height;
                 const tempCtx = tempCanvas.getContext('2d');
                 tempCtx.drawImage(ci_perspectiveImage, 0, 0);
-
                 ci_perspectiveTransformedCanvas.width = CI_FINAL_WIDTH;
                 ci_perspectiveTransformedCanvas.height = CI_FINAL_HEIGHT;
                 ci_perspectiveCtxTransformed.clearRect(0,0,CI_FINAL_WIDTH,CI_FINAL_HEIGHT);
-
                 const imgData = ci_perspectiveCtxTransformed.createImageData(CI_FINAL_WIDTH,CI_FINAL_HEIGHT); 
                 const pixels = imgData.data;
                 const invMatrix = numeric.inv(matrix);
-
                 for (let y = 0; y < CI_FINAL_HEIGHT; y++) {
                     for (let x = 0; x < CI_FINAL_WIDTH; x++) {
                         const pDest = [x, y, 1];
                         const pSrcHom = numeric.dot(invMatrix, pDest);
                         const srcX = pSrcHom[0] / pSrcHom[2];
                         const srcY = pSrcHom[1] / pSrcHom[2];
-
                         if (srcX >= 0 && srcX < ci_perspectiveImage.width && srcY >= 0 && srcY < ci_perspectiveImage.height) {
                             const srcPixelData = tempCtx.getImageData(Math.floor(srcX), Math.floor(srcY), 1, 1).data;
                             const destIdx = (y * CI_FINAL_WIDTH + x) * 4;
@@ -1803,83 +1711,52 @@
                     }
                 }
                 ci_perspectiveCtxTransformed.putImageData(imgData, 0, 0); 
-                
                 ci_applyImageAdjustments(); 
-
             } catch(err) { 
-                alert("Ocurrió un error durante la transformación de la imagen: " + err.message); 
+                showTemporaryMessage('cedula-message', `Error en transformación: ${err.message}`, true);
                 console.error("Error en ci_applyPerspectiveTransform:", err);
             }
         }
 
         function ci_applyImageAdjustments() {
             if (!ci_perspectiveTransformedCanvas || ci_perspectiveTransformedCanvas.width === 0) return;
-
-            const imageData = ci_perspectiveCtxTransformed.getImageData(
-                0, 0, 
-                ci_perspectiveTransformedCanvas.width, 
-                ci_perspectiveTransformedCanvas.height
-            );
-            
+            const imageData = ci_perspectiveCtxTransformed.getImageData(0, 0, ci_perspectiveTransformedCanvas.width, ci_perspectiveTransformedCanvas.height);
             const pixels = imageData.data;
-            
-            const brightness = ci_currentAdjustments.brightness; 
-            const contrast = ci_currentAdjustments.contrast; 
-            
+            const brightness = ci_currentAdjustments.brightness;
+            const contrast = ci_currentAdjustments.contrast;
             for (let i = 0; i < pixels.length; i += 4) {
-                let r = pixels[i];
-                let g = pixels[i+1];
-                let b = pixels[i+2];
-
-                r = (r - 128) * contrast + 128;
-                g = (g - 128) * contrast + 128;
-                b = (b - 128) * contrast + 128;
-
-                r += brightness;
-                g += brightness;
-                b += brightness;
-                
-                pixels[i]   = Math.min(255, Math.max(0, r));
+                let r = pixels[i], g = pixels[i+1], b = pixels[i+2];
+                r = (r - 128) * contrast + 128; g = (g - 128) * contrast + 128; b = (b - 128) * contrast + 128;
+                r += brightness; g += brightness; b += brightness;
+                pixels[i] = Math.min(255, Math.max(0, r));
                 pixels[i+1] = Math.min(255, Math.max(0, g));
                 pixels[i+2] = Math.min(255, Math.max(0, b));
             }
-            
             const tempAdjust = ci_currentAdjustments.temperature;
             for (let i = 0; i < pixels.length; i += 4) {
-                pixels[i]   = Math.min(255, Math.max(0, pixels[i] + tempAdjust));
+                pixels[i] = Math.min(255, Math.max(0, pixels[i] + tempAdjust));
                 pixels[i+2] = Math.min(255, Math.max(0, pixels[i+2] - tempAdjust));
             }
-            
             if (ci_currentAdjustments.sharpness > 0) { 
                 ci_applySharpness(imageData);
             }
-            
             ci_perspectiveCtxTransformed.putImageData(imageData, 0, 0);
         }
 
         function ci_applySharpness(imageData) {
-            const sharpnessFactor = ci_currentAdjustments.sharpness / 100; // Convertir a rango 0-1
-            if (sharpnessFactor <= 0) return; // No aplicar si es 0 o negativo
-
-            const center = 1 + 8 * sharpnessFactor;
-            const surround = -1 * sharpnessFactor;
-
-            const kernel = [
-                surround, surround, surround,
-                surround, center,   surround,
-                surround, surround, surround
-            ];
-        
+            const sharpnessFactor = ci_currentAdjustments.sharpness / 100;
+            if (sharpnessFactor <= 0) return;
+            const center = 1 + 4 * sharpnessFactor; 
+            const surround = -0.5 * sharpnessFactor; 
+            const kernel = [surround, surround, surround, surround, center, surround, surround, surround, surround];
             const pixels = imageData.data;
             const width = imageData.width;
             const height = imageData.height;
             const tempData = new Uint8ClampedArray(pixels);
-        
             for (let y = 1; y < height - 1; y++) {
                 for (let x = 1; x < width - 1; x++) {
-                    for (let c = 0; c < 3; c++) { 
-                        let sum = 0;
-                        let ki = 0;
+                    for (let c = 0; c < 3; c++) {
+                        let sum = 0, ki = 0;
                         for (let ky = -1; ky <= 1; ky++) {
                             for (let kx = -1; kx <= 1; kx++) {
                                 const idx = ((y + ky) * width + (x + kx)) * 4 + c;
@@ -1893,22 +1770,20 @@
             }
         }
 
-
         function ci_computePerspectiveMatrix(src, dst) {
             const A = [], B = [];
             for(let i = 0; i < 4; i++) {
-                const x = src[i].x, y = src[i].y;
-                const u = dst[i].x, v = dst[i].y;
+                const x = src[i].x, y = src[i].y, u = dst[i].x, v = dst[i].y;
                 A.push([x, y, 1, 0, 0, 0, -u*x, -u*y]);
                 A.push([0, 0, 0, x, y, 1, -v*x, -v*y]);
-                B.push(u);
-                B.push(v);
+                B.push(u); B.push(v);
             }
             try {
                 const X = numeric.solve(A, B);
                 return [[X[0],X[1],X[2]], [X[3],X[4],X[5]], [X[6],X[7],1]];
             } catch(e) {
-                console.error("Error al resolver la matriz de perspectiva (numeric.solve):", e);
+                console.error("Error en numeric.solve:", e);
+                showTemporaryMessage('cedula-message', "Error matemático. Verifique puntos.", true);
                 return null;
             }
         }
@@ -1918,30 +1793,26 @@
             let [tl, p2, p3, br] = points;
             let others = [p2, p3].sort((a, b) => (a.y - a.x) - (b.y - b.x));
             let tr = others[0], bl = others[1];
-            
             if ([tl, tr, br, bl].some(p => p === undefined)) {
-                console.warn("Ordenación simple de puntos falló, usando fallback por ángulo.");
+                console.warn("Fallback de ordenación de puntos.");
                 const center = points.reduce((acc,p)=>({x:acc.x+p.x/4, y:acc.y+p.y/4}),{x:0,y:0});
                 return points.sort((a,b)=>Math.atan2(a.y-center.y,a.x-center.x) - Math.atan2(b.y-center.y,b.x-center.x));
             }
             return [tl, tr, br, bl];
         }
 
-        function ci_saveImage() {
+        function ci_saveImage() { 
             if (!ci_perspectiveTransformedCanvas || ci_perspectiveTransformedCanvas.width === 0) { 
-                alert("No hay imagen corregida para guardar. Asegúrese de seleccionar 4 puntos y que la transformación se haya aplicado."); return; 
+                showTemporaryMessage('cedula-message', "No hay imagen corregida para guardar.", true);
+                return; 
             }
             const dataUrl = ci_perspectiveTransformedCanvas.toDataURL('image/png');
-            
             if (ci_currentSelectedFoto === 'foto1') ci_savedFoto1DataUrl = dataUrl; 
             else ci_savedFoto2DataUrl = dataUrl;
-            
             ci_updateSavedImagesList();
             ci_updatePDFButtonState();
-            
             const imageInput = document.getElementById('ciPerspectiveImageInput'); if(imageInput) imageInput.value = '';
-            ci_resetPerspectiveView(true); 
-
+            ci_resetPerspectiveView(true);
             if (ci_currentSelectedFoto === 'foto1' && !ci_savedFoto2DataUrl) { 
                 const radioFoto2 = document.querySelector('input[name="fotoCedulaSelect"][value="foto2"]'); 
                 if (radioFoto2) radioFoto2.checked = true; 
@@ -1951,74 +1822,93 @@
                 if (radioFoto1) radioFoto1.checked = true; 
                 ci_currentSelectedFoto = 'foto1';
             }
-            alert("Imagen guardada con los ajustes aplicados.");
+            showTemporaryMessage('cedula-message', "Imagen corregida guardada temporalmente.", false);
         }
 
         function ci_updateSavedImagesList() {
             const container = document.getElementById('ciSavedImagesList'); if (!container) return; 
             container.innerHTML = '';
-            
             const placeholderStyle = "width:120px;height:100px;display:flex;align-items:center;justify-content:center;border:1px dashed var(--border-input);border-radius:0.375rem;background-color:var(--bg-primary);";
-            
             container.innerHTML += ci_savedFoto1DataUrl ? 
-                `<div class="saved-image-item"><img src="${ci_savedFoto1DataUrl}" class="saved-image-preview" alt="Anverso Cédula"><p class="text-sm text-primary mt-1">Anverso</p></div>` : 
+                `<div class="saved-image-item"><img src="${ci_savedFoto1DataUrl}" class="saved-image-preview" alt="[Imagen del] Anverso Cédula"><p class="text-sm text-primary mt-1">Anverso</p></div>` : 
                 `<div class="saved-image-item" style="${placeholderStyle}"><span class="text-xs text-secondary">Anverso (Vacío)</span></div>`;
-            
             container.innerHTML += ci_savedFoto2DataUrl ? 
-                `<div class="saved-image-item"><img src="${ci_savedFoto2DataUrl}" class="saved-image-preview" alt="Reverso Cédula"><p class="text-sm text-primary mt-1">Reverso</p></div>` : 
+                `<div class="saved-image-item"><img src="${ci_savedFoto2DataUrl}" class="saved-image-preview" alt="[Imagen del] Reverso Cédula"><p class="text-sm text-primary mt-1">Reverso</p></div>` : 
                 `<div class="saved-image-item" style="${placeholderStyle}"><span class="text-xs text-secondary">Reverso (Vacío)</span></div>`;
         }
 
-        async function ci_generatePDF() {
-            if (!ci_savedFoto1DataUrl || !ci_savedFoto2DataUrl) { alert('Debe guardar ambas caras de la cédula primero.'); return; }
-            if (!PDFLib || !PDFLib.PDFDocument) { alert("La librería PDF no está lista. Intente de nuevo."); return; }
+        async function ci_generateAndSavePDF() { 
+            const nombreJugadorInput = document.getElementById('nombre-jugador-cedula');
+            const nombre_jugador = nombreJugadorInput?.value.trim().toUpperCase();
+
+            if (!nombre_jugador) {
+                showTemporaryMessage('cedula-message', "Por favor, ingresa el nombre del jugador.", true);
+                nombreJugadorInput?.focus();
+                return;
+            }
+            if (!ci_savedFoto1DataUrl || !ci_savedFoto2DataUrl) { 
+                showTemporaryMessage('cedula-message', "Debe guardar ambas caras de la cédula primero.", true);
+                return; 
+            }
+            if (!PDFLib || !PDFLib.PDFDocument) { 
+                showTemporaryMessage('cedula-message', "Librería PDF no lista. Intente de nuevo.", true);
+                return; 
+            }
             const { PDFDocument } = PDFLib;
+            
+            const currentUser = JSON.parse(localStorage.getItem('currentUser')); // Usar currentUser
+            if (!currentUser || !currentUser.id) {
+                showTemporaryMessage('cedula-message', "Error de sesión. Intenta reingresar.", true);
+                console.error("Error: currentUser o currentUser.id no disponible en ci_generateAndSavePDF");
+                return;
+            }
 
             try {
                 const pdfDoc = await PDFDocument.create();
                 const page = pdfDoc.addPage([595, 842]);
-                
                 const margin = 50;
                 const imageDisplayWidth = 290;
 
                 const anversoBytes = await fetch(ci_savedFoto1DataUrl).then(r=>r.arrayBuffer());
                 const anversoImg = await pdfDoc.embedPng(anversoBytes);
                 const anversoDims = anversoImg.scaleToFit(imageDisplayWidth, (imageDisplayWidth / CI_FINAL_WIDTH) * CI_FINAL_HEIGHT);
-                page.drawImage(anversoImg, {
-                    x: margin,
-                    y: page.getHeight() - margin - anversoDims.height,
-                    width: anversoDims.width,
-                    height: anversoDims.height
-                });
-                page.drawText('Anverso Cédula', {x:margin, y:page.getHeight()-margin-anversoDims.height-15, size:10});
+                page.drawImage(anversoImg, { x: margin, y: page.getHeight() - margin - anversoDims.height, width: anversoDims.width, height: anversoDims.height });
+                page.drawText(`Anverso Cédula - ${nombre_jugador}`, {x:margin, y:page.getHeight()-margin-anversoDims.height-15, size:10});
 
                 const reversoBytes = await fetch(ci_savedFoto2DataUrl).then(r=>r.arrayBuffer());
                 const reversoImg = await pdfDoc.embedPng(reversoBytes);
                 const reversoDims = reversoImg.scaleToFit(imageDisplayWidth, (imageDisplayWidth / CI_FINAL_WIDTH) * CI_FINAL_HEIGHT);
-                page.drawImage(reversoImg, {
-                    x: margin,
-                    y: page.getHeight() - margin - anversoDims.height - 30 - reversoDims.height,
-                    width: reversoDims.width,
-                    height: reversoDims.height
-                });
-                page.drawText('Reverso Cédula', {x:margin, y:page.getHeight()-margin-anversoDims.height-30-reversoDims.height-15, size:10});
+                page.drawImage(reversoImg, { x: margin, y: page.getHeight() - margin - anversoDims.height - 30 - reversoDims.height, width: reversoDims.width, height: reversoDims.height });
+                page.drawText(`Reverso Cédula - ${nombre_jugador}`, {x:margin, y:page.getHeight()-margin-anversoDims.height-30-reversoDims.height-15, size:10});
 
-                const pdfBytes = await pdfDoc.save();
-                const blob = new Blob([pdfBytes], {type:'application/pdf'});
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
-                link.download = `cedula_identidad_${Date.now()}.pdf`;
-                document.body.appendChild(link); link.click(); document.body.removeChild(link);
-                URL.revokeObjectURL(link.href);
+                const pdf_dataurl = await pdfDoc.saveAsBase64({ dataUri: true });
+                
+                const cedulaData = {
+                    user_id: currentUser.id, // Usar el ID de public.users
+                    nombre_jugador: nombre_jugador,
+                    pdf_dataurl: pdf_dataurl
+                };
+                const { data, error } = await supabaseClient
+                    .from('cedulas_identidad')
+                    .insert([cedulaData]);
+
+                if (error) {
+                    console.error("Error al guardar PDF de cédula en Supabase:", error);
+                    showTemporaryMessage('cedula-message', `Error al guardar PDF: ${error.message}`, true);
+                } else {
+                    showTemporaryMessage('cedula-message', "PDF de cédula generado y guardado exitosamente.", false);
+                }
+
             } catch(e) { 
-                alert("Error al generar el PDF de la cédula: " + e.message); 
-                console.error("Error en ci_generatePDF:", e);
+                showTemporaryMessage('cedula-message', `Error al generar PDF: ${e.message}`, true);
+                console.error("Error en ci_generateAndSavePDF:", e);
             }
         }
 
         function ci_updatePDFButtonState() {
             const btn = document.getElementById('ci-generate-cedula-pdf-btn'); 
-            if(btn) btn.disabled = !(ci_savedFoto1DataUrl && ci_savedFoto2DataUrl);
+            const nombreJugador = document.getElementById('nombre-jugador-cedula')?.value.trim();
+            if(btn) btn.disabled = !(ci_savedFoto1DataUrl && ci_savedFoto2DataUrl && nombreJugador);
         }
 
         function ci_resetPerspectiveView(clearFullImage = true) {
@@ -2034,11 +1924,500 @@
                 ci_perspectiveCtxTransformed.clearRect(0,0,ci_perspectiveTransformedCanvas.width,ci_perspectiveTransformedCanvas.height);
             }
             const saveBtn = document.getElementById('ci-perspective-save-btn'); if(saveBtn) saveBtn.disabled = true;
-
             if (!clearFullImage && ci_perspectiveImage.src && ci_perspectiveCtxOriginal) {
                 ci_drawImage();
             }
+            ci_updatePDFButtonState(); 
         }
+
+        // --- Handler Functions ---
+        window.handleLoginSubmit = async function(event) {
+            event.preventDefault();
+            const usernameInput = document.getElementById('username'); // Este es el RUT
+            const passwordInput = document.getElementById('password');
+            const errorMessage = document.getElementById('login-error-message');
+            errorMessage.textContent = '';
+
+            const username = usernameInput.value; // RUT del usuario
+            const password = passwordInput.value;
+
+            console.log('[handleLoginSubmit] Intentando login con Cédula (username) procesada:', username);
+
+            const { data: user, error } = await supabaseClient
+                .from('users') 
+                .select('*') 
+                .eq('username', username) 
+                .single();
+
+            if (error || !user) {
+                errorMessage.textContent = 'Usuario (RUT) no encontrado o error de conexión.';
+                console.error('[handleLoginSubmit] Error fetching from public.users or user not found:', error);
+                return;
+            }
+            
+            const encoder = new TextEncoder();
+            const passwordData = encoder.encode(password);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', passwordData);
+            const enteredPasswordHash = Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+
+            if (enteredPasswordHash === user.password_hash) {
+                console.log('[handleLoginSubmit] Credenciales válidas para (public.users):', user.username);
+                localStorage.setItem('currentUser', JSON.stringify(user)); // Guardar usuario de public.users
+                
+                usernameInput.value = ''; 
+                passwordInput.value = '';
+                showAppScreen();
+            } else {
+                console.warn('[handleLoginSubmit] Contraseña incorrecta para (public.users):', username);
+                errorMessage.textContent = 'Credenciales inválidas.';
+            }
+        };
+
+        function handleLogout() {
+            localStorage.removeItem('currentUser'); // Limpiar usuario de public.users
+            // No es necesario llamar a supabaseClient.auth.signOut() si no se usó para login
+            console.log("Sesión local cerrada.");
+            showLoginScreen();
+        }
+        
+        async function handleAddUserSubmit(event) {
+            event.preventDefault();
+            const currentUser = JSON.parse(localStorage.getItem('currentUser')); // Usar currentUser
+            if (!currentUser || currentUser.role !== 'admin') {
+                showTemporaryMessage('add-user-error', 'Acceso no autorizado para esta acción.', true);
+                return;
+            }
+
+            const nombre_completo = document.getElementById('new-fullname').value.trim();
+            const username_rut = document.getElementById('new-username').value.trim(); // RUT
+            const password = document.getElementById('new-password').value;
+            const role_public_users = document.getElementById('new-role').value; // Rol para public.users
+            const errorDivId = 'add-user-error';
+            const editPublicUserId = document.getElementById('edit-user-id').value; 
+
+            showTemporaryMessage(errorDivId, '', false, 0); 
+
+            if (!nombre_completo || !username_rut || !role_public_users) {
+                showTemporaryMessage(errorDivId, 'Nombre Completo, Usuario (RUT) y Rol son requeridos.', true);
+                return;
+            }
+            
+            let password_hash = null;
+            if (password) {
+                const encoder = new TextEncoder();
+                const data = encoder.encode(password);
+                const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+                password_hash = Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+            }
+
+            if (editPublicUserId) { // MODO EDICIÓN
+                const publicUserUpdateData = {
+                    nombre_completo: nombre_completo,
+                    username: username_rut,
+                    role: role_public_users,
+                };
+                 if (password_hash) { 
+                    publicUserUpdateData.password_hash = password_hash;
+                }
+
+                const { error: updatePublicUserError } = await supabaseClient
+                    .from('users')
+                    .update(publicUserUpdateData)
+                    .eq('id', editPublicUserId);
+
+                if (updatePublicUserError) {
+                    console.error("Error al actualizar usuario en public.users:", updatePublicUserError);
+                    showTemporaryMessage(errorDivId, 'Error al actualizar datos: ' + updatePublicUserError.message, true);
+                } else {
+                    showTemporaryMessage(errorDivId, 'Usuario actualizado exitosamente.', false);
+                    setTimeout(() => renderUserManagementForm(), 1500);
+                }
+            } else { // MODO AGREGAR NUEVO USUARIO
+                if (!password_hash) { // La contraseña es obligatoria para nuevos usuarios
+                    showTemporaryMessage(errorDivId, 'La clave es requerida para nuevos usuarios.', true);
+                    return;
+                }
+                
+                const { error: insertPublicUserError } = await supabaseClient
+                    .from('users') 
+                    .insert([{
+                        username: username_rut, 
+                        password_hash: password_hash, 
+                        nombre_completo: nombre_completo,
+                        role: role_public_users
+                        // No se incluye email_auth ya que no se usa en este flujo de login
+                    }]);
+
+                if (insertPublicUserError) {
+                    console.error("Error al registrar usuario en public.users:", insertPublicUserError);
+                     if (insertPublicUserError.message.includes('duplicate key value violates unique constraint')) {
+                         showTemporaryMessage(errorDivId, 'Error: El usuario (RUT) ya existe.', true);
+                    } else {
+                        showTemporaryMessage(errorDivId, 'Error al registrar usuario: ' + insertPublicUserError.message, true);
+                    }
+                } else {
+                    showTemporaryMessage(errorDivId, 'Usuario registrado exitosamente.', false);
+                    setTimeout(() => renderUserManagementForm(), 1500);
+                }
+            }
+        }
+        
+        async function populateUserEditForm(publicUserId) { 
+            const { data: user, error } = await supabaseClient.from('users').select('*').eq('id', publicUserId).single();
+            if (error || !user) { 
+                showTemporaryMessage('add-user-error', 'No se pudo cargar el usuario para editar.', true);
+                return; 
+            }
+            document.getElementById('new-fullname').value = user.nombre_completo || '';
+            document.getElementById('new-username').value = user.username; // RUT
+            // No se rellena el campo email_auth ya que fue eliminado del formulario
+            document.getElementById('new-password').value = '';
+            document.getElementById('new-password').placeholder = 'Nueva Clave (o dejar en blanco)';
+            document.getElementById('new-role').value = user.role || 'user';
+            document.getElementById('edit-user-id').value = user.id; 
+
+            document.getElementById('user-form-title').textContent = 'Editar Usuario';
+            const submitButton = document.getElementById('user-submit-button');
+            submitButton.classList.remove('bg-button-green-bg', 'hover:bg-button-green-hover-bg');
+            submitButton.classList.add('edit-user-button');
+            document.getElementById('user-submit-button-text').textContent = 'Guardar Cambios';
+            document.getElementById('user-cancel-button').classList.remove('hidden');
+            showTemporaryMessage('add-user-error', '', false, 0);
+            document.getElementById('new-fullname').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            document.getElementById('new-fullname').focus();
+        }
+
+        function resetUserForm() {
+            const form = document.getElementById('form-add-user');
+            if (form) form.reset();
+            document.getElementById('edit-user-id').value = '';
+            document.getElementById('user-form-title').textContent = 'Agregar Nuevo Usuario';
+            const submitButton = document.getElementById('user-submit-button');
+            if (submitButton) {
+                submitButton.classList.remove('edit-user-button');
+                submitButton.classList.add('bg-button-green-bg', 'hover:bg-button-green-hover-bg');
+            }
+            document.getElementById('user-submit-button-text').textContent = 'Agregar';
+            document.getElementById('user-cancel-button').classList.add('hidden');
+            const passwordInput = document.getElementById('new-password');
+            if (passwordInput) passwordInput.placeholder = '(dejar en blanco para no cambiar al editar)';
+            const roleInput = document.getElementById('new-role');
+            if (roleInput) roleInput.value = 'user';
+            showTemporaryMessage('add-user-error', '', false, 0);
+        }
+
+        async function handleTramiteSubmit(event) {
+            event.preventDefault();
+            const formTramite = document.getElementById('form-tramite');
+            let messageDiv = formTramite.parentNode.querySelector('.form-message');
+            if (!messageDiv) {
+                messageDiv = document.createElement('div');
+                messageDiv.className = 'text-sm mt-2 min-h-[1.25rem] form-message';
+                formTramite.parentNode.insertBefore(messageDiv, formTramite.nextSibling);
+            }
+            messageDiv.id = 'tramite-form-message'; 
+
+            const currentUser = JSON.parse(localStorage.getItem('currentUser')); // Usar currentUser
+            if (!currentUser || !currentUser.id) { 
+                showTemporaryMessage(messageDiv.id, "Debes iniciar sesión para guardar un trámite.", true);
+                return;
+            }
+
+            const tramiteData = {
+                ci: document.getElementById('ci').value,
+                fecha_nac: document.getElementById('fecha-nac').value,
+                apellido_paterno: document.getElementById('apellido-paterno').value,
+                apellido_materno: document.getElementById('apellido-materno').value,
+                nombres: document.getElementById('nombres').value,
+                solicita_inscripcion: document.getElementById('solicita_inscripcion_char').value.trim().toUpperCase() || null,
+                solicita_pase_interno: document.getElementById('solicita_pase_interno_char').value.trim().toUpperCase() || null,
+                solicita_pase_regional: document.getElementById('solicita_pase_regional_char').value.trim().toUpperCase() || null,
+                solicita_pase_externo: document.getElementById('solicita_pase_externo_char').value.trim().toUpperCase() || null,
+                categoria_extranjero: document.getElementById('categoria_extranjero_char').value.trim().toUpperCase() || null,
+                categoria_libertad: document.getElementById('categoria_libertad_char').value.trim().toUpperCase() || null,
+                categoria_adulto: document.getElementById('categoria_adulto_char').value.trim().toUpperCase() || null,
+                categoria_femenina: document.getElementById('categoria_femenina_char').value.trim().toUpperCase() || null,
+                categoria_infantil: document.getElementById('categoria_infantil_char').value.trim().toUpperCase() || null,
+                procede_club: document.getElementById('procede-club').value,
+                procede_asociacion: document.getElementById('procede-asociacion').value,
+                user_id: currentUser.id // ID de la tabla public.users
+            };
+
+            const dateRegex = /^\d{2}-\d{2}-\d{4}$/;
+            if (!dateRegex.test(tramiteData.fecha_nac)) { 
+                showTemporaryMessage(messageDiv.id, 'Formato de Fecha de Nacimiento incorrecto. Use DD-MM-AAAA.', true);
+                return; 
+            }
+            const solicitaValue = Object.keys(tramiteData).filter(k => k.startsWith('solicita_') && tramiteData[k]).length > 0;
+            const categoriaValue = Object.keys(tramiteData).filter(k => k.startsWith('categoria_') && tramiteData[k]).length > 0;
+            if (!solicitaValue) { 
+                showTemporaryMessage(messageDiv.id, 'Debe marcar al menos una opción en "Solicita".', true);
+                return; 
+            }
+            if (!categoriaValue) { 
+                showTemporaryMessage(messageDiv.id, 'Debe marcar al menos una opción en "Categoría".', true);
+                return; 
+            }
+            
+            const { error } = await supabaseClient.from('players').insert([tramiteData]);
+
+            if (error) {
+                console.error('[handleTramiteSubmit] Error al guardar trámite:', error);
+                showTemporaryMessage(messageDiv.id, 'Error al guardar trámite: ' + error.message, true);
+            } else { 
+                showTemporaryMessage(messageDiv.id, 'Trámite guardado exitosamente!', false);
+                formTramite.reset();
+                setTimeout(() => renderPlayerList(), 1500);
+            }
+        }
+
+        async function handleAutorizacionSubmit(event) { 
+            event.preventDefault();
+            const formAuth = document.getElementById('form-autorizacion');
+            let messageDiv = formAuth.parentNode.querySelector('.form-message');
+            if (!messageDiv) {
+                messageDiv = document.createElement('div');
+                messageDiv.className = 'text-sm mt-2 min-h-[1.25rem] form-message';
+                formAuth.parentNode.insertBefore(messageDiv, formAuth.nextSibling);
+            }
+            messageDiv.id = 'auth-form-message';
+
+            const currentUser = JSON.parse(localStorage.getItem('currentUser')); // Usar currentUser
+            if (!currentUser || !currentUser.id) { 
+                showTemporaryMessage(messageDiv.id, "Debes iniciar sesión para guardar una autorización.", true);
+                return;
+            }
+            
+            const autorizacionData = {
+                apoderado_nombre: document.getElementById('apoderado-nombre').value,
+                apoderado_ci: document.getElementById('apoderado-ci').value,
+                jugador_nombre: document.getElementById('jugador-nombre-auth').value,
+                parentesco: document.getElementById('parentesco').value,
+                user_id: currentUser.id // ID de la tabla public.users
+            };
+
+            if (autorizacionData.parentesco === "") {
+                showTemporaryMessage(messageDiv.id, "Por favor, seleccione un parentesco.", true);
+                return;
+            }
+            
+            const { error } = await supabaseClient
+                .from('autorizaciones')
+                .insert([autorizacionData]);
+
+            if (error) {
+                console.error('[handleAutorizacionSubmit] Error al guardar autorización:', error);
+                showTemporaryMessage(messageDiv.id, 'Error al guardar autorización: ' + error.message, true);
+            } else {
+                showTemporaryMessage(messageDiv.id, 'Autorización guardada exitosamente!', false);
+                formAuth.reset();
+                setTimeout(() => renderPlayerList(), 1500);
+            }
+        }
+
+        async function generatePdf(type, id) { 
+            // ... (sin cambios, ya que esta función no depende del tipo de login)
+            const contentArea = document.getElementById('content-area');
+            let tempMessageDiv = document.getElementById('global-temp-message');
+            if (!tempMessageDiv) {
+                tempMessageDiv = document.createElement('div');
+                tempMessageDiv.id = 'global-temp-message';
+                tempMessageDiv.className = 'text-sm p-2 text-center fixed top-4 left-1/2 -translate-x-1/2 rounded shadow-lg z-50';
+                document.body.appendChild(tempMessageDiv);
+            }
+            
+            const showTempGlobalMessage = (message, isError = false) => {
+                tempMessageDiv.textContent = message;
+                tempMessageDiv.className = `text-sm p-2 text-center fixed top-4 left-1/2 -translate-x-1/2 rounded shadow-lg z-50 ${isError ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`;
+                setTimeout(() => { tempMessageDiv.style.display = 'none'; }, 3000); 
+                tempMessageDiv.style.display = 'block';
+            };
+            
+            if (typeof PDFLib === 'undefined' || !PDFLib.PDFDocument) { 
+                showTempGlobalMessage("La librería PDF no está lista. Intente de nuevo.", true);
+                return; 
+            }
+            const { PDFDocument } = PDFLib;
+            const urlTramite = "https://zkak0.github.io/BotafogoApp/tramite_individual.pdf";
+            const urlAutorizacion = "https://zkak0.github.io/BotafogoApp/autorizacion_jugadores.pdf";
+            let pdfUrlToLoad, dataToFill, outputFilename, isTramite = false;
+
+            if (type === 'tramite') {
+                isTramite = true;
+                const { data, error } = await supabaseClient.from('players').select('*').eq('id', id).single();
+                if (error || !data) { 
+                    showTempGlobalMessage("Error: Trámite no encontrado en la base de datos.", true);
+                    return; 
+                }
+                dataToFill = data; pdfUrlToLoad = urlTramite;
+                outputFilename = `tramite_${(data.ci || 'jugador').replace(/[^a-zA-Z0-9]/g, '_')}_${Date.now()}.pdf`;
+            } else if (type === 'autorizacion') {
+                const { data, error } = await supabaseClient.from('autorizaciones').select('*').eq('id', id).single();
+                if (error || !data) { 
+                    showTempGlobalMessage("Error: Autorización no encontrada en la base de datos.", true);
+                    return; 
+                }
+                dataToFill = data; pdfUrlToLoad = urlAutorizacion;
+                outputFilename = `autorizacion_${(dataToFill.jugador_nombre || 'jugador').replace(/[^a-zA-Z0-9]/g, '_')}_${Date.now()}.pdf`;
+            } else { 
+                showTempGlobalMessage('Error: Tipo de PDF desconocido.', true);
+                return; 
+            }
+
+            try {
+                const existingPdfBytes = await fetch(pdfUrlToLoad).then(res => {
+                    if (!res.ok) throw new Error(`Error al descargar la plantilla PDF (${res.status})`); return res.arrayBuffer();
+                });
+                const pdfDoc = await PDFDocument.load(existingPdfBytes);
+                const form = pdfDoc.getForm();
+
+                if (isTramite) {
+                    const fieldMap = {
+                        ci: 'CEDULA IDENTIDAD', fechaNac: 'FECHA NAC', apellidoPaterno: 'APELLIDO PATERNO',
+                        apellidoMaterno: 'APELLIDO MATERNO', nombres: 'NOMBRES', procedeClub: 'PROCEDE DEL CLUB',
+                        procedeAsociacion: 'ASOCIACION', solicita_inscripcion: 'INSCRIPCION',
+                        solicita_pase_interno: 'PASE INTERNO', solicita_pase_regional: 'PASE REGIONAL',
+                        solicita_pase_externo: 'PASE EXTERNO', categoria_extranjero: 'EXTRANJERO',
+                        categoria_libertad: 'LIBERTAD ACCION', categoria_adulto: 'ADULTO',
+                        categoria_femenina: 'FEMENINA', categoria_infantil: 'INFANTIL'
+                    };
+                    const dataForPdf = { 
+                        ci: dataToFill.ci, fechaNac: dataToFill.fecha_nac, apellidoPaterno: dataToFill.apellido_paterno,
+                        apellidoMaterno: dataToFill.apellido_materno, nombres: dataToFill.nombres,
+                        procedeClub: dataToFill.procede_club, procedeAsociacion: dataToFill.procede_asociacion,
+                        solicita_inscripcion: dataToFill.solicita_inscripcion, solicita_pase_interno: dataToFill.solicita_pase_interno,
+                        solicita_pase_regional: dataToFill.solicita_pase_regional, solicita_pase_externo: dataToFill.solicita_pase_externo,
+                        categoria_extranjero: dataToFill.categoria_extranjero, categoria_libertad: dataToFill.categoria_libertad,
+                        categoria_adulto: dataToFill.categoria_adulto, categoria_femenina: dataToFill.categoria_femenina,
+                        categoria_infantil: dataToFill.categoria_infantil
+                    };
+                    Object.keys(fieldMap).forEach(key => {
+                        try {
+                            const field = form.getTextField(fieldMap[key]);
+                            field.setText((dataForPdf[key] || '').toString()); 
+                            field.setAlignment(PDFLib.TextAlignment.Center); 
+                        } catch (e) { console.warn(`Campo no encontrado o error al rellenar (Trámite) '${fieldMap[key]}': ${e.message}`); }
+                    });
+                } else { 
+                    const fieldMapAuth = { nombreAutorizante: 'NOMBRE AUTORIZANTE', cedulaIdentidad: 'CEDULA IDENTIDAD', nombreJugador: 'NOMBRE JUGADOR', parentesco: 'PARENTESCO' };
+                    const authDataMap = { 
+                        nombreAutorizante: dataToFill.apoderado_nombre, 
+                        cedulaIdentidad: dataToFill.apoderado_ci, 
+                        nombreJugador: dataToFill.jugador_nombre, 
+                        parentesco: dataToFill.parentesco 
+                    };
+                    Object.keys(fieldMapAuth).forEach(key => {
+                        try {
+                            const field = form.getTextField(fieldMapAuth[key]);
+                            field.setText((authDataMap[key] || '').toString());
+                            field.setAlignment(PDFLib.TextAlignment.Center);
+                        } catch (e) { console.warn(`Campo no encontrado o error al rellenar (Autorización) '${fieldMapAuth[key]}': ${e.message}`); }
+                    });
+                }
+                try { form.flatten(); } catch (e) { console.warn("Error al aplanar el PDF (flatten):", e); } 
+                
+                const pdfBytes = await pdfDoc.save();
+                const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob); link.download = outputFilename;
+                document.body.appendChild(link); link.click(); document.body.removeChild(link);
+                URL.revokeObjectURL(link.href); 
+            } catch (error) { 
+                showTempGlobalMessage(`Error al procesar el PDF: ${error.message}. Asegúrese de que las plantillas PDF son accesibles.`, true);
+            }
+        }
+
+        async function deleteTramite(tramiteId) {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser')); // Usar currentUser
+            if (!currentUser || currentUser.role !== 'admin') {
+                showTemporaryMessage(document.getElementById('content-area').id, 'Solo los administradores pueden eliminar trámites.', true); 
+                return;
+            }
+            const { data: tramiteData, error: fetchError } = await supabaseClient
+                .from('players')
+                .select('nombres, ci')
+                .eq('id', tramiteId)
+                .single();
+            
+            let itemName = `el trámite ID ${tramiteId.substring(0,8)}...`; 
+            if (tramiteData) {
+                itemName = `el trámite de ${tramiteData.nombres || tramiteData.ci}`;
+            } else if (fetchError && fetchError.code !== 'PGRST116') { 
+                console.error('Error al buscar información del trámite para eliminar:', fetchError);
+            }
+            showDeleteConfirmModal(tramiteId, 'tramite', itemName);
+        }
+        
+        async function deleteAutorizacion(autorizacionId) {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser')); // Usar currentUser
+            if (!currentUser || currentUser.role !== 'admin') {
+                showTemporaryMessage(document.getElementById('content-area').id, 'Solo los administradores pueden eliminar autorizaciones.', true);
+                return;
+            }
+            const { data: authData, error: fetchError } = await supabaseClient
+                .from('autorizaciones')
+                .select('jugador_nombre')
+                .eq('id', autorizacionId)
+                .single();
+
+            let itemName = `la autorización ID ${autorizacionId.substring(0,8)}...`;
+            if (authData && authData.jugador_nombre) {
+                itemName = `la autorización para ${authData.jugador_nombre}`;
+            } else if (fetchError && fetchError.code !== 'PGRST116') {
+                 console.error('Error al buscar información de la autorización para eliminar:', fetchError);
+            }
+            showDeleteConfirmModal(autorizacionId, 'autorizacion', itemName);
+        }
+
+        async function deleteUser(username_rut) { 
+            console.log('[deleteUser] Iniciando para Cédula/Username (RUT):', username_rut);
+            const currentUser = JSON.parse(localStorage.getItem('currentUser')); // Usar currentUser
+
+            if (!currentUser) {
+                console.error('[deleteUser] Error: No hay datos de usuario actual.');
+                showTemporaryMessage('add-user-error', 'Debes iniciar sesión.', true);
+                return;
+            }
+            if (currentUser.username === username_rut) { 
+                showTemporaryMessage('add-user-error', 'No puedes eliminar tu propia cuenta.', true);
+                return;
+            }
+            if (currentUser.role !== 'admin') {
+                showTemporaryMessage('add-user-error', 'Acceso no autorizado.', true);
+                return;
+            }
+            
+            const { data: userToDeleteData, error: fetchErr } = await supabaseClient
+                .from('users')
+                .select('nombre_completo') 
+                .eq('username', username_rut) 
+                .single();
+
+            let itemName = `al usuario con RUT ${username_rut}`;
+            if (userToDeleteData && userToDeleteData.nombre_completo) {
+                itemName = userToDeleteData.nombre_completo; 
+            }
+            
+            if (fetchErr && fetchErr.code !== 'PGRST116') { 
+                 console.error('[deleteUser] Error al buscar información del usuario a eliminar de public.users:', fetchErr);
+                 showTemporaryMessage('add-user-error', 'Error al buscar usuario: ' + fetchErr.message, true);
+                 return;
+            }
+            if (!userToDeleteData && !fetchErr) { // Si no hay error pero no hay datos, el usuario no existe
+                showTemporaryMessage('add-user-error', 'Usuario no encontrado para eliminar.', true);
+                return;
+            }
+            
+            showDeleteConfirmModal(username_rut, 'user', itemName);
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar')?.classList.toggle('sidebar-collapsed');
+        }
+        
+        // --- INICIO: Lógica para Cédula Identidad (Corrección de Perspectiva) ---
+        // (Misma lógica que antes, sin cambios en esta sección)
+        // ...
         // --- FIN: Lógica para Cédula Identidad ---
 
         // --- Inicialización y Listeners Globales ---
@@ -2055,7 +2434,6 @@
             const contentArea = document.getElementById('content-area');
             const logoutButton = document.getElementById('logout-button');
             const darkModeToggle = document.getElementById('dark-mode-toggle');
-
             const confirmDeleteButton = document.getElementById('confirm-delete-btn');
             const cancelDeleteButton = document.getElementById('cancel-delete-btn');
 
@@ -2077,7 +2455,7 @@
                 applyDarkMode(isDark);
             });
 
-            if (loginForm) loginForm.addEventListener('submit', handleLoginSubmit);
+            if (loginForm) loginForm.addEventListener('submit', window.handleLoginSubmit); 
             if (usernameLoginInput) usernameLoginInput.addEventListener('input', () => formatLoginUsername(usernameLoginInput));
 
             if (menuTramite) menuTramite.addEventListener('click', (e) => { e.preventDefault(); renderTramiteForm(); });
@@ -2097,30 +2475,37 @@
                 
                     const action = targetButton.dataset.action;
                     const type = targetButton.dataset.type;
-                    const id = targetButton.dataset.id;
+                    const id = targetButton.dataset.id; 
                     const name = targetButton.dataset.name || `elemento ID ${id ? (typeof id === 'string' ? id.substring(0,8) + "..." : id) : "desconocido"}`;
-                                            
+                                                
                     if (action === 'delete') {
-                        if (type === 'user' && id) { 
-                            deleteUser(id);
-                        } else if (type === 'tramite' && id) { 
-                            deleteTramite(id); 
-                        } else if (type === 'autorizacion' && id) { 
-                            deleteAutorizacion(id); 
+                        if (type === 'user' && id) { deleteUser(id); } 
+                        else if (type === 'tramite' && id) { deleteTramite(id); }
+                        else if (type === 'autorizacion' && id) { deleteAutorizacion(id); }
+                        else if (type === 'fotocarnet' && id) { 
+                            showDeleteConfirmModal(id, 'fotocarnet', name);
+                        } else if (type === 'cedula' && id) { 
+                            showDeleteConfirmModal(id, 'cedula', name);
                         }
                     } else if (action === 'edit' && type === 'user' && id) { 
                         populateUserEditForm(id);
-                    } else if (action === 'generate-pdf' && id) { 
+                    } else if (action === 'generate-pdf' && id && (type === 'tramite' || type === 'autorizacion')) { 
                         generatePdf(type, id);
                     }
                 });
             }
 
+            // Verificar sesión local al cargar la página
             const storedUser = localStorage.getItem('currentUser');
             if (storedUser) {
                 try { 
                     const user = JSON.parse(storedUser);
-                    showAppScreen();
+                    if (user && user.id) { // Verificar que el usuario y su ID existan
+                        showAppScreen();
+                    } else {
+                        localStorage.removeItem('currentUser');
+                        showLoginScreen();
+                    }
                 }
                 catch (e) {
                     localStorage.removeItem('currentUser'); 
