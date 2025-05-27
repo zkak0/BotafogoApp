@@ -236,8 +236,8 @@
             <img src="https://i.imgur.com/IAVAqup.jpeg" alt="[Imagen del] Logo Botafogo" class="login-logo" onerror="this.src='https://placehold.co/200x100/cccccc/333333?text=LOGO'; this.onerror=null;">
             <h2 class="text-2xl font-bold text-primary mb-6">Bienvenido a BotafogoApp v3</h2> <form id="login-form">
                 <div>
-                    <label for="username" class="sr-only">Usuario (RUT)</label>
-                    <input type="text" id="username" name="username" class="login-input" placeholder="Usuario (RUT)" required>
+                    <label for="username" class="sr-only">Usuario</label>
+                    <input type="text" id="username" name="username" class="login-input" placeholder="Usuario" required>
                 </div>
                 <div>
                     <label for="password" class="sr-only">Clave</label>
@@ -918,7 +918,7 @@
                             <thead class="bg-primary dark:bg-gray-700">
                                 <tr>
                                     <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-secondary uppercase tracking-wider border-r border-border-color">Nombre Completo</th>
-                                    <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-secondary uppercase tracking-wider border-r border-border-color">Usuario (RUT)</th>
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-secondary uppercase tracking-wider border-r border-border-color">Usuario</th>
                                     <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-secondary uppercase tracking-wider border-r border-border-color">Rol</th>
                                     <th scope="col" class="px-4 py-3 text-center text-xs font-semibold text-secondary uppercase tracking-wider border-r border-border-color">Editar</th>
                                     <th scope="col" class="px-4 py-3 text-center text-xs font-semibold text-secondary uppercase tracking-wider">Eliminar</th>
@@ -1956,7 +1956,7 @@
                 .single();
 
             if (error || !user) {
-                errorMessage.textContent = 'Usuario (RUT) no encontrado o error de conexión.';
+                errorMessage.textContent = 'Usuario no encontrado o error de conexión.';
                 console.error('[handleLoginSubmit] Error fetching from public.users or user not found:', error);
                 return;
             }
@@ -2004,7 +2004,7 @@
             showTemporaryMessage(errorDivId, '', false, 0); 
 
             if (!nombre_completo || !username_rut || !role_public_users) {
-                showTemporaryMessage(errorDivId, 'Nombre Completo, Usuario (RUT) y Rol son requeridos.', true);
+                showTemporaryMessage(errorDivId, 'Nombre Completo, Usuario y Rol son requeridos.', true);
                 return;
             }
             
@@ -2057,7 +2057,7 @@
                 if (insertPublicUserError) {
                     console.error("Error al registrar usuario en public.users:", insertPublicUserError);
                      if (insertPublicUserError.message.includes('duplicate key value violates unique constraint')) {
-                         showTemporaryMessage(errorDivId, 'Error: El usuario (RUT) ya existe.', true);
+                         showTemporaryMessage(errorDivId, 'Error: El usuario ya existe.', true);
                     } else {
                         showTemporaryMessage(errorDivId, 'Error al registrar usuario: ' + insertPublicUserError.message, true);
                     }
