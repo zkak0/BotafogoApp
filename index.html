@@ -776,7 +776,34 @@
     // FUNCIONES DE UTILIDAD GENERAL
     // =================================================================================
 
+    /**
+    * Convierte una fecha en formato 'AAAA-MM-DD' a formato largo en español.
+    * @param {string} dateString - La fecha en formato 'AAAA-MM-DD'.
+    * @returns {string} - La fecha en formato 'DD de [mes] de AAAA'.
+    */
+    function formatDateToLongSpanish(dateString) {
+        if (!dateString || !dateString.includes('-')) {
+            return ''; // Devuelve vacío si la fecha no es válida
+        }
+        const months = [
+            "enero", "febrero", "marzo", "abril", "mayo", "junio",
+            "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"
+        ];
+        const parts = dateString.split('-'); // [AAAA, MM, DD]
+        if (parts.length !== 3) {
+            return dateString; // Devuelve el original si no tiene el formato esperado
+        }
+        const year = parts[0];
+        const monthIndex = parseInt(parts[1], 10) - 1; // El mes es 0-11
+        const day = parseInt(parts[2], 10);
     
+        if (isNaN(monthIndex) || isNaN(day)) {
+            return dateString;
+        }
+
+            return `${day} de ${months[monthIndex]} de ${year}`;
+    }
+
     function setupExclusiveChoice(inputElements) {
         inputElements.forEach(clickedInput => {
             clickedInput.addEventListener('click', () => {
@@ -2926,9 +2953,10 @@ async function handlePoderSimpleSubmit(event) {
                 'Cedula_autorizante': dataToFill.ci_autorizante,
                 'Jugador': dataToFill.nombre_hijo,
                 'Cedula_jugador': dataToFill.ci_hijo,
-                // Formatear la fecha de AAAA-MM-DD a DD-MM-AAAA para el PDF
-                'Fecha_doc': (dataToFill.fecha || '').split('-').reverse().join('-')
-            };
+        // --- LÍNEA MODIFICADA ---
+        // Ahora usamos la nueva función para formatear la fecha
+                'Fecha_doc': formatDateToLongSpanish(dataToFill.fecha)
+        };
             
             Object.keys(fieldMapPoderSimple).forEach(fieldName => {
                 try {
