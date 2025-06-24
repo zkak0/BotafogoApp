@@ -148,8 +148,8 @@
         .action-button[data-action="delete"]:hover, .delete-btn:hover { color: #b91c1c; }
         html.dark .action-button[data-action="delete"], html.dark .delete-btn { color: #f87171; }
         html.dark .action-button[data-action="delete"]:hover, html.dark .delete-btn:hover { color: #ef4444; }
-        #form-tramite button[type=submit], #form-autorizacion button[type=submit], #form-add-user #user-submit-button[class*="bg-green"], #preview-foto-carnet-button, #save-foto-carnet-button { background-color: var(--button-action-bg); color: white; }
-        #form-tramite button[type=submit]:hover, #form-autorizacion button[type=submit]:hover, #form-add-user #user-submit-button[class*="bg-green"]:hover, #preview-foto-carnet-button:hover, #save-foto-carnet-button:hover { background-color: var(--button-action-hover-bg); }
+        #form-tramite button[type=submit], #form-autorizacion button[type=submit], #form-poder-simple button[type=submit], #form-add-user #user-submit-button[class*="bg-green"], #preview-foto-carnet-button, #save-foto-carnet-button { background-color: var(--button-action-bg); color: white; }
+        #form-tramite button[type=submit]:hover, #form-autorizacion button[type=submit]:hover, #form-poder-simple button[type=submit]:hover, #form-add-user #user-submit-button[class*="bg-green"]:hover, #preview-foto-carnet-button:hover, #save-foto-carnet-button:hover { background-color: var(--button-action-hover-bg); }
         #form-add-user #user-submit-button { background-color: var(--button-green-bg); color: white; }
         #form-add-user #user-submit-button:hover { background-color: var(--button-green-hover-bg); }
         #form-add-user #user-cancel-button { border: 1px solid var(--border-input); background-color: var(--bg-secondary); color: var(--text-secondary); }
@@ -160,7 +160,7 @@
         #result-canvas { border: 1px solid var(--border-color); max-width: 100%; height: auto; display: none; margin: 0 auto; }
         .button-group button, .button-group .file-input-label { margin-right: 0.5rem; margin-bottom: 0.5rem; }
         .button-group button:last-child, .button-group .file-input-label:last-child { margin-right: 0; }
-        .form-section { margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color); }
+        .form-section { margin-top: 1rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color); }
         .single-char-input { width: 2.25rem; height: 2.25rem; text-align: center; padding: 0.25rem; margin-left: 0.25rem; margin-right: 0.5rem; border-width: 1px; border-radius: 0.375rem; border-color: var(--border-input); background-color: var(--bg-secondary); color: var(--text-primary); text-transform: uppercase; font-size: 0.875rem; }
         .single-char-input:focus { outline: none; border-color: var(--border-input-focus); box-shadow: 0 0 0 2px rgba(var(--border-input-focus-rgb, 37, 99, 235), 0.3); }
         html.dark .single-char-input:focus { box-shadow: 0 0 0 2px rgba(var(--border-input-focus-rgb, 96, 165, 250), 0.3); }
@@ -331,6 +331,7 @@
                         <li><a href="#" class="block rounded transition duration-200 px-4 py-2.5 text-sm font-medium hover:bg-sidebar-hover hover:text-sidebar-hover menu-item-text" id="menu-autorizacion"><i class="fas fa-file-signature text-lg"></i> <span>Autorización</span></a></li>
                         <li><a href="#" class="block rounded transition duration-200 px-4 py-2.5 text-sm font-medium hover:bg-sidebar-hover hover:text-sidebar-hover menu-item-text" id="menu-fotocarnet"><i class="fas fa-id-badge text-lg"></i> <span>Foto Carnet</span></a></li>
                         <li><a href="#" class="block rounded transition duration-200 px-4 py-2.5 text-sm font-medium hover:bg-sidebar-hover hover:text-sidebar-hover menu-item-text" id="menu-cedula-identidad"><i class="fas fa-id-card text-lg"></i> <span>Cédula de Identidad</span></a></li>
+                        <li><a href="#" class="block rounded transition duration-200 px-4 py-2.5 text-sm font-medium hover:bg-sidebar-hover hover:text-sidebar-hover menu-item-text" id="menu-poder-simple"><i class="fas fa-file-signature text-lg"></i> <span>Poder Simple</span></a></li>
                         <li><a href="#" class="block rounded transition duration-200 px-4 py-2.5 text-sm font-medium hover:bg-sidebar-hover hover:text-sidebar-hover menu-item-text" id="menu-lista"><i class="fas fa-list-alt text-lg"></i> <span>Tramites Guardados</span></a></li>
                         <li id="li-menu-usuarios"><a href="#" class="block rounded transition duration-200 px-4 py-2.5 text-sm font-medium hover:bg-sidebar-hover hover:text-sidebar-hover menu-item-text" id="menu-usuarios"><i class="fas fa-users-cog text-lg"></i> <span>Gestión Usuarios</span></a></li>
                     </ul>
@@ -410,6 +411,16 @@
             </td>
             <td class="px-4 py-4 whitespace-nowrap text-sm text-primary border-b border-r border-border-input">{{this.createdAtFormatted}}</td>
             <td class="px-4 py-4 whitespace-nowrap text-sm text-primary border-b border-r border-border-input">{{this.nombre_jugador}}</td>
+        {{/if}}
+
+        {{#if (eq ../type "poder_simple")}}
+            <td class="px-4 py-4 text-center border-b border-r border-border-input"><button class="action-button" data-action="generate-pdf" data-type="poder_simple" data-id="{{this.id}}" title="Generar PDF Poder Simple"><i class="fas fa-file-pdf fa-lg"></i></button></td>
+            <td class="px-4 py-4 whitespace-nowrap text-sm text-primary border-b border-r border-border-input">{{this.createdAtFormatted}}</td>
+            <td class="px-4 py-4 whitespace-nowrap text-sm text-primary border-b border-r border-border-input">{{this.nombre_autorizante}}</td>
+            <td class="px-4 py-4 whitespace-nowrap text-sm text-primary border-b border-r border-border-input">{{this.ci_autorizante}}</td>
+            <td class="px-4 py-4 whitespace-nowrap text-sm text-primary border-b border-r border-border-input">{{this.nombre_hijo}}</td>
+            <td class="px-4 py-4 whitespace-nowrap text-sm text-primary border-b border-r border-border-input">{{this.ci_hijo}}</td>
+            <td class="px-4 py-4 whitespace-nowrap text-sm text-primary border-b border-r border-border-input">{{this.fecha}}</td>
         {{/if}}
 
         {{#if ../isAdmin}}
@@ -647,6 +658,84 @@
         </div>
     </script>
 
+    <script id="poder-simple-form-template-desktop" type="text/x-handlebars-template">
+    <div class="bg-secondary p-4 sm:p-6 rounded-lg shadow-md">
+        <form id="form-poder-simple">
+            <div class="form-section pt-0 border-t-0">
+                <h3 class="text-lg font-semibold text-secondary mb-6">Datos del Autorizante</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="md:col-span-2">
+                        <label for="poder-nombre-autorizante" class="block text-sm font-medium text-secondary mb-1">Nombre Completo del Autorizante:</label>
+                        <input type="text" id="poder-nombre-autorizante" class="form-input-base" required>
+                    </div>
+                    <div>
+                        <label for="poder-ci-autorizante" class="block text-sm font-medium text-secondary mb-1">Cédula de Identidad:</label>
+                        <input type="text" id="poder-ci-autorizante" class="form-input-base" placeholder="Ej: 12345678-K" required>
+                    </div>
+                </div>
+            </div>
+            <div class="form-section">
+                <h3 class="text-lg font-semibold text-secondary mb-6">Datos del Jugador</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="md:col-span-2">
+                        <label for="poder-nombre-hijo" class="block text-sm font-medium text-secondary mb-1">Nombre Completo del Jugador:</label>
+                        <input type="text" id="poder-nombre-hijo" class="form-input-base" required>
+                    </div>
+                    <div>
+                        <label for="poder-ci-hijo" class="block text-sm font-medium text-secondary mb-1">Cédula de Identidad:</label>
+                        <input type="text" id="poder-ci-hijo" class="form-input-base" placeholder="Ej: 23456789-K" required>
+                    </div>
+                </div>
+            </div>
+            <div class="form-section">
+    <h3 class="text-lg font-semibold text-secondary mb-6">Fecha del Documento</h3>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div>
+            <input type="text" id="poder-fecha" class="form-input-base" placeholder="dd-mm-aaaa" required maxlength="10">
+        </div>
+    </div>
+</div>
+            <div class="mt-8 text-left">
+                <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out">Guardar Poder Simple</button>
+            </div>
+        </form>
+        <div id="poder-simple-form-message" class="text-sm mt-2 min-h-[1.25rem]"></div>
+    </div>
+</script>
+
+        <script id="poder-simple-form-template-mobile" type="text/x-handlebars-template">
+    <div class="bg-secondary p-4 rounded-lg shadow-md">
+        <form id="form-poder-simple">
+            <div class="space-y-4">
+                <div>
+                    <label for="poder-nombre-autorizante" class="block text-sm font-medium text-secondary mb-1">Yo, (Nombre Completo del Autorizante):</label>
+                    <input type="text" id="poder-nombre-autorizante" class="form-input-base" required>
+                </div>
+                <div>
+                    <label for="poder-ci-autorizante" class="block text-sm font-medium text-secondary mb-1">Cédula de Identidad del Autorizante:</label>
+                    <input type="text" id="poder-ci-autorizante" class="form-input-base" placeholder="Ej: 12345678-K" required>
+                </div>
+                <hr class="my-6 border-[var(--border-color)]">
+                <div>
+                    <label for="poder-nombre-hijo" class="block text-sm font-medium text-secondary mb-1">Autorizo a mi hijo(a):</label>
+                    <input type="text" id="poder-nombre-hijo" class="form-input-base" required>
+                </div>
+                <div>
+                    <label for="poder-ci-hijo" class="block text-sm font-medium text-secondary mb-1">Cédula de Identidad del Jugador:</label>
+                    <input type="text" id="poder-ci-hijo" class="form-input-base" placeholder="Ej: 23456789-K" required>
+                </div>
+            </div>
+            <div>
+    <input type="text" id="poder-fecha" class="form-input-base" placeholder="dd-mm-aaaa" required maxlength="10">
+</div>
+            <div class="mt-8 text-right">
+                <button type="submit" class="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out">Guardar Poder Simple</button>
+            </div>
+        </form>
+        <div id="poder-simple-form-message" class="text-sm mt-2 min-h-[1.25rem]"></div>
+    </div>
+</script>
+
     <script>
     // =================================================================================
     // CONFIGURACIÓN Y VARIABLES GLOBALES
@@ -687,10 +776,7 @@
     // FUNCIONES DE UTILIDAD GENERAL
     // =================================================================================
 
-    /**
-     * Configura un grupo de inputs para que solo uno pueda tener un valor a la vez.
-     * @param {NodeListOf<Element>} inputElements - Una colección de elementos input.
-     */
+    
     function setupExclusiveChoice(inputElements) {
         inputElements.forEach(clickedInput => {
             clickedInput.addEventListener('click', () => {
@@ -993,6 +1079,9 @@
             case 'cedula':
                 tableName = 'cedulas_identidad';
                 break;
+            case 'poder_simple':
+                tableName = 'poderes_simples';
+                break;
             default:
                 console.error("Tipo de eliminación desconocido:", itemToDelete.type);
                 hideDeleteConfirmModal();
@@ -1075,9 +1164,38 @@
     // RENDERIZADO DE CONTENIDO DINÁMICO (Formularios y Listas)
     // =================================================================================
 
-    /**
-     * Renderiza la lista de trámites, autorizaciones, fotos carnet y cédulas.
-     */
+function renderPoderSimpleForm() {
+    if (!mainTitleElement || !contentAreaElement) return;
+    mainTitleElement.innerText = 'Poder Simple';
+
+    const desktopTemplateSource = document.getElementById('poder-simple-form-template-desktop').innerHTML;
+    const mobileTemplateSource = document.getElementById('poder-simple-form-template-mobile').innerHTML;
+
+    const desktopTemplate = Handlebars.compile(desktopTemplateSource);
+    const mobileTemplate = Handlebars.compile(mobileTemplateSource);
+
+    contentAreaElement.innerHTML = `
+        <div class="desktop-only">${desktopTemplate()}</div>
+        <div class="mobile-only">${mobileTemplate()}</div>
+    `;
+    
+    document.getElementById('form-poder-simple').addEventListener('submit', handlePoderSimpleSubmit);
+    document.getElementById('poder-ci-autorizante').addEventListener('input', (e) => formatRut(e.target));
+    document.getElementById('poder-ci-hijo').addEventListener('input', (e) => formatRut(e.target));
+    ['poder-nombre-autorizante', 'poder-nombre-hijo'].forEach(id => {
+        const input = document.getElementById(id);
+        if (input) input.addEventListener('input', (e) => { e.target.value = e.target.value.toUpperCase(); });
+    });
+    // --- CÓDIGO PARA FORMATEAR LA FECHA AL ESCRIBIR ---
+        const fechaInput = document.getElementById('poder-fecha');
+        if (fechaInput) {
+    // Añadir el listener para que se auto-formatee al escribir, usando la misma función que "Fecha Nacimiento"
+    fechaInput.addEventListener('input', (e) => formatFechaNacimiento(e.target));
+        }
+    // --- FIN DEL CÓDIGO DE FECHA ---
+
+    }
+
     async function renderPlayerList() {
         const currentUser = JSON.parse(localStorage.getItem('currentUser'));
         if (!currentUser) { showLoginScreen(); return; }
@@ -1159,6 +1277,26 @@
                 </table>
             </div>
         </div>
+        <div class="p-4 border border-border-color rounded-lg bg-primary">
+    <h2 class="text-xl sm:text-2xl font-semibold mb-4 text-primary">Poderes Simples</h2>
+    <div class="overflow-x-auto">
+        <table class="min-w-full border-collapse">
+            <thead>
+                <tr>
+                    <th scope="col" class="bg-gray-400 text-white dark:bg-gray-700 dark:text-gray-200 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider border-b-2 border-r border-border-input">PDF</th>
+                    <th scope="col" class="bg-gray-400 text-white dark:bg-gray-700 dark:text-gray-200 px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider border-b-2 border-r border-border-input">Fec. Creación</th>
+                    <th scope="col" class="bg-gray-400 text-white dark:bg-gray-700 dark:text-gray-200 px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider border-b-2 border-r border-border-input">Autorizante</th>
+                    <th scope="col" class="bg-gray-400 text-white dark:bg-gray-700 dark:text-gray-200 px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider border-b-2 border-r border-border-input">CI Autorizante</th>
+                    <th scope="col" class="bg-gray-400 text-white dark:bg-gray-700 dark:text-gray-200 px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider border-b-2 border-r border-border-input">Jugador</th>
+                    <th scope="col" class="bg-gray-400 text-white dark:bg-gray-700 dark:text-gray-200 px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider border-b-2 border-r border-border-input">CI Jugador</th>
+                    <th scope="col" class="bg-gray-400 text-white dark:bg-gray-700 dark:text-gray-200 px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider border-b-2 border-r border-border-input">Fecha Doc.</th>
+                    ${currentUser.role === 'admin' ? '<th scope="col" class="bg-gray-400 text-white dark:bg-gray-700 dark:text-gray-200 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider border-b-2 border-border-input">Eliminar</th>' : ''}
+                </tr>
+            </thead>
+            <tbody id="list-poderes-simples-body" class="bg-secondary"></tbody>
+        </table>
+    </div>
+</div>
     </div>`;
         contentAreaElement.innerHTML = listContainerHtml;
 
@@ -1167,27 +1305,28 @@
 
         const isAdmin = currentUser.role === 'admin';
         const emptyRowColspan = (type) => {
-            const spans = { tramite: 6, autorizacion: 5, fotocarnet: 4, cedula: 3 };
+            const spans = { tramite: 6, autorizacion: 5, fotocarnet: 4, cedula: 3, poder_simple: 6 };
             return isAdmin ? spans[type] + 1 : spans[type];
         };
 
         const populateTable = async (tableName, bodyId, type, fields = '*') => {
-            const tableBody = document.getElementById(bodyId);
-            if (!tableBody) return;
+    const tableBody = document.getElementById(bodyId);
+    if (!tableBody) return;
 
-            let query = supabaseClient.from(tableName).select(fields);
-            if (!isAdmin) {
-                query = query.eq('user_id', currentUser.id);
-            }
-            const { data, error } = await query;
+    let query = supabaseClient.from(tableName).select(fields);
+    if (!isAdmin) {
+        query = query.eq('user_id', currentUser.id);
+    }
+    const { data, error } = await query;
 
-            if (error) {
-                tableBody.innerHTML = `<tr><td colspan="${emptyRowColspan(type)}" class="px-6 py-4 text-center text-red-500">Error cargando datos: ${error.message}</td></tr>`;
-            } else if (!data || data.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="${emptyRowColspan(type)}" class="px-6 py-4 text-center text-secondary">No hay elementos registrados.</td></tr>`;
-            } else {
-                data.forEach(item => {
-            if (item.created_at) { // Solo formatea la fecha si el campo existe
+    if (error) {
+        tableBody.innerHTML = `<tr><td colspan="${emptyRowColspan(type)}" class="px-6 py-4 text-center text-red-500">Error cargando datos: ${error.message}</td></tr>`;
+    } else if (!data || data.length === 0) {
+        tableBody.innerHTML = `<tr><td colspan="${emptyRowColspan(type)}" class="px-6 py-4 text-center text-secondary">No hay elementos registrados.</td></tr>`;
+    } else {
+        data.forEach(item => {
+            // Formatear la fecha de creación (createdAtFormatted)
+            if (item.created_at) {
                 item.createdAtFormatted = new Date(item.created_at).toLocaleDateString('es-CL', {
                     day: '2-digit',
                     month: '2-digit',
@@ -1196,16 +1335,29 @@
             } else {
                 item.createdAtFormatted = 'N/A';
             }
-        });
-                const context = { items: data, isAdmin: isAdmin, type: type };
-                tableBody.innerHTML = template(context);
+
+            // --- INICIO DE LA MODIFICACIÓN ---
+            // Formatear la fecha del documento (fecha) si existe
+            if (item.fecha) { // El campo 'fecha' viene de la base de datos como AAAA-MM-DD
+                const parts = item.fecha.split('-');
+                if (parts.length === 3) {
+                    // La reordenamos para mostrarla como DD-MM-AAAA
+                    item.fecha = `${parts[2]}-${parts[1]}-${parts[0]}`;
+                }
             }
-        };
+            // --- FIN DE LA MODIFICACIÓN ---
+        });
+        
+        const context = { items: data, isAdmin: isAdmin, type: type };
+        tableBody.innerHTML = template(context);
+    }
+};
 
         populateTable('players', 'list-tramites-body', 'tramite');
         populateTable('autorizaciones', 'list-autorizaciones-body', 'autorizacion');
         populateTable('fotocarnets', 'list-fotocarnets-body', 'fotocarnet');
         populateTable('cedulas_identidad', 'list-cedulas-body', 'cedula');
+        populateTable('poderes_simples', 'list-poderes-simples-body', 'poder_simple');
     }
 
     /**
@@ -1662,6 +1814,41 @@
         }
     }
 
+    /**
+ * Maneja el envío del formulario de Poder Simple.
+ */
+async function handlePoderSimpleSubmit(event) {
+    event.preventDefault();
+    const formPoder = document.getElementById('form-poder-simple');
+    const messageDivId = 'poder-simple-form-message';
+
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    if (!currentUser || !currentUser.id) {
+        showTemporaryMessage(messageDivId, "Debes iniciar sesión para guardar un poder simple.", true);
+        return;
+    }
+
+    const poderSimpleData = {
+        nombre_autorizante: document.getElementById('poder-nombre-autorizante').value,
+        ci_autorizante: document.getElementById('poder-ci-autorizante').value,
+        nombre_hijo: document.getElementById('poder-nombre-hijo').value,
+        ci_hijo: document.getElementById('poder-ci-hijo').value,
+        fecha: document.getElementById('poder-fecha').value.split('-').reverse().join('-'),
+        user_id: currentUser.id 
+    };
+
+    // Nota: Necesitarás crear una tabla en Supabase llamada "poderes_simples"
+    const { error } = await supabaseClient.from('poderes_simples').insert([poderSimpleData]);
+
+    if (error) {
+        console.error('[handlePoderSimpleSubmit] Error al guardar poder simple:', error);
+        showTemporaryMessage(messageDivId, 'Error al guardar poder simple: ' + error.message, true);
+    } else {
+        showTemporaryMessage(messageDivId, 'Poder Simple guardado exitosamente!', false);
+        if (formPoder) formPoder.reset();
+        setTimeout(() => renderPlayerList(), 1500);
+    }
+}
     /**
      * Maneja el envío del formulario para agregar o editar usuarios.
      */
@@ -2675,117 +2862,134 @@
     // =================================================================================
 
     async function generatePdf(type, id) {
-        let tempMessageDiv = document.getElementById('global-temp-message');
-        if (!tempMessageDiv) { // Crear si no existe
-            tempMessageDiv = document.createElement('div');
-            tempMessageDiv.id = 'global-temp-message';
-            // Estilos para que sea visible y centrado
-            tempMessageDiv.className = 'text-sm p-2 text-center fixed top-4 left-1/2 -translate-x-1/2 rounded shadow-lg z-[1001]'; // Alto z-index
-            document.body.appendChild(tempMessageDiv);
-        }
+    // Limpiar el mensaje temporal de la UI y configurar la función para mostrar mensajes
+    let tempMessageDiv = document.getElementById('global-temp-message');
+    if (!tempMessageDiv) {
+        tempMessageDiv = document.createElement('div');
+        tempMessageDiv.id = 'global-temp-message';
+        tempMessageDiv.className = 'text-sm p-2 text-center fixed top-4 left-1/2 -translate-x-1/2 rounded shadow-lg z-[1001]';
+        document.body.appendChild(tempMessageDiv);
+    }
+    const showTempGlobalMessage = (message, isError = false) => {
+        tempMessageDiv.textContent = message;
+        tempMessageDiv.className = `text-sm p-2 text-center fixed top-4 left-1/2 -translate-x-1/2 rounded shadow-lg z-[1001] ${isError ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`;
+        tempMessageDiv.style.display = 'block';
+        setTimeout(() => { tempMessageDiv.style.display = 'none'; }, 4000);
+    };
 
-        const showTempGlobalMessage = (message, isError = false) => {
-            tempMessageDiv.textContent = message;
-            tempMessageDiv.className = `text-sm p-2 text-center fixed top-4 left-1/2 -translate-x-1/2 rounded shadow-lg z-[1001] ${isError ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`;
-            tempMessageDiv.style.display = 'block'; // Asegurar que sea visible
-            setTimeout(() => { tempMessageDiv.style.display = 'none'; }, 3000);
-        };
-
+    try {
         if (typeof PDFLib === 'undefined' || !PDFLib.PDFDocument) {
-            showTempGlobalMessage("La librería PDF no está lista. Intente de nuevo.", true);
-            return;
+            throw new Error("La librería PDF (PDFLib) no está cargada.");
         }
-        const { PDFDocument, TextAlignment } = PDFLib; // Añadir TextAlignment
+        const { PDFDocument, TextAlignment, StandardFonts } = PDFLib;
+        
         const urlTramite = "https://zkak0.github.io/BotafogoApp/tramite_individual.pdf";
         const urlAutorizacion = "https://zkak0.github.io/BotafogoApp/autorizacion_jugadores.pdf";
-        let pdfUrlToLoad, dataToFill, outputFilename, isTramite = false;
+        const urlPoderSimple = "https://zkak0.github.io/BotafogoApp/podersimple_botafogo.pdf";
+        
+        let pdfUrlToLoad, dataToFill, outputFilename;
 
+        // 1. Obtener los datos correctos de Supabase
         if (type === 'tramite') {
-            isTramite = true;
             const { data, error } = await supabaseClient.from('players').select('*').eq('id', id).single();
-            if (error || !data) {
-                showTempGlobalMessage("Error: Trámite no encontrado en la base de datos.", true);
-                return;
-            }
+            if (error || !data) throw new Error(`Trámite no encontrado. Error DB: ${error?.message}`);
             dataToFill = data; pdfUrlToLoad = urlTramite;
-            outputFilename = `tramite_${(data.ci || 'jugador').replace(/[^a-zA-Z0-9]/g, '_')}_${Date.now()}.pdf`;
+            outputFilename = `tramite_${(data.ci || 'jugador').replace(/[^a-zA-Z0-9]/g, '_')}.pdf`;
         } else if (type === 'autorizacion') {
             const { data, error } = await supabaseClient.from('autorizaciones').select('*').eq('id', id).single();
-            if (error || !data) {
-                showTempGlobalMessage("Error: Autorización no encontrada en la base de datos.", true);
-                return;
-            }
+            if (error || !data) throw new Error(`Autorización no encontrada. Error DB: ${error?.message}`);
             dataToFill = data; pdfUrlToLoad = urlAutorizacion;
-            outputFilename = `autorizacion_${(dataToFill.jugador_nombre || 'jugador').replace(/[^a-zA-Z0-9]/g, '_')}_${Date.now()}.pdf`;
+            outputFilename = `autorizacion_${(data.jugador_nombre || 'jugador').replace(/[^a-zA-Z0-9]/g, '_')}.pdf`;
+        } else if (type === 'poder_simple') {
+            const { data, error } = await supabaseClient.from('poderes_simples').select('*').eq('id', id).single();
+            if (error || !data) throw new Error(`Poder Simple no encontrado. Error DB: ${error?.message}`);
+            dataToFill = data; pdfUrlToLoad = urlPoderSimple;
+            outputFilename = `poder_simple_${(data.nombre_hijo || 'jugador').replace(/[^a-zA-Z0-9]/g, '_')}.pdf`;
         } else {
-            showTempGlobalMessage('Error: Tipo de PDF desconocido.', true);
-            return;
+            throw new Error(`Tipo de PDF desconocido: '${type}'.`);
         }
 
-        try {
-            const existingPdfBytes = await fetch(pdfUrlToLoad).then(res => {
-                if (!res.ok) throw new Error(`Error al descargar la plantilla PDF (${res.status}) desde ${pdfUrlToLoad}`);
-                return res.arrayBuffer();
+        // 2. Descargar y cargar la plantilla PDF
+        const existingPdfBytes = await fetch(pdfUrlToLoad).then(res => {
+            if (!res.ok) throw new Error(`Error al descargar la plantilla PDF. Estado: ${res.status}`);
+            return res.arrayBuffer();
+        });
+        
+        const pdfDoc = await PDFDocument.load(existingPdfBytes);
+        const form = pdfDoc.getForm();
+
+        // 3. Rellenar los campos del PDF según el tipo
+        if (type === 'poder_simple') {
+            // --- INICIO DE LA CORRECCIÓN PARA PODER SIMPLE ---
+            const fieldMapPoderSimple = {
+                'Autorizante': dataToFill.nombre_autorizante,
+                'Cedula_autorizante': dataToFill.ci_autorizante,
+                'Jugador': dataToFill.nombre_hijo,
+                'Cedula_jugador': dataToFill.ci_hijo,
+                // Formatear la fecha de AAAA-MM-DD a DD-MM-AAAA para el PDF
+                'Fecha_doc': (dataToFill.fecha || '').split('-').reverse().join('-')
+            };
+            
+            Object.keys(fieldMapPoderSimple).forEach(fieldName => {
+                try {
+                    const field = form.getTextField(fieldName);
+                    field.setText(fieldMapPoderSimple[fieldName] || '');
+                    field.setAlignment(TextAlignment.Center); // Centrar el texto
+                } catch (e) { console.warn(`Campo no encontrado en PDF Poder Simple: '${fieldName}'`); }
             });
-            const pdfDoc = await PDFDocument.load(existingPdfBytes);
-            const form = pdfDoc.getForm();
-
-            if (isTramite) {
-                const fieldMap = {
-                    ci: 'CEDULA IDENTIDAD', fechaNac: 'FECHA NAC', apellidoPaterno: 'APELLIDO PATERNO',
-                    apellidoMaterno: 'APELLIDO MATERNO', nombres: 'NOMBRES', procedeClub: 'PROCEDE DEL CLUB',
-                    procedeAsociacion: 'ASOCIACION', solicita_inscripcion: 'INSCRIPCION',
-                    solicita_pase_interno: 'PASE INTERNO', solicita_pase_regional: 'PASE REGIONAL',
-                    solicita_pase_externo: 'PASE EXTERNO', categoria_extranjero: 'EXTRANJERO',
-                    categoria_libertad: 'LIBERTAD ACCION', categoria_adulto: 'ADULTO',
-                    categoria_femenina: 'FEMENINA', categoria_infantil: 'INFANTIL'
-                };
-                const dataForPdf = { // Mapear nombres de Supabase a los del formulario PDF
-                    ci: dataToFill.ci, fechaNac: dataToFill.fecha_nac, apellidoPaterno: dataToFill.apellido_paterno,
-                    apellidoMaterno: dataToFill.apellido_materno, nombres: dataToFill.nombres,
-                    procedeClub: dataToFill.procede_club, procedeAsociacion: dataToFill.procede_asociacion,
-                    solicita_inscripcion: dataToFill.solicita_inscripcion, solicita_pase_interno: dataToFill.solicita_pase_interno,
-                    solicita_pase_regional: dataToFill.solicita_pase_regional, solicita_pase_externo: dataToFill.solicita_pase_externo,
-                    categoria_extranjero: dataToFill.categoria_extranjero, categoria_libertad: dataToFill.categoria_libertad,
-                    categoria_adulto: dataToFill.categoria_adulto, categoria_femenina: dataToFill.categoria_femenina,
-                    categoria_infantil: dataToFill.categoria_infantil
-                };
-                Object.keys(fieldMap).forEach(key => {
-                    try {
-                        const field = form.getTextField(fieldMap[key]);
-                        field.setText((dataForPdf[key] || '').toString()); // Convertir a string, incluso si es null
-                        field.setAlignment(TextAlignment.Center); // Centrar texto
-                    } catch (e) { console.warn(`Campo no encontrado o error al rellenar (Trámite) '${fieldMap[key]}': ${e.message}`); }
-                });
-            } else { // Autorización
-                const fieldMapAuth = { nombreAutorizante: 'NOMBRE AUTORIZANTE', cedulaIdentidad: 'CEDULA IDENTIDAD', nombreJugador: 'NOMBRE JUGADOR', parentesco: 'PARENTESCO' };
-                const authDataMap = { // Mapear nombres de Supabase a los del formulario PDF
-                    nombreAutorizante: dataToFill.apoderado_nombre,
-                    cedulaIdentidad: dataToFill.apoderado_ci,
-                    nombreJugador: dataToFill.jugador_nombre,
-                    parentesco: dataToFill.parentesco
-                };
-                Object.keys(fieldMapAuth).forEach(key => {
-                    try {
-                        const field = form.getTextField(fieldMapAuth[key]);
-                        field.setText((authDataMap[key] || '').toString());
-                        field.setAlignment(TextAlignment.Center);
-                    } catch (e) { console.warn(`Campo no encontrado o error al rellenar (Autorización) '${fieldMapAuth[key]}': ${e.message}`); }
-                });
-            }
-            try { form.flatten(); } catch (e) { console.warn("Error al aplanar el PDF (flatten):", e); }
-
-            const pdfBytes = await pdfDoc.save();
-
-            const blobUrl = URL.createObjectURL(new Blob([pdfBytes], { type: 'application/pdf' }));
-            downloadDataUrlAsPdf(blobUrl, outputFilename);
-            URL.revokeObjectURL(blobUrl);
-
-        } catch (error) {
-            showTempGlobalMessage(`Error al procesar el PDF: ${error.message}. Asegúrese de que las plantillas PDF son accesibles.`, true);
-            console.error("Error en generatePdf:", error);
+            // --- FIN DE LA CORRECCIÓN ---
+        } else {
+            // Lógica existente para los otros formularios
+            const fieldMap = type === 'tramite' ? {
+                ci: 'CEDULA IDENTIDAD', fechaNac: 'FECHA NAC', apellidoPaterno: 'APELLIDO PATERNO',
+                apellidoMaterno: 'APELLIDO MATERNO', nombres: 'NOMBRES', procedeClub: 'PROCEDE DEL CLUB',
+                procedeAsociacion: 'ASOCIACION', solicita_inscripcion: 'INSCRIPCION',
+                solicita_pase_interno: 'PASE INTERNO', solicita_pase_regional: 'PASE REGIONAL',
+                solicita_pase_externo: 'PASE EXTERNO', categoria_extranjero: 'EXTRANJERO',
+                categoria_libertad: 'LIBERTAD ACCION', categoria_adulto: 'ADULTO',
+                categoria_femenina: 'FEMENINA', categoria_infantil: 'INFANTIL'
+            } : {
+                nombreAutorizante: 'NOMBRE AUTORIZANTE', cedulaIdentidad: 'CEDULA IDENTIDAD',
+                nombreJugador: 'NOMBRE JUGADOR', parentesco: 'PARENTESCO'
+            };
+            const dataForPdf = type === 'tramite' ? {
+                ci: dataToFill.ci, fechaNac: dataToFill.fecha_nac, apellidoPaterno: dataToFill.apellido_paterno,
+                apellidoMaterno: dataToFill.apellido_materno, nombres: dataToFill.nombres,
+                procedeClub: dataToFill.procede_club, procedeAsociacion: dataToFill.procede_asociacion,
+                solicita_inscripcion: dataToFill.solicita_inscripcion, solicita_pase_interno: dataToFill.solicita_pase_interno,
+                solicita_pase_regional: dataToFill.solicita_pase_regional, solicita_pase_externo: dataToFill.solicita_pase_externo,
+                categoria_extranjero: dataToFill.categoria_extranjero, categoria_libertad: dataToFill.categoria_libertad,
+                categoria_adulto: dataToFill.categoria_adulto, categoria_femenina: dataToFill.categoria_femenina,
+                categoria_infantil: dataToFill.categoria_infantil
+            } : {
+                nombreAutorizante: dataToFill.apoderado_nombre, cedulaIdentidad: dataToFill.apoderado_ci,
+                nombreJugador: dataToFill.jugador_nombre, parentesco: dataToFill.parentesco
+            };
+            
+            Object.keys(fieldMap).forEach(key => {
+                try {
+                    const field = form.getTextField(fieldMap[key]);
+                    field.setText((dataForPdf[key] || '').toString());
+                    field.setAlignment(TextAlignment.Center);
+                } catch (e) { console.warn(`Campo no encontrado o error al rellenar '${fieldMap[key]}': ${e.message}`); }
+            });
         }
+        
+        try { form.flatten(); } catch (e) { console.warn("Error al aplanar el PDF (flatten):", e); }
+        
+        // 4. Guardar y descargar el PDF
+        const pdfBytes = await pdfDoc.save();
+        const blobUrl = URL.createObjectURL(new Blob([pdfBytes], { type: 'application/pdf' }));
+        downloadDataUrlAsPdf(blobUrl, outputFilename);
+        URL.revokeObjectURL(blobUrl);
+
+        showTempGlobalMessage("PDF generado exitosamente.", false);
+
+    } catch (error) {
+        console.error("--- ERROR DETECTADO ---", error);
+        showTempGlobalMessage(`Error al generar PDF: ${error.message}`, true);
     }
+}
 
     // =================================================================================
     // INICIALIZACIÓN Y LISTENERS GLOBALES
@@ -2811,6 +3015,7 @@
         menuListaLink = document.getElementById('menu-lista');
         menuFotoCarnetLink = document.getElementById('menu-fotocarnet');
         menuCedulaIdentidadLink = document.getElementById('menu-cedula-identidad');
+        menuPoderSimpleLink = document.getElementById('menu-poder-simple');
         collapseToggleBtn = document.getElementById('collapse-toggle');
         logoutBtn = document.getElementById('logout-button');
         darkModeToggleBtn = document.getElementById('dark-mode-toggle');
@@ -2839,6 +3044,7 @@
         if (menuListaLink) menuListaLink.addEventListener('click', (e) => { e.preventDefault(); renderPlayerList(); });
         if (menuFotoCarnetLink) menuFotoCarnetLink.addEventListener('click', (e) => { e.preventDefault(); renderFotoCarnetForm(); });
         if (menuCedulaIdentidadLink) menuCedulaIdentidadLink.addEventListener('click', (e) => { e.preventDefault(); renderCedulaIdentidadForm(); });
+        if (menuPoderSimpleLink) menuPoderSimpleLink.addEventListener('click', (e) => { e.preventDefault(); renderPoderSimpleForm(); });
 
         // Listeners de UI General
         if (collapseToggleBtn) collapseToggleBtn.addEventListener('click', toggleSidebar);
@@ -2862,9 +3068,10 @@
                     else if (type === 'autorizacion' && id) { showDeleteConfirmModal(id, 'autorizacion', name); }
                     else if (type === 'fotocarnet' && id) { showDeleteConfirmModal(id, 'fotocarnet', name); }
                     else if (type === 'cedula' && id) { showDeleteConfirmModal(id, 'cedula', name); }
+                    else if (type === 'poder_simple' && id) { showDeleteConfirmModal(id, 'poder_simple', name); }
                 } else if (action === 'edit' && type === 'user' && id) {
                     populateUserEditForm(id); // id es el UUID de public.users
-                } else if (action === 'generate-pdf' && id && (type === 'tramite' || type === 'autorizacion')) {
+                } else if (action === 'generate-pdf' && id && (type === 'tramite' || type === 'autorizacion' || type === 'poder_simple')) {
                     generatePdf(type, id);
                 }
             });
