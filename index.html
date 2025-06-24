@@ -368,54 +368,56 @@
     </div>
     
     <script id="list-row-template" type="text/x-handlebars-template">
-        {{#each items}}
-        <tr class="hover:bg-primary dark:hover:bg-gray-700">
-            {{#if (eq ../type "tramite")}}
-                <td class="px-4 py-4 text-center border-b border-r border-border-input"><button class="action-button" data-action="generate-pdf" data-type="tramite" data-id="{{this.id}}" title="Generar PDF Trámite"><i class="fas fa-file-pdf fa-lg"></i></button></td>
-                <td class="px-4 py-4 whitespace-nowrap text-sm text-primary border-b border-r border-border-input">{{this.ci}}</td>
-                <td class="px-4 py-4 whitespace-nowrap text-sm text-primary border-b border-r border-border-input">{{this.apellido_paterno}}</td>
-                <td class="px-4 py-4 whitespace-nowrap text-sm text-primary border-b border-r border-border-input">{{this.apellido_materno}}</td>
-                <td class="px-4 py-4 whitespace-nowrap text-sm text-primary border-b border-r border-border-input">{{this.nombres}}</td>
-                <td class="px-4 py-4 whitespace-nowrap text-sm text-primary border-b border-r border-border-input">{{this.fecha_nac}}</td>
-            {{/if}}
+    {{#each items}}
+    <tr class="hover:bg-primary dark:hover:bg-gray-700">
+        {{#if (eq ../type "tramite")}}
+            <td class="px-4 py-4 text-center border-b border-r border-border-input"><button class="action-button" data-action="generate-pdf" data-type="tramite" data-id="{{this.id}}" title="Generar PDF Trámite"><i class="fas fa-file-pdf fa-lg"></i></button></td>
+            <td class="px-4 py-4 whitespace-nowrap text-sm text-primary border-b border-r border-border-input">{{this.createdAtFormatted}}</td>
+            <td class="px-4 py-4 whitespace-nowrap text-sm text-primary border-b border-r border-border-input">{{this.ci}}</td>
+            <td class="px-4 py-4 whitespace-nowrap text-sm text-primary border-b border-r border-border-input">{{this.apellido_paterno}}</td>
+            <td class="px-4 py-4 whitespace-nowrap text-sm text-primary border-b border-r border-border-input">{{this.apellido_materno}}</td>
+            <td class="px-4 py-4 whitespace-nowrap text-sm text-primary border-b border-r border-border-input">{{this.nombres}}</td>
+            <td class="px-4 py-4 whitespace-nowrap text-sm text-primary border-b border-r border-border-input">{{this.fecha_nac}}</td>
+        {{/if}}
 
-            {{#if (eq ../type "autorizacion")}}
-                <td class="px-4 py-4 text-center border-b border-r border-border-input"><button class="action-button" data-action="generate-pdf" data-type="autorizacion" data-id="{{this.id}}" title="Generar PDF Autorización"><i class="fas fa-file-pdf fa-lg"></i></button></td>
-                <td class="px-4 py-4 whitespace-nowrap text-sm text-primary border-b border-r border-border-input">{{this.apoderado_nombre}}</td>
-                <td class="px-4 py-4 whitespace-nowrap text-sm text-primary border-b border-r border-border-input">{{this.apoderado_ci}}</td>
-                <td class="px-4 py-4 whitespace-nowrap text-sm text-primary border-b border-r border-border-input">{{this.jugador_nombre}}</td>
-                <td class="px-4 py-4 whitespace-nowrap text-sm text-primary border-b border-r border-border-input">{{this.parentesco}}</td>
-            {{/if}}
+        {{#if (eq ../type "autorizacion")}}
+            <td class="px-4 py-4 text-center border-b border-r border-border-input"><button class="action-button" data-action="generate-pdf" data-type="autorizacion" data-id="{{this.id}}" title="Generar PDF Autorización"><i class="fas fa-file-pdf fa-lg"></i></button></td>
+            <td class="px-4 py-4 whitespace-nowrap text-sm text-primary border-b border-r border-border-input">{{this.createdAtFormatted}}</td>
+            <td class="px-4 py-4 whitespace-nowrap text-sm text-primary border-b border-r border-border-input">{{this.apoderado_nombre}}</td>
+            <td class="px-4 py-4 whitespace-nowrap text-sm text-primary border-b border-r border-border-input">{{this.apoderado_ci}}</td>
+            <td class="px-4 py-4 whitespace-nowrap text-sm text-primary border-b border-r border-border-input">{{this.jugador_nombre}}</td>
+            <td class="px-4 py-4 whitespace-nowrap text-sm text-primary border-b border-r border-border-input">{{this.parentesco}}</td>
+        {{/if}}
 
-            {{#if (eq ../type "fotocarnet")}}
-                <td class="px-4 py-4 text-center border-b border-r border-border-input">
-                    <button class="action-button" data-action="download-image" onclick="downloadDataUrlAsImage('{{this.imagen_dataurl}}', 'fotocarnet_{{this.nombre_completo_jugador}}_{{this.created_at}}.png')" title="Descargar Foto Carnet">
-                        <i class="fas fa-download fa-lg"></i>
-                    </button>
-                </td>
-                <td class="px-4 py-4 whitespace-nowrap text-sm text-primary border-b border-r border-border-input">{{this.nombre_completo_jugador}}</td>
-                <td class="px-4 py-4 whitespace-nowrap text-sm text-primary border-b border-r border-border-input">{{this.rut_jugador}}</td>
-                <td class="px-4 py-4 whitespace-nowrap text-sm text-primary border-b border-r border-border-input">{{this.createdAtFormatted}}</td>
-            {{/if}}
-
-            {{#if (eq ../type "cedula")}}
-                <td class="px-4 py-4 text-center border-b border-r border-border-input">
-                    <button class="action-button" data-action="generate-pdf" onclick="downloadDataUrlAsPdf('{{this.pdf_dataurl}}', 'cedula_{{this.nombre_jugador}}_{{this.created_at}}.pdf')" title="Descargar PDF Cédula">
-                        <i class="fas fa-file-pdf fa-lg"></i> </button>
-                </td>
-                <td class="px-4 py-4 whitespace-nowrap text-sm text-primary border-b border-r border-border-input">{{this.nombre_jugador}}</td>
-                <td class="px-4 py-4 whitespace-nowrap text-sm text-primary border-b border-r border-border-input">{{this.createdAtFormatted}}</td>
-            {{/if}}
-
-            {{#if ../isAdmin}}
-            <td class="px-4 py-4 text-center border-b border-border-input">
-                <button class="action-button delete-btn" data-action="delete" data-id="{{this.id}}" data-type="{{../type}}" data-name="{{#if this.nombres}}{{this.nombres}}{{else if this.jugador_nombre}}{{this.jugador_nombre}}{{else if this.nombre_completo_jugador}}{{this.nombre_completo_jugador}}{{else}}Elemento{{/if}}" title="Eliminar"><i class="fas fa-trash fa-lg"></i>
+        {{#if (eq ../type "fotocarnet")}}
+            <td class="px-4 py-4 text-center border-b border-r border-border-input">
+                <button class="action-button" data-action="download-image" onclick="downloadDataUrlAsImage('{{this.imagen_dataurl}}', 'fotocarnet_{{this.nombre_completo_jugador}}_{{this.created_at}}.png')" title="Descargar Foto Carnet">
+                    <i class="fas fa-download fa-lg"></i>
                 </button>
             </td>
-            {{/if}}
-        </tr>
-        {{/each}}
-    </script>
+            <td class="px-4 py-4 whitespace-nowrap text-sm text-primary border-b border-r border-border-input">{{this.createdAtFormatted}}</td>
+            <td class="px-4 py-4 whitespace-nowrap text-sm text-primary border-b border-r border-border-input">{{this.nombre_completo_jugador}}</td>
+            <td class="px-4 py-4 whitespace-nowrap text-sm text-primary border-b border-r border-border-input">{{this.rut_jugador}}</td>
+        {{/if}}
+
+        {{#if (eq ../type "cedula")}}
+            <td class="px-4 py-4 text-center border-b border-r border-border-input">
+                <button class="action-button" data-action="generate-pdf" onclick="downloadDataUrlAsPdf('{{this.pdf_dataurl}}', 'cedula_{{this.nombre_jugador}}_{{this.created_at}}.pdf')" title="Descargar PDF Cédula">
+                    <i class="fas fa-file-pdf fa-lg"></i> </button>
+            </td>
+            <td class="px-4 py-4 whitespace-nowrap text-sm text-primary border-b border-r border-border-input">{{this.createdAtFormatted}}</td>
+            <td class="px-4 py-4 whitespace-nowrap text-sm text-primary border-b border-r border-border-input">{{this.nombre_jugador}}</td>
+        {{/if}}
+
+        {{#if ../isAdmin}}
+        <td class="px-4 py-4 text-center border-b border-border-input">
+            <button class="action-button delete-btn" data-action="delete" data-id="{{this.id}}" data-type="{{../type}}" data-name="{{#if this.nombres}}{{this.nombres}}{{else if this.jugador_nombre}}{{this.jugador_nombre}}{{else if this.nombre_completo_jugador}}{{this.nombre_completo_jugador}}{{else}}Elemento{{/if}}" title="Eliminar"><i class="fas fa-trash fa-lg"></i>
+            </button>
+        </td>
+        {{/if}}
+    </tr>
+    {{/each}}
+</script>
     <script id="user-management-row-template" type="text/x-handlebars-template">
       {{#each users}}
         <tr class="hover:bg-primary dark:hover:bg-gray-700">
@@ -1081,78 +1083,80 @@
         mainTitleElement.innerText = 'Tramites Guardados';
 
         const listContainerHtml = `
-            <div class="bg-secondary p-4 sm:p-6 rounded-lg shadow-md space-y-8">
-                <div class="p-4 border border-border-color rounded-lg bg-primary">
-                    <h2 class="text-xl sm:text-2xl font-semibold mb-4 text-primary">Trámites Individuales</h2>
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full border-collapse">
-                            <thead>
-                                <tr>
-                                    <th scope="col" class="bg-gray-400 text-white dark:bg-gray-700 dark:text-gray-200 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider border-b-2 border-r border-border-input">PDF</th>
-                                    <th scope="col" class="bg-gray-400 text-white dark:bg-gray-700 dark:text-gray-200 px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider border-b-2 border-r border-border-input">Cédula</th>
-                                    <th scope="col" class="bg-gray-400 text-white dark:bg-gray-700 dark:text-gray-200 px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider border-b-2 border-r border-border-input">A. Paterno</th>
-                                    <th scope="col" class="bg-gray-400 text-white dark:bg-gray-700 dark:text-gray-200 px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider border-b-2 border-r border-border-input">A. Materno</th>
-                                    <th scope="col" class="bg-gray-400 text-white dark:bg-gray-700 dark:text-gray-200 px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider border-b-2 border-r border-border-input">Nombres</th>
-                                    <th scope="col" class="bg-gray-400 text-white dark:bg-gray-700 dark:text-gray-200 px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider border-b-2 border-r border-border-input">Fec. Nac.</th>
-                                    ${currentUser.role === 'admin' ? '<th scope="col" class="bg-gray-400 text-white dark:bg-gray-700 dark:text-gray-200 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider border-b-2 border-border-input">Eliminar</th>' : ''}
-                                </tr>
-                            </thead>
-                            <tbody id="list-tramites-body" class="bg-secondary"></tbody>
-                        </table>
-                    </div>
-                </div>
-                <div class="p-4 border border-border-color rounded-lg bg-primary">
-                    <h2 class="text-xl sm:text-2xl font-semibold mb-4 text-primary">Autorizaciones</h2>
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full border-collapse">
-                            <thead>
-                                <tr>
-                                    <th scope="col" class="bg-gray-400 text-white dark:bg-gray-700 dark:text-gray-200 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider border-b-2 border-r border-border-input">PDF</th>
-                                    <th scope="col" class="bg-gray-400 text-white dark:bg-gray-700 dark:text-gray-200 px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider border-b-2 border-r border-border-input">Apoderado</th>
-                                    <th scope="col" class="bg-gray-400 text-white dark:bg-gray-700 dark:text-gray-200 px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider border-b-2 border-r border-border-input">CI Apod.</th>
-                                    <th scope="col" class="bg-gray-400 text-white dark:bg-gray-700 dark:text-gray-200 px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider border-b-2 border-r border-border-input">Jugador</th>
-                                    <th scope="col" class="bg-gray-400 text-white dark:bg-gray-700 dark:text-gray-200 px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider border-b-2 border-r border-border-input">Parentesco</th>
-                                    ${currentUser.role === 'admin' ? '<th scope="col" class="bg-gray-400 text-white dark:bg-gray-700 dark:text-gray-200 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider border-b-2 border-border-input">Eliminar</th>' : ''}
-                                </tr>
-                            </thead>
-                            <tbody id="list-autorizaciones-body" class="bg-secondary"></tbody>
-                        </table>
-                    </div>
-                </div>
-                <div class="p-4 border border-border-color rounded-lg bg-primary">
-                    <h2 class="text-xl sm:text-2xl font-semibold mb-4 text-primary">Fotos Carnet</h2>
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full border-collapse">
-                            <thead>
-                                <tr>
-                                    <th scope="col" class="bg-gray-400 text-white dark:bg-gray-700 dark:text-gray-200 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider border-b-2 border-r border-border-input">Descargar</th>
-                                    <th scope="col" class="bg-gray-400 text-white dark:bg-gray-700 dark:text-gray-200 px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider border-b-2 border-r border-border-input">Nombre Jugador</th>
-                                    <th scope="col" class="bg-gray-400 text-white dark:bg-gray-700 dark:text-gray-200 px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider border-b-2 border-r border-border-input">RUT Jugador</th>
-                                    <th scope="col" class="bg-gray-400 text-white dark:bg-gray-700 dark:text-gray-200 px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider border-b-2 border-r border-border-input">Fecha Creación</th>
-                                    ${currentUser.role === 'admin' ? '<th scope="col" class="bg-gray-400 text-white dark:bg-gray-700 dark:text-gray-200 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider border-b-2 border-border-input">Eliminar</th>' : ''}
-                                </tr>
-                            </thead>
-                            <tbody id="list-fotocarnets-body" class="bg-secondary"></tbody>
-                        </table>
-                    </div>
-                </div>
-                <div class="p-4 border border-border-color rounded-lg bg-primary">
-                    <h2 class="text-xl sm:text-2xl font-semibold mb-4 text-primary">Cédulas de Identidad</h2>
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full border-collapse">
-                            <thead>
-                                <tr>
-                                    <th scope="col" class="bg-gray-400 text-white dark:bg-gray-700 dark:text-gray-200 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider border-b-2 border-r border-border-input">Descargar PDF</th>
-                                    <th scope="col" class="bg-gray-400 text-white dark:bg-gray-700 dark:text-gray-200 px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider border-b-2 border-r border-border-input">Nombre Jugador</th>
-                                    <th scope="col" class="bg-gray-400 text-white dark:bg-gray-700 dark:text-gray-200 px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider border-b-2 border-r border-border-input">Fecha Creación</th>
-                                    ${currentUser.role === 'admin' ? '<th scope="col" class="bg-gray-400 text-white dark:bg-gray-700 dark:text-gray-200 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider border-b-2 border-border-input">Eliminar</th>' : ''}
-                                </tr>
-                            </thead>
-                            <tbody id="list-cedulas-body" class="bg-secondary"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>`;
+    <div class="bg-secondary p-4 sm:p-6 rounded-lg shadow-md space-y-8">
+        <div class="p-4 border border-border-color rounded-lg bg-primary">
+            <h2 class="text-xl sm:text-2xl font-semibold mb-4 text-primary">Trámites Individuales</h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full border-collapse">
+                    <thead>
+                        <tr>
+                            <th scope="col" class="bg-gray-400 text-white dark:bg-gray-700 dark:text-gray-200 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider border-b-2 border-r border-border-input">PDF</th>
+                            <th scope="col" class="bg-gray-400 text-white dark:bg-gray-700 dark:text-gray-200 px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider border-b-2 border-r border-border-input">Fec. Creación</th>
+                            <th scope="col" class="bg-gray-400 text-white dark:bg-gray-700 dark:text-gray-200 px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider border-b-2 border-r border-border-input">Cédula</th>
+                            <th scope="col" class="bg-gray-400 text-white dark:bg-gray-700 dark:text-gray-200 px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider border-b-2 border-r border-border-input">A. Paterno</th>
+                            <th scope="col" class="bg-gray-400 text-white dark:bg-gray-700 dark:text-gray-200 px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider border-b-2 border-r border-border-input">A. Materno</th>
+                            <th scope="col" class="bg-gray-400 text-white dark:bg-gray-700 dark:text-gray-200 px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider border-b-2 border-r border-border-input">Nombres</th>
+                            <th scope="col" class="bg-gray-400 text-white dark:bg-gray-700 dark:text-gray-200 px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider border-b-2 border-r border-border-input">Fec. Nac.</th>
+                            ${currentUser.role === 'admin' ? '<th scope="col" class="bg-gray-400 text-white dark:bg-gray-700 dark:text-gray-200 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider border-b-2 border-border-input">Eliminar</th>' : ''}
+                        </tr>
+                    </thead>
+                    <tbody id="list-tramites-body" class="bg-secondary"></tbody>
+                </table>
+            </div>
+        </div>
+        <div class="p-4 border border-border-color rounded-lg bg-primary">
+            <h2 class="text-xl sm:text-2xl font-semibold mb-4 text-primary">Autorizaciones</h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full border-collapse">
+                    <thead>
+                        <tr>
+                            <th scope="col" class="bg-gray-400 text-white dark:bg-gray-700 dark:text-gray-200 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider border-b-2 border-r border-border-input">PDF</th>
+                            <th scope="col" class="bg-gray-400 text-white dark:bg-gray-700 dark:text-gray-200 px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider border-b-2 border-r border-border-input">Fec. Creación</th>
+                            <th scope="col" class="bg-gray-400 text-white dark:bg-gray-700 dark:text-gray-200 px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider border-b-2 border-r border-border-input">Apoderado</th>
+                            <th scope="col" class="bg-gray-400 text-white dark:bg-gray-700 dark:text-gray-200 px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider border-b-2 border-r border-border-input">CI Apod.</th>
+                            <th scope="col" class="bg-gray-400 text-white dark:bg-gray-700 dark:text-gray-200 px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider border-b-2 border-r border-border-input">Jugador</th>
+                            <th scope="col" class="bg-gray-400 text-white dark:bg-gray-700 dark:text-gray-200 px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider border-b-2 border-r border-border-input">Parentesco</th>
+                            ${currentUser.role === 'admin' ? '<th scope="col" class="bg-gray-400 text-white dark:bg-gray-700 dark:text-gray-200 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider border-b-2 border-border-input">Eliminar</th>' : ''}
+                        </tr>
+                    </thead>
+                    <tbody id="list-autorizaciones-body" class="bg-secondary"></tbody>
+                </table>
+            </div>
+        </div>
+        <div class="p-4 border border-border-color rounded-lg bg-primary">
+            <h2 class="text-xl sm:text-2xl font-semibold mb-4 text-primary">Fotos Carnet</h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full border-collapse">
+                    <thead>
+                        <tr>
+                            <th scope="col" class="bg-gray-400 text-white dark:bg-gray-700 dark:text-gray-200 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider border-b-2 border-r border-border-input">FOTO</th>
+                            <th scope="col" class="bg-gray-400 text-white dark:bg-gray-700 dark:text-gray-200 px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider border-b-2 border-r border-border-input">Fecha Creación</th>
+                            <th scope="col" class="bg-gray-400 text-white dark:bg-gray-700 dark:text-gray-200 px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider border-b-2 border-r border-border-input">Nombre Jugador</th>
+                            <th scope="col" class="bg-gray-400 text-white dark:bg-gray-700 dark:text-gray-200 px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider border-b-2 border-r border-border-input">RUT Jugador</th>
+                            ${currentUser.role === 'admin' ? '<th scope="col" class="bg-gray-400 text-white dark:bg-gray-700 dark:text-gray-200 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider border-b-2 border-border-input">Eliminar</th>' : ''}
+                        </tr>
+                    </thead>
+                    <tbody id="list-fotocarnets-body" class="bg-secondary"></tbody>
+                </table>
+            </div>
+        </div>
+        <div class="p-4 border border-border-color rounded-lg bg-primary">
+            <h2 class="text-xl sm:text-2xl font-semibold mb-4 text-primary">Cédulas de Identidad</h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full border-collapse">
+                    <thead>
+                        <tr>
+                            <th scope="col" class="bg-gray-400 text-white dark:bg-gray-700 dark:text-gray-200 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider border-b-2 border-r border-border-input">PDF</th>
+                            <th scope="col" class="bg-gray-400 text-white dark:bg-gray-700 dark:text-gray-200 px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider border-b-2 border-r border-border-input">Fecha Creación</th>
+                            <th scope="col" class="bg-gray-400 text-white dark:bg-gray-700 dark:text-gray-200 px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider border-b-2 border-r border-border-input">Nombre Jugador</th>
+                            ${currentUser.role === 'admin' ? '<th scope="col" class="bg-gray-400 text-white dark:bg-gray-700 dark:text-gray-200 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider border-b-2 border-border-input">Eliminar</th>' : ''}
+                        </tr>
+                    </thead>
+                    <tbody id="list-cedulas-body" class="bg-secondary"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>`;
         contentAreaElement.innerHTML = listContainerHtml;
 
         const templateSource = document.getElementById('list-row-template').innerHTML;
@@ -1179,11 +1183,17 @@
             } else if (!data || data.length === 0) {
                 tableBody.innerHTML = `<tr><td colspan="${emptyRowColspan(type)}" class="px-6 py-4 text-center text-secondary">No hay elementos registrados.</td></tr>`;
             } else {
-                if (type === 'fotocarnet' || type === 'cedula') {
-                    data.forEach(item => {
-                        item.createdAtFormatted = item.created_at ? new Date(item.created_at).toLocaleDateString('es-CL') : 'N/A';
-                    });
-                }
+                data.forEach(item => {
+            if (item.created_at) { // Solo formatea la fecha si el campo existe
+                item.createdAtFormatted = new Date(item.created_at).toLocaleDateString('es-CL', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                });
+            } else {
+                item.createdAtFormatted = 'N/A';
+            }
+        });
                 const context = { items: data, isAdmin: isAdmin, type: type };
                 tableBody.innerHTML = template(context);
             }
