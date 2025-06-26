@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Deportivo Botafogo - App Gestión</title>
+    <title>BotafogoApp</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.min.js"></script>
@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/numeric/1.2.6/numeric.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-sha256/build/sha256.min.js"></script>
     <style>
         /* --- Estilos CSS Actualizados --- */
         :root {
@@ -295,7 +296,7 @@
     <div id="login-screen">
         <div class="login-box">
             <img src="https://i.ibb.co/rKqWkJxt/Sin-t-tulo-1.png" alt="[Imagen del] Logo Botafogo" class="login-logo" onerror="this.src='https://placehold.co/200x100/cccccc/333333?text=LOGO'; this.onerror=null;">
-            <h2 class="text-2xl font-bold text-primary mb-6">Bienvenido a BotafogoApp</h2>
+            <h2 class="text-2xl font-bold text-primary mb-6">Club Deportivo Botafogo</h2>
             <form id="login-form">
                 <div>
                     <label for="username" class="sr-only">Usuario</label>
@@ -871,24 +872,18 @@
      * Formatea el input de username/RUT para el formulario de usuarios (permite guion).
      * @param {HTMLInputElement} rutInput - El elemento input del RUT.
      */
-    function formatUsernameRut(rutInput) {
-        if (!rutInput) return;
-        let value = rutInput.value.replace(/[^0-9kK-]/g, '');
-        const parts = value.split('-');
-        let body = parts[0].replace(/[^0-9kK]/g, '');
-        let dv = '';
-        if (parts.length > 1) {
-            dv = parts.slice(1).join('').replace(/[^0-9kK]/g, '');
-            if (dv.length > 1) dv = dv.charAt(0);
-        }
-        value = body;
-        if (dv.match(/^[0-9kK]$/i)) {
-            value += '-' + dv;
-        } else if (dv) { // Si hay algo después del guion pero no es un DV válido, solo mantener el cuerpo
-             value = body;
-        }
-        rutInput.value = value.toUpperCase();
+    // --- REEMPLAZA TU FUNCIÓN formatUsernameRut ANTIGUA POR ESTA ---
+function formatUsernameRut(inputElement) {
+    if (!inputElement) return;
+    // Permite solo números, la letra K y el guion.
+    let value = inputElement.value.toUpperCase().replace(/[^0-9K-]/g, '');
+    const parts = value.split('-');
+    // Si el usuario por error pone más de un guion, esta lógica lo arregla.
+    if (parts.length > 2) {
+        value = parts[0] + '-' + parts.slice(1).join('');
     }
+    inputElement.value = value;
+}
 
     /**
      * Formatea el input de username para el login (permite un solo guion).
@@ -1162,11 +1157,8 @@
             return;
         }
 
-        // Comparar hash de contraseña
-        const encoder = new TextEncoder();
-        const passwordData = encoder.encode(passwordValue);
-        const hashBuffer = await crypto.subtle.digest('SHA-256', passwordData);
-        const enteredPasswordHash = Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+        // Se usa la nueva librería 'sha256()' que es más simple y no necesita contexto seguro.
+        const enteredPasswordHash = sha256(passwordValue);
 
         if (enteredPasswordHash === user.password_hash) {
             console.log('[handleLoginSubmit] Credenciales válidas para (public.users):', user.username);
@@ -1456,210 +1448,198 @@ function renderPoderSimpleForm() {
      * Renderiza el formulario de gestión de usuarios y la lista de usuarios.
      */
     async function renderUserManagementForm() {
-        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-        if (!currentUser || currentUser.role !== 'admin') {
-            if (contentAreaElement) contentAreaElement.innerHTML = '<p class="text-red-500 text-center font-semibold p-4">Acceso restringido a administradores.</p>';
-            return;
-        }
-        if (!mainTitleElement || !contentAreaElement) return;
-        mainTitleElement.innerText = 'Gestión de Usuarios';
-        const inputBaseClasses = "form-input-base";
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    if (!currentUser || currentUser.role !== 'admin') {
+        if (contentAreaElement) contentAreaElement.innerHTML = '<p class="text-red-500 text-center font-semibold p-4">Acceso restringido a administradores.</p>';
+        return;
+    }
+    if (!mainTitleElement || !contentAreaElement) return;
 
-        // --- INICIO DE LA MODIFICACIÓN ---
-        const desktopForm = `
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 items-end">
-                <div>
-                    <label for="new-username" class="block text-sm font-medium text-secondary mb-1">Usuario (RUT):</label>
-                    <input type="text" id="new-username" class="${inputBaseClasses}" placeholder="Ej: 12345678-K" required>
-                </div>
-                <div>
-                    <label for="new-password" class="block text-sm font-medium text-secondary mb-1">Clave:</label>
-                    <input type="password" id="new-password" class="${inputBaseClasses}" placeholder="(En blanco para no cambiar al editar)">
-                </div>
-                <div class="flex flex-col">
-                    <button type="submit" id="user-submit-button" class="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white focus:outline-none focus:ring-2 focus:ring-offset-2">
-                        <span id="user-submit-button-text">Agregar</span>
-                    </button>
-                    <button type="button" id="user-cancel-button" class="hidden w-full mt-2 inline-flex justify-center py-2 px-4 border shadow-sm text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                        Cancelar Edición
-                    </button>
-                </div>
-            </div>
-        `;
-        const mobileForm = `
-            <div class="space-y-4">
-                <div>
-                    <label for="new-username" class="block text-sm font-medium text-secondary mb-1">Usuario (RUT):</label>
-                    <input type="text" id="new-username" class="${inputBaseClasses}" placeholder="Ej: 12345678-K" required>
-                </div>
-                <div>
-                    <label for="new-password" class="block text-sm font-medium text-secondary mb-1">Clave:</label>
-                    <input type="password" id="new-password" class="${inputBaseClasses}" placeholder="(En blanco para no cambiar al editar)">
-                </div>
-                <div class="flex flex-col space-y-2">
-                    <button type="submit" id="user-submit-button" class="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white focus:outline-none focus:ring-2 focus:ring-offset-2">
-                        <span id="user-submit-button-text">Agregar</span>
-                    </button>
-                    <button type="button" id="user-cancel-button" class="hidden w-full inline-flex justify-center py-2 px-4 border shadow-sm text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                        Cancelar Edición
-                    </button>
-                </div>
-            </div>
-        `;
+    mainTitleElement.innerText = 'Gestión de Usuarios';
+    const inputBaseClasses = "form-input-base";
 
-        const managementHtml = `
-            <div class="bg-secondary p-4 sm:p-6 rounded-lg shadow-md mb-8">
-                <h2 id="user-form-title" class="text-lg sm:text-xl font-semibold mb-4 text-primary">Agregar Nuevo Usuario</h2>
-                <form id="form-add-user">
-                    <input type="hidden" id="edit-user-id" value="">
-                    <div class="mb-4">
+    // --- ESTRUCTURA HTML CON ORDEN DE TABULADOR CORREGIDO ---
+    const managementHtml = `
+        <div class="bg-secondary p-4 sm:p-6 rounded-lg shadow-md mb-8">
+            <h2 id="user-form-title" class="text-lg sm:text-xl font-semibold mb-4 text-primary">Agregar Nuevo Usuario</h2>
+            <form id="form-add-user" novalidate>
+                <input type="hidden" id="edit-user-id" value="">
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                    
+                    <div>
                         <label for="new-fullname" class="block text-sm font-medium text-secondary mb-1">Nombre Completo:</label>
-                        <input type="text" id="new-fullname" class="${inputBaseClasses}" required>
+                        <input type="text" id="new-fullname" class="${inputBaseClasses}">
                     </div>
                     
-                    <div class="desktop-only">${desktopForm}</div>
-                    <div class="mobile-only">${mobileForm}</div>
+                    <div>
+                        <label for="new-username" class="block text-sm font-medium text-secondary mb-1">Usuario (RUT):</label>
+                        <input type="text" id="new-username" class="${inputBaseClasses}" placeholder="Ej: 12345678-K">
+                    </div>
 
-                    <div class="mb-4">
+                    <div>
+                        <label for="new-password" class="block text-sm font-medium text-secondary mb-1">Clave:</label>
+                        <input type="password" id="new-password" class="${inputBaseClasses}" placeholder="(En blanco para no cambiar al editar)">
+                    </div>
+
+                    <div>
                         <label for="new-role" class="block text-sm font-medium text-secondary mb-1">Rol:</label>
                         <select id="new-role" class="${inputBaseClasses} form-select-base">
                             <option value="user">Usuario</option>
                             <option value="admin">Administrador</option>
                         </select>
                     </div>
-                    <div id="add-user-error" class="text-sm mt-1 min-h-[1.25rem]"></div>
-                </form>
-            </div>
-            <div class="bg-secondary p-4 sm:p-6 rounded-lg shadow-md">
-                <h2 class="text-lg sm:text-xl font-semibold mb-4 text-primary">Usuarios Registrados</h2>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-border-color border border-border-input">
-                        <thead class="bg-primary dark:bg-gray-700">
-                            <tr>
-                                <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-secondary uppercase tracking-wider border-r border-border-color">Nombre Completo</th>
-                                <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-secondary uppercase tracking-wider border-r border-border-color">Usuario (RUT)</th>
-                                <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-secondary uppercase tracking-wider border-r border-border-color">Rol</th>
-                                <th scope="col" class="px-4 py-3 text-center text-xs font-semibold text-secondary uppercase tracking-wider border-r border-border-color">Editar</th>
-                                <th scope="col" class="px-4 py-3 text-center text-xs font-semibold text-secondary uppercase tracking-wider">Eliminar</th>
-                            </tr>
-                        </thead>
-                        <tbody id="user-management-table-body" class="bg-secondary divide-y divide-border-color">
-                        </tbody>
-                    </table>
+
                 </div>
-            </div>`;
-        // --- FIN DE LA MODIFICACIÓN ---
-            
-        contentAreaElement.innerHTML = managementHtml;
 
-        document.getElementById('form-add-user').addEventListener('submit', handleAddUserSubmit);
-        document.getElementById('user-cancel-button').addEventListener('click', resetUserForm);
-        document.getElementById('new-username').addEventListener('input', (e) => formatUsernameRut(e.target));
-        document.getElementById('new-fullname').addEventListener('input', (e) => { e.target.value = e.target.value.toUpperCase(); });
-        resetUserForm();
+                <div class="mt-6 flex flex-col sm:flex-row items-center gap-4">
+                    <button type="submit" id="user-submit-button" class="w-full sm:w-auto inline-flex justify-center py-2 px-6 border border-transparent shadow-sm text-sm font-medium rounded-md text-white focus:outline-none focus:ring-2 focus:ring-offset-2">
+                        <span id="user-submit-button-text">Agregar</span>
+                    </button>
+                    <button type="button" id="user-cancel-button" class="hidden w-full sm:w-auto mt-2 sm:mt-0 inline-flex justify-center py-2 px-4 border shadow-sm text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        Cancelar Edición
+                    </button>
+                    <div id="add-user-error" class="text-sm min-h-[1.25rem] sm:ml-4"></div>
+                </div>
+            </form>
+        </div>
 
-        const userTableBody = document.getElementById('user-management-table-body');
-        const { data: usersData, error: usersError } = await supabaseClient.from('users').select('*');
+        <div class="bg-secondary p-4 sm:p-6 rounded-lg shadow-md">
+            <h2 class="text-lg sm:text-xl font-semibold mb-4 text-primary">Usuarios Registrados</h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-border-color border border-border-input">
+                    <thead class="bg-primary dark:bg-gray-700">
+                        <tr>
+                            <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-secondary uppercase tracking-wider border-r border-border-color">Nombre Completo</th>
+                            <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-secondary uppercase tracking-wider border-r border-border-color">Usuario (RUT)</th>
+                            <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-secondary uppercase tracking-wider border-r border-border-color">Rol</th>
+                            <th scope="col" class="px-4 py-3 text-center text-xs font-semibold text-secondary uppercase tracking-wider border-r border-border-color">Editar</th>
+                            <th scope="col" class="px-4 py-3 text-center text-xs font-semibold text-secondary uppercase tracking-wider">Eliminar</th>
+                        </tr>
+                    </thead>
+                    <tbody id="user-management-table-body" class="bg-secondary divide-y divide-border-color">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    `;
+        
+    contentAreaElement.innerHTML = managementHtml;
 
-        if (usersError) {
-            userTableBody.innerHTML = `<tr><td colspan="5" class="px-6 py-4 text-center text-red-500">Error cargando usuarios: ${usersError.message}</td></tr>`;
-            return;
-        }
-        if (!usersData || usersData.length === 0) {
-            userTableBody.innerHTML = `<tr><td colspan="5" class="px-6 py-4 text-center text-secondary">No hay usuarios registrados.</td></tr>`;
-            return;
-        }
+    // Se adjuntan los listeners al nuevo formulario unificado
+    // La función handleAddUserSubmit que te di antes ya está lista para funcionar con esto.
+    document.getElementById('form-add-user').addEventListener('submit', handleAddUserSubmit); 
+    document.getElementById('user-cancel-button').addEventListener('click', resetUserForm);
+    document.getElementById('new-username').addEventListener('input', (e) => formatUsernameRut(e.target));
+    document.getElementById('new-fullname').addEventListener('input', (e) => { e.target.value = e.target.value.toUpperCase(); });
+    resetUserForm(); // Prepara el formulario
 
-        const templateSource = document.getElementById('user-management-row-template').innerHTML;
-        const template = Handlebars.compile(templateSource);
-        userTableBody.innerHTML = template({ users: usersData });
+    // Cargar la lista de usuarios existentes
+    const userTableBody = document.getElementById('user-management-table-body');
+    const { data: usersData, error: usersError } = await supabaseClient.from('users').select('*');
+
+    if (usersError) {
+        userTableBody.innerHTML = `<tr><td colspan="5" class="px-6 py-4 text-center text-red-500">Error cargando usuarios: ${usersError.message}</td></tr>`;
+        return;
     }
+    if (!usersData || usersData.length === 0) {
+        userTableBody.innerHTML = `<tr><td colspan="5" class="px-6 py-4 text-center text-secondary">No hay usuarios registrados.</td></tr>`;
+        return;
+    }
+
+    const templateSource = document.getElementById('user-management-row-template').innerHTML;
+    const template = Handlebars.compile(templateSource);
+    userTableBody.innerHTML = template({ users: usersData });
+}
 
 
     /**
-     * Renderiza el formulario para generar Foto Carnet.
-     */
-    function renderFotoCarnetForm() {
-        if (!mainTitleElement || !contentAreaElement) return;
+ * [VERSIÓN FINAL SIN NITIDEZ] Renderiza el formulario para generar Foto Carnet.
+ */
+function renderFotoCarnetForm() {
+    if (!mainTitleElement || !contentAreaElement) return;
 
-        if (cropperInstance) {
-            try { cropperInstance.destroy(); } catch (e) { console.warn("Error al destruir Cropper:", e); }
-            cropperInstance = null;
-        }
-        fc_currentAdjustments = { brightness: 0, contrast: 1, sharpness: 0, temperature: 0 };
-
-        mainTitleElement.innerText = 'Generar Foto Carnet';
-        const inputBaseClasses = "form-input-base";
-        contentAreaElement.innerHTML = `
-            <div class="bg-secondary p-4 sm:p-6 rounded-lg shadow-md">
-                <div class="form-section pt-0 border-t-0">
-                    <h2 class="text-lg sm:text-xl font-semibold mb-4 text-primary">1. Sube y Ajusta tu Foto</h2>
-                    <div class="mb-4 button-group">
-                        <input type="file" id="image-upload" class="hidden-file-input" accept="image/*">
-                        <label for="image-upload" class="file-input-label">
-                            <i class="fas fa-upload"></i> <span>Seleccionar Foto</span>
-                        </label>
-                    </div>
-                    <div class="cropper-container-wrapper mb-4 bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
-                         <img id="cropper-image" src="" alt=" Sube una imagen para empezar.">
-                    </div>
-                </div>
-
-                <div class="form-section">
-                    <h2 class="text-lg sm:text-xl font-semibold mb-4 text-primary">2. Ingresa tus Datos</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                        <div>
-                            <label for="foto-nombres" class="block text-sm font-medium text-secondary mb-1">Nombres:</label>
-                            <input type="text" id="foto-nombres" class="${inputBaseClasses}" required>
-                        </div>
-                        <div>
-                            <label for="foto-apellidos" class="block text-sm font-medium text-secondary mb-1">Apellidos:</label>
-                            <input type="text" id="foto-apellidos" class="${inputBaseClasses}" required>
-                        </div>
-                        <div>
-                            <label for="foto-rut" class="block text-sm font-medium text-secondary mb-1">Cédula de Identidad:</label>
-                            <input type="text" id="foto-rut" class="${inputBaseClasses}" placeholder="Ej: 12345678-K" required>
-                        </div>
-                    </div>
-                    <div class="mt-4">
-                         <button type="button" id="preview-foto-carnet-button" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50" disabled>
-                            <i class="fas fa-eye mr-2"></i>Previsualizar
-                        </button>
-                    </div>
-                </div>
-
-                <div class="form-section">
-                    <h2 class="text-lg sm:text-xl font-semibold mb-4 text-primary">3. Previsualización y Ajustes</h2>
-                    <div class="result-canvas-container mb-6 max-w-xs">
-                        <canvas id="result-canvas"></canvas>
-                        <p id="canvas-placeholder" class="text-secondary">Aquí aparecerá la foto generada.</p>
-                    </div>
-
-                     <div class="foto-carnet-ajustes-container mb-6 max-w-md">
-                        <h3 class="text-md font-medium text-primary mb-3 text-left">Ajustes de Imagen</h3>
-                        <div class="foto-carnet-ajustes-grid grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div class="adjustment-control">
-                                <label for="fcBrightness" class="block text-sm font-medium text-primary">Brillo: <span id="fcBrightnessValue">0</span>%</label>
-                                <input type="range" id="fcBrightness" min="-50" max="50" value="0" class="slider">
-                            </div>
-                            <div class="adjustment-control">
-                                <label for="fcContrast" class="block text-sm font-medium text-primary">Contraste: <span id="fcContrastValue">100</span>%</label>
-                                <input type="range" id="fcContrast" min="50" max="150" value="100" class="slider">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="form-section text-left">
-                    <button type="button" id="save-foto-carnet-button" class="inline-flex items-center px-6 py-3 border border-transparent shadow-sm text-base font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50" disabled>
-                        <i class="fas fa-save mr-2"></i>Guardar Foto
-                    </button>
-                    <div id="foto-carnet-message" class="text-sm mt-2 min-h-[1.25rem]"></div>
-                </div>
-            </div>`;
-        loadScript('https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js', setupFotoCarnetListeners);
+    if (cropperInstance) {
+        try { cropperInstance.destroy(); } catch (e) { console.warn("Error al destruir Cropper:", e); }
+        cropperInstance = null;
     }
+    // Se elimina 'sharpness' del objeto de ajustes
+    fc_currentAdjustments = { brightness: 0, contrast: 1, temperature: 0 };
 
+    mainTitleElement.innerText = 'Generar Foto Carnet';
+    const inputBaseClasses = "form-input-base";
+    
+    // --- ESTE ES EL HTML DEFINITIVO SIN EL CAMPO "NITIDEZ" ---
+    contentAreaElement.innerHTML = `
+        <div class="bg-secondary p-4 sm:p-6 rounded-lg shadow-md">
+            <div class="form-section pt-0 border-t-0">
+                <h2 class="text-lg sm:text-xl font-semibold mb-4 text-primary">1. Sube y Ajusta tu Foto</h2>
+                <div class="mb-4 button-group">
+                    <input type="file" id="image-upload" class="hidden-file-input" accept="image/*">
+                    <label for="image-upload" class="file-input-label">
+                        <i class="fas fa-upload"></i> <span>Seleccionar Foto</span>
+                    </label>
+                </div>
+                <div class="cropper-container-wrapper mb-4 bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+                    <img id="cropper-image" src="" alt=" Sube una imagen para empezar.">
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2 class="text-lg sm:text-xl font-semibold mb-4 text-primary">2. Ingresa tus Datos</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <div>
+                        <label for="foto-nombres" class="block text-sm font-medium text-secondary mb-1">Nombres:</label>
+                        <input type="text" id="foto-nombres" class="${inputBaseClasses}">
+                    </div>
+                    <div>
+                        <label for="foto-apellidos" class="block text-sm font-medium text-secondary mb-1">Apellidos:</label>
+                        <input type="text" id="foto-apellidos" class="${inputBaseClasses}">
+                    </div>
+                    <div>
+                        <label for="foto-rut" class="block text-sm font-medium text-secondary mb-1">Cédula de Identidad:</label>
+                        <input type="text" id="foto-rut" class="${inputBaseClasses}" placeholder="Ej: 12345678-K">
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <button type="button" id="preview-foto-carnet-button" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50" disabled>
+                        <i class="fas fa-eye mr-2"></i>Previsualizar
+                    </button>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2 class="text-lg sm:text-xl font-semibold mb-4 text-primary">3. Previsualización y Ajustes</h2>
+                <div class="result-canvas-container mb-6 max-w-xs">
+                    <canvas id="result-canvas"></canvas>
+                    <p id="canvas-placeholder" class="text-secondary">Aquí aparecerá la foto generada.</p>
+                </div>
+
+                <div class="foto-carnet-ajustes-container mb-6 max-w-md">
+                    <h3 class="text-md font-medium text-primary mb-3 text-left">Ajustes de Imagen</h3>
+                    <div class="foto-carnet-ajustes-grid grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="adjustment-control">
+                            <label for="fcBrightness" class="block text-sm font-medium text-primary">Brillo: <span id="fcBrightnessValue">0</span>%</label>
+                            <input type="range" id="fcBrightness" min="-50" max="50" value="0" class="slider">
+                        </div>
+                        <div class="adjustment-control">
+                            <label for="fcContrast" class="block text-sm font-medium text-primary">Contraste: <span id="fcContrastValue">100</span>%</label>
+                            <input type="range" id="fcContrast" min="50" max="150" value="100" class="slider">
+                        </div>
+                        </div>
+                </div>
+            </div>
+            
+            <div class="form-section text-left">
+                <button type="button" id="save-foto-carnet-button" class="inline-flex items-center px-6 py-3 border border-transparent shadow-sm text-base font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50" disabled>
+                    <i class="fas fa-save mr-2"></i>Guardar Foto
+                </button>
+                <div id="foto-carnet-message" class="text-sm mt-2 min-h-[1.25rem]"></div>
+            </div>
+        </div>`;
+        
+    loadScript('https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js', setupFotoCarnetListeners);
+}
     /**
      * Renderiza el formulario para Cédula de Identidad.
      */
@@ -1880,86 +1860,89 @@ async function handlePoderSimpleSubmit(event) {
      * Maneja el envío del formulario para agregar o editar usuarios.
      */
     async function handleAddUserSubmit(event) {
-        event.preventDefault();
-        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-        if (!currentUser || currentUser.role !== 'admin') {
-            showTemporaryMessage('add-user-error', 'Acceso no autorizado para esta acción.', true);
-            return;
-        }
+    event.preventDefault();
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    if (!currentUser || currentUser.role !== 'admin') {
+        showTemporaryMessage('add-user-error', 'Acceso no autorizado para esta acción.', true);
+        return;
+    }
 
-        const nombre_completo = document.getElementById('new-fullname').value.trim();
-        const username_rut = document.getElementById('new-username').value.trim(); // RUT
-        const password = document.getElementById('new-password').value;
-        const role_public_users = document.getElementById('new-role').value; // Rol para public.users
-        const errorDivId = 'add-user-error';
-        const editPublicUserId = document.getElementById('edit-user-id').value;
+    // Obtener valores del formulario
+    const nombre_completo = document.getElementById('new-fullname').value.trim();
+    const username_rut = document.getElementById('new-username').value.trim().toUpperCase();
+    const password = document.getElementById('new-password').value;
+    const role = document.getElementById('new-role').value;
+    const editUserId = document.getElementById('edit-user-id').value;
+    const errorDivId = 'add-user-error';
 
-        showTemporaryMessage(errorDivId, '', false, 0); // Limpiar mensajes previos
+    // Validaciones básicas
+    if (!nombre_completo || !username_rut || !role) {
+        showTemporaryMessage(errorDivId, 'Nombre Completo, Usuario (RUT) y Rol son requeridos.', true);
+        return;
+    }
 
-        if (!nombre_completo || !username_rut || !role_public_users) {
-            showTemporaryMessage(errorDivId, 'Nombre Completo, Usuario (RUT) y Rol son requeridos.', true);
-            return;
-        }
+    // Validar formato del RUT (ej: 12345678-K o 12.345.678-K)
+    const rutRegex = /^(\d{1,3}(?:\.?\d{3}){2}-[\dkK])$/;
+    if (!rutRegex.test(username_rut)) {
+        showTemporaryMessage(errorDivId, 'Formato de RUT inválido. Use 12345678-K o 12.345.678-K', true);
+        return;
+    }
 
-        let password_hash = null;
-        if (password) {
-            const encoder = new TextEncoder();
-            const data = encoder.encode(password);
-            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-            password_hash = Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
-        }
+    // Preparar datos para Supabase
+    const userData = {
+        nombre_completo: nombre_completo,
+        username: username_rut,
+        role: role
+    };
 
-        if (editPublicUserId) { // MODO EDICIÓN
-            const publicUserUpdateData = {
-                nombre_completo: nombre_completo,
-                username: username_rut,
-                role: role_public_users,
-            };
-             if (password_hash) { // Solo actualizar hash si se proveyó una nueva contraseña
-                publicUserUpdateData.password_hash = password_hash;
-            }
+    // Solo agregar/actualizar contraseña si se proporcionó una nueva
+    if (password) {
+        userData.password_hash = sha256(password);
+    }
 
-            const { error: updatePublicUserError } = await supabaseClient
+    try {
+        if (editUserId) {
+            // MODE EDITAR USUARIO
+            const { error } = await supabaseClient
                 .from('users')
-                .update(publicUserUpdateData)
-                .eq('id', editPublicUserId);
+                .update(userData)
+                .eq('id', editUserId);
 
-            if (updatePublicUserError) {
-                console.error("Error al actualizar usuario en public.users:", updatePublicUserError);
-                showTemporaryMessage(errorDivId, 'Error al actualizar datos: ' + updatePublicUserError.message, true);
-            } else {
-                showTemporaryMessage(errorDivId, 'Usuario actualizado exitosamente.', false);
-                setTimeout(() => renderUserManagementForm(), 1500);
-            }
-        } else { // MODO AGREGAR NUEVO USUARIO
-            if (!password_hash) { // La contraseña es obligatoria para nuevos usuarios
-                showTemporaryMessage(errorDivId, 'La clave es requerida para nuevos usuarios.', true);
+            if (error) throw error;
+            
+            showTemporaryMessage(errorDivId, 'Usuario actualizado exitosamente.', false);
+        } else {
+            // MODE AGREGAR NUEVO USUARIO
+            if (!password) {
+                showTemporaryMessage(errorDivId, 'La contraseña es requerida para nuevos usuarios.', true);
                 return;
             }
 
-            const { error: insertPublicUserError } = await supabaseClient
-                .from('users') // Tabla public.users
-                .insert([{
-                    username: username_rut, // RUT como username
-                    password_hash: password_hash, // Hash de la contraseña
-                    nombre_completo: nombre_completo,
-                    role: role_public_users
-                }]);
+            const { error } = await supabaseClient
+                .from('users')
+                .insert([userData]);
 
-            if (insertPublicUserError) {
-                console.error("Error al registrar usuario en public.users:", insertPublicUserError);
-                 if (insertPublicUserError.message.includes('duplicate key value violates unique constraint')) {
-                      showTemporaryMessage(errorDivId, 'Error: El usuario (RUT) ya existe.', true);
-                 } else {
-                    showTemporaryMessage(errorDivId, 'Error al registrar usuario: ' + insertPublicUserError.message, true);
-                 }
-            } else {
-                showTemporaryMessage(errorDivId, 'Usuario registrado exitosamente.', false);
-                setTimeout(() => renderUserManagementForm(), 1500);
+            if (error) {
+                if (error.code === '23505') { // Violación de unique constraint
+                    showTemporaryMessage(errorDivId, 'Error: El RUT ya está registrado.', true);
+                } else {
+                    throw error;
+                }
+                return;
             }
+            
+            showTemporaryMessage(errorDivId, 'Usuario registrado exitosamente.', false);
         }
-    }
 
+        // Limpiar formulario y recargar lista después de 1.5 segundos
+        resetUserForm();
+        setTimeout(() => renderUserManagementForm(), 1500);
+
+    } catch (error) {
+        console.error('Error en handleAddUserSubmit:', error);
+        showTemporaryMessage(errorDivId, `Error: ${error.message || 'No se pudo completar la operación'}`, true);
+    }
+}
     /**
      * Rellena el formulario de usuario para edición.
      */
@@ -2015,68 +1998,63 @@ async function handlePoderSimpleSubmit(event) {
     // =================================================================================
 
     function setupFotoCarnetListeners() {
-        if (typeof Cropper === 'undefined') {
-            console.error("Cropper no está definido. La funcionalidad de recorte de imagen no estará disponible.");
-            const cropperContainer = document.querySelector('.cropper-container-wrapper');
-            if (cropperContainer) {
-                cropperContainer.innerHTML = '<p class="text-red-600 font-bold text-center p-4">Error: La herramienta de recorte de imagen no pudo cargarse. Intente recargar la página.</p>';
-            }
-            const previewButton = document.getElementById('preview-foto-carnet-button');
-            if (previewButton) previewButton.disabled = true;
-            const saveButton = document.getElementById('save-foto-carnet-button');
-            if (saveButton) saveButton.disabled = true;
-            return;
+    if (typeof Cropper === 'undefined') {
+        console.error("Cropper no está definido. La funcionalidad de recorte de imagen no estará disponible.");
+        const cropperContainer = document.querySelector('.cropper-container-wrapper');
+        if (cropperContainer) {
+            cropperContainer.innerHTML = '<p class="text-red-600 font-bold text-center p-4">Error: La herramienta de recorte de imagen no pudo cargarse. Intente recargar la página.</p>';
         }
-        const imageUpload = document.getElementById('image-upload');
         const previewButton = document.getElementById('preview-foto-carnet-button');
+        if (previewButton) previewButton.disabled = true;
         const saveButton = document.getElementById('save-foto-carnet-button');
-        const rutInput = document.getElementById('foto-rut');
-        const textInputs = ['foto-nombres', 'foto-apellidos', 'foto-rut'];
+        if (saveButton) saveButton.disabled = true;
+        return;
+    }
+    const imageUpload = document.getElementById('image-upload');
+    const previewButton = document.getElementById('preview-foto-carnet-button');
+    const saveButton = document.getElementById('save-foto-carnet-button');
+    const rutInput = document.getElementById('foto-rut');
+    const textInputs = ['foto-nombres', 'foto-apellidos', 'foto-rut'];
 
-        if (imageUpload) imageUpload.addEventListener('change', handleImageUploadWithCropper);
-        if (previewButton) previewButton.addEventListener('click', () => generateFotoCarnetWithCropper(true)); // true para preview
-        if (saveButton) saveButton.addEventListener('click', () => generateFotoCarnetWithCropper(false)); // false para guardar
+    if (imageUpload) imageUpload.addEventListener('change', handleImageUploadWithCropper);
+    if (previewButton) previewButton.addEventListener('click', () => generateFotoCarnetWithCropper(true));
+    if (saveButton) saveButton.addEventListener('click', () => generateFotoCarnetWithCropper(false));
 
-        if (rutInput) {
-            rutInput.addEventListener('input', () => {
-                formatRut(rutInput);
+    if (rutInput) {
+        rutInput.addEventListener('input', () => {
+            formatRut(rutInput);
+            checkEnableFotoCarnetButtons();
+        });
+    }
+    textInputs.forEach(id => {
+        const input = document.getElementById(id);
+        if (input) {
+            input.addEventListener('input', (e) => {
+                if (id !== 'foto-rut') e.target.value = e.target.value.toUpperCase();
                 checkEnableFotoCarnetButtons();
             });
         }
-        textInputs.forEach(id => {
-            const input = document.getElementById(id);
-            if (input) {
-                input.addEventListener('input', (e) => {
-                    if (id !== 'foto-rut') e.target.value = e.target.value.toUpperCase();
-                    checkEnableFotoCarnetButtons();
-                });
-            }
-        });
+    });
 
-        // Event listeners para los controles de ajuste de imagen de Foto Carnet
-        document.getElementById('fcBrightness')?.addEventListener('input', (e) => {
-            fc_currentAdjustments.brightness = parseInt(e.target.value);
-            document.getElementById('fcBrightnessValue').textContent = e.target.value;
-            if (cropperInstance && cropperInstance.canvasData) { // Solo regenerar si hay una imagen cargada y recortada
-                 generateFotoCarnetWithCropper(true); // Actualizar preview
-            }
-        });
-        document.getElementById('fcContrast')?.addEventListener('input', (e) => {
-            fc_currentAdjustments.contrast = parseInt(e.target.value) / 100;
-            document.getElementById('fcContrastValue').textContent = e.target.value;
-            if (cropperInstance && cropperInstance.canvasData) {
-                 generateFotoCarnetWithCropper(true);
-            }
-        });
-        document.getElementById('fcSharpness')?.addEventListener('input', (e) => {
-            fc_currentAdjustments.sharpness = parseInt(e.target.value);
-            document.getElementById('fcSharpnessValue').textContent = e.target.value;
-            if (cropperInstance && cropperInstance.canvasData) {
-                 generateFotoCarnetWithCropper(true);
-            }
-        });
-        checkEnableFotoCarnetButtons(); // Estado inicial de los botones
-    }
+    // Event listeners para los controles de ajuste de imagen (SIN NITIDEZ)
+    document.getElementById('fcBrightness')?.addEventListener('input', (e) => {
+        fc_currentAdjustments.brightness = parseInt(e.target.value);
+        document.getElementById('fcBrightnessValue').textContent = e.target.value;
+        if (cropperInstance && cropperInstance.canvasData) {
+            generateFotoCarnetWithCropper(true);
+        }
+    });
+    document.getElementById('fcContrast')?.addEventListener('input', (e) => {
+        fc_currentAdjustments.contrast = parseInt(e.target.value) / 100;
+        document.getElementById('fcContrastValue').textContent = e.target.value;
+        if (cropperInstance && cropperInstance.canvasData) {
+            generateFotoCarnetWithCropper(true);
+        }
+    });
+    // Se eliminó el addEventListener para fcSharpness
+    
+    checkEnableFotoCarnetButtons();
+}
 
     function checkEnableFotoCarnetButtons() {
         const previewButton = document.getElementById('preview-foto-carnet-button');
@@ -2098,142 +2076,104 @@ async function handlePoderSimpleSubmit(event) {
     }
 
     function handleImageUploadWithCropper(event) {
-        const file = event.target.files[0];
-        const imageElement = document.getElementById('cropper-image');
-        const resultCanvas = document.getElementById('result-canvas');
-        const canvasPlaceholder = document.getElementById('canvas-placeholder');
+    const file = event.target.files[0];
+    const imageElement = document.getElementById('cropper-image');
+    const resultCanvas = document.getElementById('result-canvas');
+    const canvasPlaceholder = document.getElementById('canvas-placeholder');
 
-        if (cropperInstance) {
-            try { cropperInstance.destroy(); } catch(e) { console.warn("Error al destruir Cropper:", e); }
-            cropperInstance = null;
-        }
-        if (resultCanvas) { // Limpiar canvas de resultado previo
-            const ctx = resultCanvas.getContext('2d');
-            ctx.clearRect(0, 0, resultCanvas.width, resultCanvas.height);
-            resultCanvas.style.display = 'none';
-            if(canvasPlaceholder) canvasPlaceholder.style.display = 'block';
-        }
-
-        // Resetear sliders y valores de ajuste de Foto Carnet
-        document.getElementById('fcBrightness').value = 0;
-        document.getElementById('fcContrast').value = 100;
-        document.getElementById('fcSharpness').value = 0;
-        fc_currentAdjustments = { brightness: 0, contrast: 1, sharpness: 0, temperature: 0 };
-        document.getElementById('fcBrightnessValue').textContent = '0';
-        document.getElementById('fcContrastValue').textContent = '100';
-        document.getElementById('fcSharpnessValue').textContent = '0';
-
-        checkEnableFotoCarnetButtons(); // Actualizar estado de botones
-
-        if (file && file.type.startsWith('image/')) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                imageElement.src = e.target.result;
-                imageElement.alt = "[Imagen del] Imagen cargada para recortar";
-                if (typeof Cropper === 'undefined') {
-                    const errorDiv = document.querySelector('.cropper-container-wrapper') || contentAreaElement;
-                    if (errorDiv) errorDiv.innerHTML = '<p class="text-red-500 text-center font-bold p-2">Error: La librería de recorte no se cargó. Intente recargar.</p>';
-                    return;
-                }
-                try {
-                    cropperInstance = new Cropper(imageElement, {
-                        aspectRatio: 3 / 4, // Proporción típica para foto carnet
-                        viewMode: 1,        // Restringir el área de recorte al canvas
-                        dragMode: 'move',   // Mover la imagen, no el recorte
-                        autoCropArea: 0.9,  // Área inicial del recorte
-                        background: false,  // Sin fondo de grid en el cropper
-                        zoomable: true,
-                        movable: true,
-                        cropBoxResizable: true,
-                        ready: () => {
-                            checkEnableFotoCarnetButtons();
-                            generateFotoCarnetWithCropper(true); // Generar preview inicial
-                        },
-                        crop: () => { // Se dispara continuamente al recortar
-                            generateFotoCarnetWithCropper(true); // Actualizar preview dinámicamente
-                            checkEnableFotoCarnetButtons();
-                        }
-                    });
-                } catch (error) {
-                    const errorDiv = document.querySelector('.cropper-container-wrapper') || contentAreaElement;
-                    if (errorDiv) errorDiv.innerHTML = `<p class="text-red-500 text-center font-bold p-2">Error al inicializar recorte: ${error.message}</p>`;
-                    imageElement.src = ""; imageElement.alt = "[Imagen del] Error al cargar imagen.";
-                }
-            };
-            reader.readAsDataURL(file);
-        } else {
-            imageElement.src = ""; // Limpiar si no es imagen
-            imageElement.alt = " Sube una imagen para empezar.";
-            if(file) { // Si se seleccionó un archivo pero no es imagen
-                 const errorDiv = document.querySelector('.cropper-container-wrapper') || contentAreaElement;
-                 if (errorDiv) errorDiv.insertAdjacentHTML('afterbegin', '<p class="text-yellow-500 text-center font-bold p-2">Por favor, selecciona un archivo de imagen válido (ej: JPG, PNG).</p>');
-            }
-            checkEnableFotoCarnetButtons();
-        }
+    if (cropperInstance) {
+        try { cropperInstance.destroy(); } catch(e) { console.warn("Error al destruir Cropper:", e); }
+        cropperInstance = null;
     }
+    if (resultCanvas) {
+        const ctx = resultCanvas.getContext('2d');
+        ctx.clearRect(0, 0, resultCanvas.width, resultCanvas.height);
+        resultCanvas.style.display = 'none';
+        if(canvasPlaceholder) canvasPlaceholder.style.display = 'block';
+    }
+
+    // Resetear sliders y valores de ajuste de Foto Carnet (SIN NITIDEZ)
+    document.getElementById('fcBrightness').value = 0;
+    document.getElementById('fcContrast').value = 100;
+    // Se eliminó la línea de fcSharpness que causaba el error
+    
+    fc_currentAdjustments = { brightness: 0, contrast: 1, temperature: 0 }; // Objeto actualizado sin sharpness
+    document.getElementById('fcBrightnessValue').textContent = '0';
+    document.getElementById('fcContrastValue').textContent = '100';
+    // Se eliminó la línea de fcSharpnessValue
+    
+    checkEnableFotoCarnetButtons();
+
+    if (file && file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            imageElement.src = e.target.result;
+            imageElement.alt = "Imagen cargada para recortar";
+            if (typeof Cropper === 'undefined') {
+                const errorDiv = document.querySelector('.cropper-container-wrapper') || contentAreaElement;
+                if (errorDiv) errorDiv.innerHTML = '<p class="text-red-500 text-center font-bold p-2">Error: La librería de recorte no se cargó. Intente recargar.</p>';
+                return;
+            }
+            try {
+                cropperInstance = new Cropper(imageElement, {
+                    aspectRatio: 3 / 4,
+                    viewMode: 1,
+                    dragMode: 'move',
+                    autoCropArea: 0.9,
+                    background: false,
+                    zoomable: true,
+                    movable: true,
+                    cropBoxResizable: true,
+                    ready: () => {
+                        checkEnableFotoCarnetButtons();
+                        generateFotoCarnetWithCropper(true);
+                    },
+                    crop: () => {
+                        generateFotoCarnetWithCropper(true);
+                        checkEnableFotoCarnetButtons();
+                    }
+                });
+            } catch (error) {
+                const errorDiv = document.querySelector('.cropper-container-wrapper') || contentAreaElement;
+                if (errorDiv) errorDiv.innerHTML = `<p class="text-red-500 text-center font-bold p-2">Error al inicializar recorte: ${error.message}</p>`;
+                imageElement.src = ""; imageElement.alt = "Error al cargar imagen.";
+            }
+        };
+        reader.readAsDataURL(file);
+    } else {
+        imageElement.src = "";
+        imageElement.alt = "Sube una imagen para empezar.";
+        if(file) {
+            const errorDiv = document.querySelector('.cropper-container-wrapper') || contentAreaElement;
+            if (errorDiv) errorDiv.insertAdjacentHTML('afterbegin', '<p class="text-yellow-500 text-center font-bold p-2">Por favor, selecciona un archivo de imagen válido (ej: JPG, PNG).</p>');
+        }
+        checkEnableFotoCarnetButtons();
+    }
+}
 
     function fc_applyImageAdjustments(imageData) {
-        if (!imageData) return;
-        const pixels = imageData.data;
-        const brightness = fc_currentAdjustments.brightness;
-        const contrast = fc_currentAdjustments.contrast; // Ya está en formato decimal (ej. 1.0 para 100%)
+    if (!imageData) return;
+    const pixels = imageData.data;
+    const brightness = fc_currentAdjustments.brightness;
+    const contrast = fc_currentAdjustments.contrast;
 
-        for (let i = 0; i < pixels.length; i += 4) {
-            let r = pixels[i], g = pixels[i+1], b = pixels[i+2];
-            // Aplicar contraste
-            r = (r - 128) * contrast + 128;
-            g = (g - 128) * contrast + 128;
-            b = (b - 128) * contrast + 128;
-            // Aplicar brillo
-            r += brightness;
-            g += brightness;
-            b += brightness;
-            // Asegurar que los valores estén en el rango [0, 255]
-            pixels[i]   = Math.min(255, Math.max(0, r));
-            pixels[i+1] = Math.min(255, Math.max(0, g));
-            pixels[i+2] = Math.min(255, Math.max(0, b));
-        }
-        if (fc_currentAdjustments.sharpness > 0) {
-            fc_applySharpness(imageData);
-        }
+    for (let i = 0; i < pixels.length; i += 4) {
+        let r = pixels[i], g = pixels[i+1], b = pixels[i+2];
+        // Aplicar contraste
+        r = (r - 128) * contrast + 128;
+        g = (g - 128) * contrast + 128;
+        b = (b - 128) * contrast + 128;
+        // Aplicar brillo
+        r += brightness;
+        g += brightness;
+        b += brightness;
+        // Asegurar que los valores estén en el rango [0, 255]
+        pixels[i]   = Math.min(255, Math.max(0, r));
+        pixels[i+1] = Math.min(255, Math.max(0, g));
+        pixels[i+2] = Math.min(255, Math.max(0, b));
     }
 
-    function fc_applySharpness(imageData) {
-        const sharpnessFactor = fc_currentAdjustments.sharpness / 100; // Convertir porcentaje a factor
-        if (sharpnessFactor <= 0) return;
-
-        // Kernel de nitidez simple (Laplaciano modificado)
-        const center = 1 + 4 * sharpnessFactor;
-        const surround = -0.5 * sharpnessFactor;
-
-        const kernel = [
-            surround, surround, surround,
-            surround, center,   surround,
-            surround, surround, surround
-        ];
-
-        const pixels = imageData.data;
-        const width = imageData.width;
-        const height = imageData.height;
-        const tempData = new Uint8ClampedArray(pixels); // Copia para leer valores originales
-
-        for (let y = 1; y < height - 1; y++) { // Evitar bordes
-            for (let x = 1; x < width - 1; x++) {
-                for (let c = 0; c < 3; c++) { // Para R, G, B (ignorar Alpha)
-                    let sum = 0;
-                    let ki = 0; // Índice del kernel
-                    for (let ky = -1; ky <= 1; ky++) {
-                        for (let kx = -1; kx <= 1; kx++) {
-                            const idx = ((y + ky) * width + (x + kx)) * 4 + c;
-                            sum += tempData[idx] * kernel[ki++];
-                        }
-                    }
-                    const idxCurrent = (y * width + x) * 4 + c;
-                    pixels[idxCurrent] = Math.min(255, Math.max(0, sum));
-                }
-            }
-        }
-    }
+}
 
     async function generateFotoCarnetWithCropper(isPreview = false) {
         if (!cropperInstance || typeof cropperInstance.getCroppedCanvas !== 'function') {
