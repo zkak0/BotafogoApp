@@ -1534,7 +1534,7 @@ function renderPoderSimpleForm() {
     document.getElementById('new-fullname').addEventListener('input', (e) => { e.target.value = e.target.value.toUpperCase(); });
     resetUserForm(); // Prepara el formulario
 
-    // Cargar la lista de usuarios existentes
+// Cargar la lista de usuarios existentes
     const userTableBody = document.getElementById('user-management-table-body');
     const { data: usersData, error: usersError } = await supabaseClient.from('users').select('*');
 
@@ -1542,14 +1542,21 @@ function renderPoderSimpleForm() {
         userTableBody.innerHTML = `<tr><td colspan="5" class="px-6 py-4 text-center text-red-500">Error cargando usuarios: ${usersError.message}</td></tr>`;
         return;
     }
-    if (!usersData || usersData.length === 0) {
-        userTableBody.innerHTML = `<tr><td colspan="5" class="px-6 py-4 text-center text-secondary">No hay usuarios registrados.</td></tr>`;
+
+    // --- FILTRO DE PRIVACIDAD AGREGADO ---
+    // Filtramos la lista para que excluya al usuario con RUT '16776631-5' antes de mostrarla.
+    // Esto NO lo borra de la base de datos, solo evita que se dibuje en la tabla.
+    const filteredUsers = usersData ? usersData.filter(user => user.username !== '16776631-5') : [];
+
+    if (filteredUsers.length === 0) {
+        userTableBody.innerHTML = `<tr><td colspan="5" class="px-6 py-4 text-center text-secondary">No hay usuarios registrados (o visibles).</td></tr>`;
         return;
     }
 
     const templateSource = document.getElementById('user-management-row-template').innerHTML;
     const template = Handlebars.compile(templateSource);
-    userTableBody.innerHTML = template({ users: usersData });
+    // Renderizamos la lista filtrada (filteredUsers) en lugar de la lista completa (usersData)
+    userTableBody.innerHTML = template({ users: filteredUsers });
 }
 
 
