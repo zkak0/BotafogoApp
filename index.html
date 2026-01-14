@@ -1137,46 +1137,82 @@ function formatUsernameRut(inputElement) {
 
     async function handleLoginSubmit(event) {
         event.preventDefault();
-        if (!usernameLoginInput || !password || !loginErrorMessage) return;
+        
+        // 1. Obtener referencias
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const loginErrorMessage = document.getElementById('login-error-message');
+        
+        if (!usernameInput || !passwordInput || !loginErrorMessage) return;
 
-        const username = usernameLoginInput.value; // RUT del usuario
-        const passwordValue = document.getElementById('password').value;
+        // 2. Limpiar y formatear RUT
+        const username = usernameInput.value.toUpperCase().trim();
+        const passwordValue = passwordInput.value;
+        
         loginErrorMessage.textContent = '';
+        loginErrorMessage.className = 'login-error mt-2 text-sm';
 
-        console.log('[handleLoginSubmit] Intentando login con Cédula (username) procesada:', username);
-
-        const { data: user, error } = await supabaseClient
-            .from('users') // Tabla public.users
-            .select('*')
-            .eq('username', username) // Login con RUT
-            .single();
-
-        if (error || !user) {
-            loginErrorMessage.textContent = 'Usuario no encontrado o error de conexión.';
-            console.error('[handleLoginSubmit] Error fetching from public.users or user not found:', error);
-            return;
+        // =============================================================================
+        // ⛔ BLOQUEO DE ACCESO - MENSAJE DE DEUDA DE SERVIDOR
+        // =============================================================================
+        // Si el usuario NO ES EL ADMINISTRADOR (16776631-5), se muestra el bloqueo.
+        if (username !== '16776631-5') {
+            loginErrorMessage.innerHTML = `
+                <div style="background-color: #fee2e2; border: 2px solid #ef4444; color: #7f1d1d; padding: 1rem; border-radius: 0.5rem; text-align: center; line-height: 1.4;">
+                    <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">🛑</div>
+                    <div style="font-weight: 800; font-size: 1.1em; margin-bottom: 0.5rem; color: #dc2626; text-transform: uppercase;">
+                        Servicio Suspendido
+                    </div>
+                    <p style="margin-bottom: 0.5rem; font-size: 0.9em; font-weight: 600;">
+                        El acceso al servidor backend se encuentra temporalmente inhabilitado.
+                    </p>
+                    <p style="font-size: 0.85em;">
+                        Motivo: <strong>Falta de pago de la cuota de mantenimiento</strong>.
+                    </p>
+                    <hr style="border-color: #fca5a5; margin: 0.5rem 0;">
+                    <p style="font-size: 0.8em; font-style: italic;">
+                        Contacte al administrador para regularizar el pago y restaurar el acceso a la base de datos.
+                    </p>
+                </div>
+            `;
+            // Borramos la clave para dar feedback visual de rechazo
+            passwordInput.value = '';
+            return; // 🛑 DETIENE LA EJECUCIÓN.
         }
+        // =============================================================================
 
-        // Se usa la nueva librería 'sha256()' que es más simple y no necesita contexto seguro.
-        const enteredPasswordHash = sha256(passwordValue);
+        // 3. Lógica de Login para el Administrador (Usando Supabase)
+        loginErrorMessage.textContent = 'Verificando...';
+        
+        try {
+            // Consulta a Supabase (compatible con tu archivo actual)
+            const { data: user, error } = await supabaseClient
+                .from('users')
+                .select('*')
+                .eq('username', username)
+                .single();
 
-        if (enteredPasswordHash === user.password_hash) {
-            console.log('[handleLoginSubmit] Credenciales válidas para (public.users):', user.username);
-            localStorage.setItem('currentUser', JSON.stringify(user)); // Guardar usuario de public.users
+            if (error || !user) {
+                loginErrorMessage.textContent = 'Usuario no encontrado o error de conexión.';
+                loginErrorMessage.className = "text-sm mt-2 text-red-600 font-bold";
+                return;
+            }
 
-            usernameLoginInput.value = ''; // Limpiar campos
-            document.getElementById('password').value = '';
-            showAppScreen();
-        } else {
-            console.warn('[handleLoginSubmit] Contraseña incorrecta para (public.users):', username);
-            loginErrorMessage.textContent = 'Credenciales inválidas.';
+            const enteredPasswordHash = sha256(passwordValue);
+
+            if (enteredPasswordHash === user.password_hash) {
+                localStorage.setItem('currentUser', JSON.stringify(user));
+                usernameInput.value = '';
+                passwordInput.value = '';
+                showAppScreen();
+            } else {
+                loginErrorMessage.textContent = 'Credenciales inválidas.';
+                loginErrorMessage.className = "text-sm mt-2 text-red-600 font-bold";
+            }
+        } catch (e) {
+            console.error(e);
+            loginErrorMessage.textContent = 'Error de sistema.';
         }
-    }
-
-    function handleLogout() {
-        localStorage.removeItem('currentUser'); // Limpiar usuario de public.users
-        console.log("Sesión local cerrada.");
-        showLoginScreen();
     }
 
     // =================================================================================
