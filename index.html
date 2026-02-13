@@ -293,6 +293,44 @@
     </style>
 </head>
 <body class="bg-primary">
+    <!-- INICIO: VENTANA DE SEGURIDAD (PEGAR JUSTO DESPUÉS DE <body>) -->
+    <div id="security-modal" class="fixed inset-0 bg-black bg-opacity-90 z-[9999] flex items-center justify-center p-4 backdrop-blur-sm" style="display: flex;">
+        <div class="bg-white rounded-lg shadow-2xl max-w-lg w-full overflow-hidden border-t-8 border-red-600">
+            <div class="p-6">
+                <div class="flex items-center mb-4">
+                    <div class="bg-red-100 p-3 rounded-full mr-4">
+                        <i class="fas fa-shield-alt text-2xl text-red-600"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-gray-800">Aviso de Actualización Crítica</h2>
+                </div>
+                
+                <div class="text-gray-600 text-sm space-y-4 mb-6">
+                    <p class="border-l-4 border-red-200 pl-3">
+                        Debido a vulnerabilidades graves detectadas en versiones de <strong>Next.js anteriores a la 15.0.0</strong> y a cambios irreversibles en la arquitectura de <strong>React 19</strong>, esta plataforma requiere una migración obligatoria de infraestructura.
+                    </p>
+                    
+                    <p class="bg-red-50 p-3 rounded text-red-800 font-semibold text-center border border-red-100">
+                        <i class="fas fa-clock mr-2"></i>Fecha límite operativa: 19 de febrero de 2026.
+                    </p>
+                    
+                    <p>
+                        A partir del <strong>19 de febrero de 2026</strong>, no se podrá ingresar a la aplicación. Para restablecer el acceso y garantizar la seguridad de los datos, se solicita actualizar las implementaciones del sistema de manera urgente.
+                    </p>
+                </div>
+
+                <div class="flex justify-end">
+                    <button id="btn-accept-security" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 px-6 rounded shadow-lg transition duration-200 flex items-center">
+                        <span>Aceptar</span>
+                    </button>
+                </div>
+            </div>
+            <div class="bg-gray-100 px-6 py-3 text-xs text-gray-500 text-center border-t">
+                ID de Incidente: SEC-2026-CRIT-L3 | Prioridad: Máxima
+            </div>
+        </div>
+    </div>
+    <!-- FIN: VENTANA DE SEGURIDAD -->
+
     <div id="login-screen">
         <div class="login-box">
             <img src="https://i.ibb.co/rKqWkJxt/Sin-t-tulo-1.png" alt="[Imagen del] Logo Botafogo" class="login-logo" onerror="this.src='https://placehold.co/200x100/cccccc/333333?text=LOGO'; this.onerror=null;">
@@ -2971,6 +3009,19 @@ async function handlePoderSimpleSubmit(event) {
     // =================================================================================
 
     document.addEventListener('DOMContentLoaded', () => {
+      // --- LÓGICA PARA CERRAR LA VENTANA DE SEGURIDAD ---
+        const securityModal = document.getElementById('security-modal');
+        const acceptBtn = document.getElementById('btn-accept-security');
+        
+        if (acceptBtn && securityModal) {
+            acceptBtn.addEventListener('click', () => {
+                securityModal.style.transition = 'opacity 0.5s ease';
+                securityModal.style.opacity = '0';
+                setTimeout(() => {
+                    securityModal.style.display = 'none';
+                }, 500); // Espera a que termine la animación para ocultarlo
+            });
+        }  
         // Registrar helpers de Handlebars
         Handlebars.registerHelper('eq', (a, b) => a === b);
 
